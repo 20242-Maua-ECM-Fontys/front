@@ -1,39 +1,7 @@
-/* import font files */
-@font-face {
-    font-family: 'Uber Move Text';
-    src: url('src/assets/fonts/UberMoveTextRegular.otf') format('otf');
-    font-weight: normal;
-    font-style: normal;
-}
-
-@font-face {
-    font-family: 'Uber Move Text';
-    src: url('src/assets/fonts/UberMoveTextBold.otf') format('otf');
-    font-weight: bold;
-    font-style: normal;
-}
-
-@font-face {
-    font-family: 'Uber Move Text';
-    src: url('src/assets/fonts/UberMoveTextMedium.otf') format('otf');
-    font-weight: 500;
-    font-style: normal;
-}
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-
-.font-uber-regular {
-    font-family: 'Uber Move Text Regular', serif;
-}
-
-.font-uber-bold {
-    font-family: 'Uber Move Text Bold', serif;
-}
-
-/*
+/* 
 @layer base {
   :root {
     --background: 0 0% 100%;

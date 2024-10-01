@@ -13,24 +13,6 @@ export const createAppRouter = () =>
       },
     },
     {
-      path: '/login', // Add the authentication route here
-      lazy: async () => {
-        const { LoginRoute } = await import(
-          '@/app/routes/authentication/login'
-        );
-        return { Component: LoginRoute };
-      },
-    },
-    {
-      path: '/signup', // Add the authentication route here
-      lazy: async () => {
-        const { SignupRoute } = await import(
-          '@/app/routes/authentication/signup'
-        );
-        return { Component: SignupRoute };
-      },
-    },
-    {
       path: '/app',
       element: <AppRoot />,
       children: [],
