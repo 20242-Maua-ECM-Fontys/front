@@ -1,15 +1,17 @@
 import { useState } from 'react';
+import { Link, useSearchParams } from 'react-router-dom';
 
 import EyeIcon from '../../../assets/icons/EyeIcon.svg';
 import CirclesSvg from '../../../assets/images/Circles.svg';
-import logoImage from '../../../assets/images/MauaGrid-logo.svg';
 
-export const SignupRoute = () => {
+export const LoginForm = () => {
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
 
   const togglePasswordVisibility = () => {
     setIsPasswordVisible(!isPasswordVisible);
   };
+  const [searchParams] = useSearchParams();
+  const redirectTo = searchParams.get('redirectTo');
 
   return (
     <div className="relative flex min-h-screen items-center justify-center bg-[#004587]">
@@ -17,21 +19,16 @@ export const SignupRoute = () => {
       <div className="absolute inset-0 z-0">
         <img
           src={CirclesSvg}
-          className="absolute right-5 top-0 w-96"
+          className="absolute bottom-0 left-5 w-96 rotate-180"
           alt="Decorative circles"
         />
       </div>
 
-      <div className="font-uber-regular z-10 mb-20 text-center font-medium">
-        {/* Logo */}
-        <div className="mb-6">
-          <img src={logoImage} alt="MauaGrid Logo" className="mx-auto h-32" />
-        </div>
-
+      <div className="font-uber-regular  w-80 z-10  text-center font-medium">
         {/* Login Form */}
         <div className="mx-auto w-full max-w-md rounded-lg bg-white p-8 shadow-lg">
           <h2 className="font-uber-regular mb-6 text-2xl font-bold text-gray-900">
-            Create an Account
+            Log in to your account
           </h2>
 
           {/* Email Input */}
@@ -95,19 +92,19 @@ export const SignupRoute = () => {
               type="submit"
               className="w-full rounded-md bg-[#004587] px-4 py-2 text-white shadow hover:opacity-90"
             >
-              Create Account
+              Login now
             </button>
           </div>
 
           {/* Sign up Link */}
           <div className="mt-4 text-sm text-gray-600">
-            Already have an account ?{' '}
-            <a
-              href="/login"
-              className="font-bold text-blue-950 hover:underline"
+            Don&apos;t have an account?{' '}
+            <Link
+              to={`/signup${redirectTo ? `?redirectTo=${encodeURIComponent(redirectTo)}` : ''}`}
+              className="font-medium text-blue-600 hover:text-blue-500"
             >
-              Log In
-            </a>
+              Sign up
+            </Link>
           </div>
         </div>
       </div>

@@ -24,10 +24,10 @@ export const createAppRouter = () =>
     {
       path: '/signup', // Add the authentication route here
       lazy: async () => {
-        const { SignupRoute } = await import(
-          '@/app/routes/authentication/signup'
+        const { RegisterRoute } = await import(
+          '@/app/routes/authentication/register'
         );
-        return { Component: SignupRoute };
+        return { Component: RegisterRoute };
       },
     },
     {
