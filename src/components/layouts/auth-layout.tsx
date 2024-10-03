@@ -8,9 +8,9 @@ interface AuthLayoutProps {
 
 export const AuthLayout = ({ children }: AuthLayoutProps) => {
   return (
-    <div className="auth-layout relative flex items-center justify-center bg-[#004587]">
+    <div className="relative flex items-center justify-center bg-[#004587]">
       {/* Logo */}
-      <div className="z-20 absolute top-10">
+      <div className="absolute top-10 z-20">
         <img src={logoImage} alt="MauaGrid Logo" className="mx-auto h-32" />
       </div>
       {/* Auth Content */}

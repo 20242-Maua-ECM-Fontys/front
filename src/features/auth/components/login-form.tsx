@@ -24,7 +24,7 @@ export const LoginForm = () => {
         />
       </div>
 
-      <div className="font-uber-regular  w-80 z-10  text-center font-medium">
+      <div className="font-uber-regular  z-10 w-80  text-center font-medium">
         {/* Login Form */}
         <div className="mx-auto w-full max-w-md rounded-lg bg-white p-8 shadow-lg">
           <h2 className="font-uber-regular mb-6 text-2xl font-bold text-gray-900">

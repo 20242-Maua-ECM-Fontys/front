@@ -3,7 +3,6 @@ import { Link, useSearchParams } from 'react-router-dom';
 
 import EyeIcon from '../../../assets/icons/EyeIcon.svg';
 import CirclesSvg from '../../../assets/images/Circles.svg';
-import logoImage from '../../../assets/images/MauaGrid-logo.svg';
 
 export const RegisterForm = () => {
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
@@ -25,8 +24,7 @@ export const RegisterForm = () => {
         />
       </div>
 
-      <div className="font-uber-regular w-80 z-10 text-center font-medium">
-
+      <div className="font-uber-regular z-10 w-80 text-center font-medium">
         {/* Login Form */}
         <div className="mx-auto w-full max-w-md rounded-lg bg-white p-8 shadow-lg">
           <h2 className="font-uber-regular mb-6 text-2xl font-bold text-gray-900">
