@@ -1,5 +1,9 @@
 import { useMemo } from 'react';
-import { RouterProvider, createBrowserRouter } from 'react-router-dom';
+import {
+  Navigate,
+  RouterProvider,
+  createBrowserRouter,
+} from 'react-router-dom';
 
 import { AppRoot } from './routes/app/root';
 
@@ -7,10 +11,7 @@ export const createAppRouter = () =>
   createBrowserRouter([
     {
       path: '/',
-      lazy: async () => {
-        const { LandingRoute } = await import('./routes/landing');
-        return { Component: LandingRoute };
-      },
+      element: <Navigate to="/app" replace />,
     },
     {
       path: '/app',
