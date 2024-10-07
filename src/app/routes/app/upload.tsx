@@ -9,7 +9,7 @@ export const UploadRoute = () => {
 
           <p className="text-gray-500">Drag and drop files to upload</p>
           <p className="mt-1 text-sm text-gray-400">or</p>
-          <button className="focus:shadow-outline mt-3 h-7 rounded-lg border border-blue-950 px-5 text-gray-500 transition-colors duration-150 hover:bg-blue-500 hover:text-gray-100">
+          <button className="focus:shadow-outline mt-3 h-7 rounded-lg border border-blue-600 px-5 text-gray-500 transition-colors duration-150 hover:bg-blue-700 hover:text-gray-100">
             Browse files
           </button>
         </div>
