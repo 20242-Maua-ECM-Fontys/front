@@ -13,7 +13,7 @@ export const UploadRoute = () => {
             Browse files
           </button>
         </div>
-        <div className="mt-6 flex justify-between">
+        <div className="mt-4 flex justify-between">
           <button className="rounded bg-gray-400 px-4 py-2 text-white hover:bg-gray-500">
             Cancel
           </button>
