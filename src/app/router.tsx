@@ -16,7 +16,15 @@ export const createAppRouter = () =>
     {
       path: '/app',
       element: <AppRoot />,
-      children: [],
+      children: [
+        {
+          path: 'upload',
+          lazy: async () => {
+            const { UploadRoute } = await import('./routes/app/upload');
+            return { Component: UploadRoute };
+          },
+        },
+      ],
     },
     {
       path: '*',
