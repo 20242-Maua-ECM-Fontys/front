@@ -10,6 +10,7 @@ export const TimeRegistrationRoute = () => {
 
   const [semester, setSemester] = useState('');
   const [course, setCourse] = useState('');
+  const [weekKey, setWeekKey] = useState(0);
 
   const handleTimeSlotChange = (slot: string) => {
     switch (slot) {
@@ -25,6 +26,7 @@ export const TimeRegistrationRoute = () => {
       default:
         break;
     }
+    setWeekKey((prevKey) => prevKey + 1);
   };
 
   const handleSemesterChange = (
@@ -174,7 +176,11 @@ export const TimeRegistrationRoute = () => {
         className="mx-auto flex h-screen max-w-7xl items-center justify-center p-4 text-center sm:px-6 lg:px-8 lg:py-10"
         id="table-possibilities"
       >
-        <WeekAvailability startHour={timeSlot.start} endHour={timeSlot.end} />
+        <WeekAvailability
+          startHour={timeSlot.start}
+          endHour={timeSlot.end}
+          key={weekKey}
+        />
       </div>
     </div>
   );

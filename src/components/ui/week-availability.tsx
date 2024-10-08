@@ -11,12 +11,18 @@ type WeekDays =
 type TimeSlot = string;
 
 interface Availability {
-  [key: string]: TimeSlot[];
+  Monday?: TimeSlot[];
+  Tuesday?: TimeSlot[];
+  Wednesday?: TimeSlot[];
+  Thursday?: TimeSlot[];
+  Friday?: TimeSlot[];
+  Saturday?: TimeSlot[];
 }
 
 interface WeekAvailabilityTableProps {
   startHour: string;
   endHour: string;
+  resetAvailability?: boolean;
 }
 
 const convertTimeStringToDecimal = (timeString: string): number => {
@@ -60,6 +66,39 @@ const initialAvailability: Availability = {
   Thursday: [],
   Friday: [],
   Saturday: [],
+};
+
+const formatAvailability = (availability: Availability) => {
+  const formattedAvailability: {
+    [day: string]: { notEarlier: string; notLater: string };
+  } = {};
+
+  // dar order nos horários
+  for (const day in availability) {
+    availability[day].sort((a, b) => {
+      const [hourA, minuteA] = a.split(' - ')[0].split(':').map(Number);
+      const [hourB, minuteB] = b.split(' - ')[0].split(':').map(Number);
+
+      return hourA - hourB || minuteA - minuteB;
+    });
+  }
+
+  for (const day in availability) {
+    if (availability[day].length > 0) {
+      // Extrai o primeiro horário e o último horário de término
+      const firstTime = availability[day][0].split(' - ')[0]; // pega o horário de início do primeiro intervalo
+      const lastTime =
+        availability[day][availability[day].length - 1].split(' - ')[1]; // pega o horário de término do último intervalo
+
+      // Formata e adiciona ao objeto final
+      formattedAvailability[day] = {
+        notEarlier: firstTime.replace(':', 'h'), // formata para "hh:mm"
+        notLater: lastTime.replace(':', 'h'),
+      };
+    }
+  }
+
+  return formattedAvailability;
 };
 
 const WeekAvailabilityTable: React.FC<WeekAvailabilityTableProps> = ({
@@ -172,6 +211,7 @@ const WeekAvailabilityTable: React.FC<WeekAvailabilityTableProps> = ({
               ))}
             </tbody>
           </table>
+          <pre>{JSON.stringify(formatAvailability(availability), null, 2)}</pre>
         </div>
       </div>
     </div>
