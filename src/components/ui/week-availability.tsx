@@ -73,7 +73,7 @@ const formatAvailability = (availability: Availability) => {
     [day: string]: { notEarlier: string; notLater: string };
   } = {};
 
-  // dar order nos horários
+  // order the time slots to be in ascending order
   for (const day in availability) {
     availability[day].sort((a, b) => {
       const [hourA, minuteA] = a.split(' - ')[0].split(':').map(Number);
@@ -85,14 +85,14 @@ const formatAvailability = (availability: Availability) => {
 
   for (const day in availability) {
     if (availability[day].length > 0) {
-      // Extrai o primeiro horário e o último horário de término
-      const firstTime = availability[day][0].split(' - ')[0]; // pega o horário de início do primeiro intervalo
+      // Extract the first and last time of the day
+      const firstTime = availability[day][0].split(' - ')[0]; // catch the start time of the first interval
       const lastTime =
-        availability[day][availability[day].length - 1].split(' - ')[1]; // pega o horário de término do último intervalo
+        availability[day][availability[day].length - 1].split(' - ')[1]; // catch the end time of the last interval
 
-      // Formata e adiciona ao objeto final
+      // Format and store the availability
       formattedAvailability[day] = {
-        notEarlier: firstTime.replace(':', 'h'), // formata para "hh:mm"
+        notEarlier: firstTime.replace(':', 'h'), // format to HHhMM
         notLater: lastTime.replace(':', 'h'),
       };
     }
