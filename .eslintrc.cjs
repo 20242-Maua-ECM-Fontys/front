@@ -11,7 +11,7 @@ module.exports = {
     'generators/*',
   ],
   extends: ['eslint:recommended'],
-  plugins: ['check-file'],
+  plugins: ['check-file', 'prettier'],
   overrides: [
     {
       files: ['**/*.ts', '**/*.tsx'],
