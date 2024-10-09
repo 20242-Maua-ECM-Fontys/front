@@ -11,6 +11,7 @@ export const TimeRegistrationRoute = () => {
   const [semester, setSemester] = useState('');
   const [course, setCourse] = useState('');
   const [weekKey, setWeekKey] = useState(0);
+  const [isEngineering, setIsEngineering] = useState(false);
 
   const handleTimeSlotChange = (slot: string) => {
     switch (slot) {
@@ -37,6 +38,16 @@ export const TimeRegistrationRoute = () => {
 
   const handleCourseChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setCourse(event.target.value);
+    const engineeringCourses = [
+      'Computer Engineering',
+      'Electrical Engineering',
+      'Mechanical Engineering',
+      'Civil Engineering',
+      'Chemical Engineering',
+      'Production Engineering',
+      'Control and Automation Engineering',
+    ];
+    setIsEngineering(engineeringCourses.includes(event.target.value));
   };
 
   return (
@@ -69,27 +80,6 @@ export const TimeRegistrationRoute = () => {
             Which semester are you registering for?
           </h3>
           <div className="flex flex-col items-center p-6">
-            <label htmlFor="semester" className="mr-2 pb-2 pt-4">
-              Select Semester:
-            </label>
-            <select
-              id="semester"
-              value={semester}
-              onChange={handleSemesterChange}
-              className="rounded border border-gray-300 p-2"
-            >
-              <option value="">Select</option>
-              <option value="1st">1st Semester</option>
-              <option value="2nd">2nd Semester</option>
-              <option value="3rd">3rd Semester</option>
-              <option value="4th">4th Semester</option>
-              <option value="5th">5th Semester</option>
-              <option value="6th">6th Semester</option>
-              <option value="7th">7th Semester</option>
-              <option value="8th">8th Semester</option>
-              <option value="9th">9th Semester</option>
-              <option value="10th">10th Semester</option>
-            </select>
             <label htmlFor="course" className="mr-2 pb-2 pt-4">
               Select Course:
             </label>
@@ -104,7 +94,7 @@ export const TimeRegistrationRoute = () => {
               <option value="Information Technology">
                 Information Technology
               </option>
-              <option value="Computer Engineering">Software Engineering</option>
+              <option value="Computer Engineering">Computer Engineering</option>
               <option value="Electrical Engineering">
                 Electrical Engineering
               </option>
@@ -131,6 +121,39 @@ export const TimeRegistrationRoute = () => {
               <option value="Architecture and Urbanism">
                 Architecture and Urbanism
               </option>
+            </select>
+            <label htmlFor="semester" className="mr-2 pb-2 pt-4">
+              {isEngineering ? 'Select Year:' : 'Select Semester:'}
+            </label>
+            <select
+              id="semester"
+              value={semester}
+              onChange={handleSemesterChange}
+              className="rounded border border-gray-300 p-2"
+            >
+              <option value="">Select</option>
+              {isEngineering ? (
+                <>
+                  <option value="1st">1st Year</option>
+                  <option value="2nd">2nd Year</option>
+                  <option value="3rd">3rd Year</option>
+                  <option value="4th">4th Year</option>
+                  <option value="5th">5th Year</option>
+                </>
+              ) : (
+                <>
+                  <option value="1st">1st Semester</option>
+                  <option value="2nd">2nd Semester</option>
+                  <option value="3rd">3rd Semester</option>
+                  <option value="4th">4th Semester</option>
+                  <option value="5th">5th Semester</option>
+                  <option value="6th">6th Semester</option>
+                  <option value="7th">7th Semester</option>
+                  <option value="8th">8th Semester</option>
+                  <option value="9th">9th Semester</option>
+                  <option value="10th">10th Semester</option>
+                </>
+              )}
             </select>
           </div>
 
