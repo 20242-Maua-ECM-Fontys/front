@@ -1,5 +1,11 @@
 import { useMemo } from 'react';
-import { RouterProvider, createBrowserRouter } from 'react-router-dom';
+import {
+  Navigate,
+  RouterProvider,
+  createBrowserRouter,
+} from 'react-router-dom';
+
+import { ProtectedRoute } from '../lib/auth';
 
 import { AppRoot } from './routes/app/root';
 
@@ -7,33 +13,38 @@ export const createAppRouter = () =>
   createBrowserRouter([
     {
       path: '/',
-      lazy: async () => {
-        const { LandingRoute } = await import('./routes/landing');
-        return { Component: LandingRoute };
-      },
+      element: <Navigate to="/auth/login" />,
     },
     {
-      path: '/login', // Add the authentication route here
+      path: '/auth/login', // Add the authentication route here
       lazy: async () => {
-        const { LoginRoute } = await import(
-          '@/app/routes/authentication/login'
-        );
+        const { LoginRoute } = await import('@/app/routes/auth/login');
         return { Component: LoginRoute };
       },
     },
     {
-      path: '/signup', // Add the authentication route here
+      path: '/auth/register', // Add the authentication route here
       lazy: async () => {
-        const { RegisterRoute } = await import(
-          '@/app/routes/authentication/register'
-        );
+        const { RegisterRoute } = await import('@/app/routes/auth/register');
         return { Component: RegisterRoute };
       },
     },
     {
       path: '/app',
-      element: <AppRoot />,
-      children: [],
+      element: (
+        <ProtectedRoute>
+          <AppRoot />
+        </ProtectedRoute>
+      ),
+      children: [
+        {
+          path: '',
+          lazy: async () => {
+            const { DashboardRoute } = await import('./routes/app/dashboard');
+            return { Component: DashboardRoute };
+          },
+        },
+      ],
     },
     {
       path: '*',
