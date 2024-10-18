@@ -5,18 +5,46 @@ import {
   createBrowserRouter,
 } from 'react-router-dom';
 
+import { ProtectedRoute } from '../lib/auth';
+
 import { AppRoot } from './routes/app/root';
 
 export const createAppRouter = () =>
   createBrowserRouter([
     {
       path: '/',
-      element: <Navigate to="/app" replace />,
+      element: <Navigate to="/auth/login" />,
+    },
+    {
+      path: '/auth/login', // Add the authentication route here
+      lazy: async () => {
+        const { LoginRoute } = await import('@/app/routes/auth/login');
+        return { Component: LoginRoute };
+      },
+    },
+    {
+      path: '/auth/register', // Add the authentication route here
+      lazy: async () => {
+        const { RegisterRoute } = await import('@/app/routes/auth/register');
+        return { Component: RegisterRoute };
+      },
     },
     {
       path: '/app',
-      element: <AppRoot />,
-      children: [],
+      element: (
+        <ProtectedRoute>
+          <AppRoot />
+        </ProtectedRoute>
+      ),
+      children: [
+        {
+          path: '',
+          lazy: async () => {
+            const { DashboardRoute } = await import('./routes/app/dashboard');
+            return { Component: DashboardRoute };
+          },
+        },
+      ],
     },
     {
       path: '*',
