@@ -145,20 +145,16 @@ const WeekAvailabilityTable: React.FC<WeekAvailabilityTableProps> = ({
 
   return (
     <div className="container mx-auto p-4">
-      <h3 className="mb-4 text-center text-xl font-bold">
-        Set Your Availability
-      </h3>
-
       <div className="mb-2 flex justify-center md:hidden">
         <button
-          className="mx-1 p-2 text-blue-500 hover:text-blue-700 focus:outline-none disabled:opacity-50"
+          className="mx-1 p-2 text-blue-500 hover:text-blue-700 focus:outline-none disabled:opacity-50 "
           onClick={handlePreviousDay}
           disabled={visibleDayIndex === 0}
         >
           <FaArrowLeft size={24} />
         </button>
         <button
-          className="mx-1 p-2 text-blue-500 hover:text-blue-700 focus:outline-none disabled:opacity-50"
+          className="mx-1 p-2 text-blue-500 hover:text-blue-700 focus:outline-none disabled:opacity-50 "
           onClick={handleNextDay}
           disabled={
             visibleDayIndex === Object.keys(initialAvailability).length - 1
@@ -197,7 +193,7 @@ const WeekAvailabilityTable: React.FC<WeekAvailabilityTableProps> = ({
                   {Object.keys(initialAvailability).map((day, index) => (
                     <td
                       key={day + interval}
-                      className={`cursor-pointer border p-2 text-sm md:text-base ${
+                      className={`duration-600 cursor-pointer border p-2 text-sm transition md:text-base ${
                         index !== visibleDayIndex ? 'hidden md:table-cell' : ''
                       } ${
                         availability[day as WeekDays].includes(interval)
