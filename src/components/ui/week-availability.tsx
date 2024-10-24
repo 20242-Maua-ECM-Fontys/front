@@ -1,5 +1,5 @@
+import { ArrowRight, ArrowLeft } from 'lucide-react';
 import React, { useState } from 'react';
-import { FaArrowLeft, FaArrowRight } from 'react-icons/fa';
 
 type WeekDays =
   | 'Monday'
@@ -151,7 +151,7 @@ const WeekAvailabilityTable: React.FC<WeekAvailabilityTableProps> = ({
           onClick={handlePreviousDay}
           disabled={visibleDayIndex === 0}
         >
-          <FaArrowLeft size={24} />
+          <ArrowLeft size={24} />
         </button>
         <button
           className="mx-1 p-2 text-blue-500 hover:text-blue-700 focus:outline-none disabled:opacity-50 "
@@ -160,7 +160,7 @@ const WeekAvailabilityTable: React.FC<WeekAvailabilityTableProps> = ({
             visibleDayIndex === Object.keys(initialAvailability).length - 1
           }
         >
-          <FaArrowRight size={24} />
+          <ArrowRight size={24} />
         </button>
       </div>
 
