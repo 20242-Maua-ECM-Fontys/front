@@ -8,10 +8,10 @@ export default defineConfig({
   base: './',
   plugins: [react(), viteTsconfigPaths()],
   server: {
-    port: 3001,
+    port: 3000,
   },
   preview: {
-    port: 3001,
+    port: 3000,
   },
   optimizeDeps: { exclude: ['fsevents'] },
   build: {

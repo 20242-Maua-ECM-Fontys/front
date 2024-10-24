@@ -4,22 +4,26 @@ import { Outlet, useLocation } from 'react-router-dom';
 
 import { Spinner } from '@/components/ui/spinner';
 
+import { DashboardLayout } from '../../../components/layouts/dashboard-layout';
+
 export const AppRoot = () => {
   const location = useLocation();
   return (
-    <Suspense
-      fallback={
-        <div className="flex size-full items-center justify-center">
-          <Spinner size="xl" />
-        </div>
-      }
-    >
-      <ErrorBoundary
-        key={location.pathname}
-        fallback={<div>Something went wrong!</div>}
+    <DashboardLayout>
+      <Suspense
+        fallback={
+          <div className="flex size-full items-center justify-center">
+            <Spinner size="xl" />
+          </div>
+        }
       >
-        <Outlet />
-      </ErrorBoundary>
-    </Suspense>
+        <ErrorBoundary
+          key={location.pathname}
+          fallback={<div>Something went wrong!</div>}
+        >
+          <Outlet />
+        </ErrorBoundary>
+      </Suspense>
+    </DashboardLayout>
   );
 };
