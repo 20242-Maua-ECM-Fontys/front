@@ -194,7 +194,7 @@ const Logo = () => {
               <DropdownMenuItem
                 className={cn('block w-full px-4 py-2 text-sm text-gray-700')}
               >
-                {accounts[0].name}
+                {accounts.length > 0 ? accounts[0].name : ''}
               </DropdownMenuItem>
               <DropdownMenuItem
                 className={cn('block w-full px-4 py-2 text-sm text-gray-700')}
