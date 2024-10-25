@@ -1,12 +1,13 @@
 import { Home, PanelLeft, User2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { NavLink, useNavigation } from 'react-router-dom';
+import { useNavigate, NavLink, useNavigation } from 'react-router-dom';
 
-import logo from '@/assets/images/MauaGrid-logo.svg';
 import { Button } from '@/components/ui/button';
 import { Drawer, DrawerContent, DrawerTrigger } from '@/components/ui/drawer';
 import { useLogout } from '@/lib/auth';
 import { cn } from '@/utils/cn';
+
+
 
 import {
   DropdownMenu,
@@ -15,6 +16,7 @@ import {
   DropdownMenuTrigger,
 } from '../ui/dropdown';
 import { Link } from '../ui/link';
+import { useMsal } from '@azure/msal-react';
 
 type SideNavigationItem = {
   name: string;
@@ -23,58 +25,76 @@ type SideNavigationItem = {
 };
 
 const Logo = () => {
-  return (
-    <Link className="flex items-center text-white" to="/">
-      <img className="h-8 w-auto" src={logo} alt="Workflow" />
-      {/* <span className="text-sm font-semibold text-white">Maua Grid</span> */}
-    </Link>
-  );
-};
-
-const Progress = () => {
-  const { state, location } = useNavigation();
-
-  const [progress, setProgress] = useState(0);
-
-  useEffect(() => {
-    setProgress(0);
-  }, [location?.pathname]);
-
-  useEffect(() => {
-    if (state === 'loading') {
-      const timer = setInterval(() => {
-        setProgress((oldProgress) => {
-          if (oldProgress === 100) {
-            clearInterval(timer);
-            return 100;
-          }
-          const newProgress = oldProgress + 10;
-          return newProgress > 100 ? 100 : newProgress;
-        });
-      }, 300);
-
-      return () => {
-        clearInterval(timer);
-      };
+  // return (
+    //   <Link className="flex items-center text-white" to="/">
+    //     <img className="h-8 w-auto" src={logo} alt="Workflow" />
+    //     {/* <span className="text-sm font-semibold text-white">Maua Grid</span> */}
+    //   </Link>
+    // );
+  };
+  
+  const Progress = () => {
+    const { state, location } = useNavigation();
+    
+    const [progress, setProgress] = useState(0);
+    
+    
+    useEffect(() => {
+      setProgress(0);
+    }, [location?.pathname]);
+    
+    useEffect(() => {
+      if (state === 'loading') {
+        const timer = setInterval(() => {
+          setProgress((oldProgress) => {
+            if (oldProgress === 100) {
+              clearInterval(timer);
+              return 100;
+            }
+            const newProgress = oldProgress + 10;
+            return newProgress > 100 ? 100 : newProgress;
+          });
+        }, 300);
+        
+        return () => {
+          clearInterval(timer);
+        };
+      }
+    }, [state]);
+    
+    if (state !== 'loading') {
+      return null;
     }
-  }, [state]);
-
-  if (state !== 'loading') {
-    return null;
-  }
-
-  return (
-    <div
+    
+    return (
+      <div
       className="fixed left-0 top-0 h-1 bg-blue-500 transition-all duration-200 ease-in-out"
       style={{ width: `${progress}%` }}
-    ></div>
-  );
-};
+      ></div>
+    );
+  };
+  
+  export function DashboardLayout({ children }: { children: React.ReactNode }) {
+    const navigate = useNavigate();
+    const { instance , accounts} = useMsal();
 
-export function DashboardLayout({ children }: { children: React.ReactNode }) {
-  const logout = useLogout();
-  // const { checkAccess } = useAuthorization();
-  const navigation = [
+    useEffect(() => {
+        if (accounts.length === 0) {
+
+        navigate('/auth/login');
+        }
+        /* forçar update pagina*/
+
+    }, [accounts]);
+
+    const handleLogout = (instance: any) => {
+        instance.logoutPopup().catch((e: any) => {
+            console.error(e);
+        });
+    }
+
+    // const { checkAccess } = useAuthorization();
+    const navigation = [
     { name: 'Dashboard', to: '.', icon: Home },
     // checkAccess({ allowedRoles: [ROLES.ADMIN] }) && {
     //   name: 'Users',
@@ -173,7 +193,12 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
             <DropdownMenuContent align="end">
               <DropdownMenuItem
                 className={cn('block w-full px-4 py-2 text-sm text-gray-700')}
-                onClick={() => logout.mutate({})}
+              >
+                {accounts[0].name}
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                className={cn('block w-full px-4 py-2 text-sm text-gray-700')}
+                onClick={() => handleLogout(instance)}
               >
                 Sign Out
               </DropdownMenuItem>
