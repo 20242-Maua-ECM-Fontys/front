@@ -27,6 +27,10 @@ export const createAppRouter = () =>
       element: <AppRoot />,
       children: [
         {
+          path: '',
+          element: <Navigate to="dashboard" replace />,
+        },
+        {
           path: 'time-registration',
           lazy: async () => {
             const { TimeRegistrationRoute } = await import(
@@ -35,6 +39,13 @@ export const createAppRouter = () =>
             return { Component: TimeRegistrationRoute };
           },
         },
+        {
+          path: 'dashboard',
+          lazy: async () => {
+            const { DashboardRoute } = await import('./routes/app/dashboard');
+            return { Component: DashboardRoute };
+          },
+        }
       ],
     },
     {

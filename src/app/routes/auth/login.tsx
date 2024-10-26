@@ -21,8 +21,7 @@ export const LoginRoute = () => {
 
     useEffect(() => {
         if (accounts.length > 0) {
-            navigate('/app/time-registration');
-
+            navigate('/app');
         }
         }, [accounts]);
 
