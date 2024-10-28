@@ -45,7 +45,16 @@ export const createAppRouter = () =>
             const { DashboardRoute } = await import('./routes/app/dashboard');
             return { Component: DashboardRoute };
           },
-        }
+        },
+        {
+          path: 'teacher-suitability-availability',
+          lazy: async () => {
+            const { TeacherSuitabilityAndAvailabilityRoute } = await import(
+              './routes/app/teacher-suitability-availability'
+            );
+            return { Component: TeacherSuitabilityAndAvailabilityRoute };
+          },
+        },
       ],
     },
     {
