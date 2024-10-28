@@ -68,7 +68,7 @@ export const TimeRegistrationRoute = () => {
 
   return (
     <div>
-      <div className="flex h-screen items-center bg-white">
+      <div className="flex h-screen items-center">
         <div className="mx-auto max-w-7xl px-4 py-12 text-center sm:px-6 lg:px-8 lg:py-16">
           <h2 className="p-4 text-3xl font-extrabold tracking-tight text-gray-900 sm:text-4xl">
             <span className="block">Time Registration</span>
@@ -91,7 +91,7 @@ export const TimeRegistrationRoute = () => {
         className="mx-auto flex h-screen max-w-7xl items-center justify-center p-4 text-center sm:px-6 lg:px-8 lg:py-10"
         id="course-registration"
       >
-        <div className="flex flex-col items-center bg-white p-6">
+        <div className="flex flex-col items-center  p-6">
           <h3 className="text-2xl font-bold">
             Which course are you registering for?
           </h3>
