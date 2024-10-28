@@ -216,36 +216,32 @@
               </div>
             </div>
 
-          <ScrollArea className="h-[200px] rounded-md border p-4 sm: h-[700px] lg:h-[400px]">
-                {
-                selectedCourse ? (
-                  <div className="grid grid-cols-1 gap-5 p-6 sm:grid-cols-1">
-                    {subjects.map((subject) => (
-                      Object.keys(subject).map((subjectName) => (
-                        subjectName === selectedCourse ? (
-                          subject[selectedCourse].map((tag) => (
-                            <div key={tag} className={`rounded border p-2 transition duration-300 bg-gray-200 hover:bg-blue-400 hover:text-white flex items-center justify-center
-                              cursor-pointer ${
-                                selectedSubjects.includes(tag)
-                                  ? 'bg-blue-400 text-white'
-                                  : 'bg-gray-200 hover:bg-blue-400 hover:text-white'
-                                  }`}
-                              onClick={() => {
-                                handleSubjectAdd(tag);
-                              }}
-                            >
-                              <h4 className="text-lg font-bold text-center">{tag}</h4>
-                            </div>
-                          ))
-                        ) : null
-                      ))
-                    ))}
-                  </div>
-                ) : null
+         <ScrollArea className="h-[200px] rounded-md border p-4 sm:h-[700px] lg:h-[400px]">
+  {
+    selectedCourse ? (
+      <div className="grid grid-cols-1 gap-5 p-6 sm:grid-cols-1">
+        {subjects.map((subject) => (
+          Object.keys(subject).map((subjectName) => (
+            subjectName === selectedCourse ? (
+              subject[selectedCourse].map((tag) => (
+                <div key={tag} className={`rounded border p-2 transition duration-300 flex items-center justify-center cursor-pointer ${
+                  selectedSubjects.includes(tag)
+                    ? 'bg-blue-400 text-white'
+                    : 'bg-gray-200 hover:bg-blue-400 hover:text-white'
+                }`}
+                onClick={() => handleSubjectAdd(tag)}
+                >
+                  <h4 className="text-lg font-bold text-center">{tag}</h4>
+                </div>
+              ))
+            ) : null
+          ))
+        ))}
+      </div>
+    ) : null
+  }
+</ScrollArea>
 
-                
-                }
-            </ScrollArea>
         </div>
         
         <div
