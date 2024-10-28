@@ -23,7 +23,7 @@
       setSelectedSubjects([...selectedSubjects, subject]);
     }
 
-    const subjects = [
+    const subjects: { [key: string]: string[] }[] = [
       {
         'Computer Engineering': [
           'Computer Architecture',
@@ -149,10 +149,6 @@
           'Web Development',
         ]
       },
-
-
-
-
     ]
 
     return (
