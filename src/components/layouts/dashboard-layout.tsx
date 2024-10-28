@@ -1,4 +1,4 @@
-import { Home, PanelLeft, User2, Clock3 } from 'lucide-react';
+import { Home, PanelLeft, User2, Clock3, CalendarClock } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useNavigate, NavLink, useNavigation } from 'react-router-dom';
 
@@ -102,6 +102,7 @@ const Logo = () => {
     //   to: './users',
     //   icon: Users,
     // },
+    { name: 'Availability', to: 'teacher-suitability-availability', icon: CalendarClock },
   ].filter(Boolean) as SideNavigationItem[];
 
   return (
@@ -118,8 +119,8 @@ const Logo = () => {
               end={item.name !== 'Discussions'}
               className={({ isActive }) =>
                 cn(
-                  'text-gray-300 hover:bg-gray-700 hover:text-white',
-                  'group flex w-full flex-1 items-center rounded-md p-2 text-base font-medium',
+                  'text-gray-300 hover:bg-gray-700 hover:text-white transition duration-600',
+                  'group flex w-full flex-1 items-center rounded-xl p-2 text-base font-medium transition duration-600',
                   isActive && 'bg-gray-900 text-white',
                 )
               }
