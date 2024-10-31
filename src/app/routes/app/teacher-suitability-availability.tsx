@@ -2,14 +2,14 @@
   import { ScrollArea } from '@/components/ui/scroll-area';
   import WeekAvailability from '@/components/ui/week-availability';
   import { useMsal} from '@azure/msal-react';
-  import { useState } from 'react';
+  import { useEffect, useState } from 'react';
 
 
   export const TeacherSuitabilityAndAvailabilityRoute = () => {
     const {instance, accounts} = useMsal();
     const [weekKey, setWeekKey] = useState(0);
     const [selectedCourse, setSelectedCourse] = useState('Computer Engineering');
-  const [selectedSubjects, setSelectedSubjects] = useState<string[]>([]);
+    const [selectedSubjects, setSelectedSubjects] = useState<string[]>([]);
 
     const handleCourseChange = (course: string) => {
       setSelectedCourse(course);
@@ -150,6 +150,10 @@
         ]
       },
     ]
+
+    useEffect(() => {
+        window.scrollTo(0, 0);
+    }, []);
 
     return (
       <div>

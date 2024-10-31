@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import WeekAvailability from '@/components/ui/week-availability';
 
@@ -13,6 +13,10 @@ export const TimeRegistrationRoute = () => {
   const [course, setCourse] = useState('');
   const [weekKey, setWeekKey] = useState(0);
   const [isEngineering, setIsEngineering] = useState(false);
+  
+  useEffect(() => {
+        window.scrollTo(0, 0);
+    }, []);
 
   const handleTimeSlotChange = (slot: string) => {
     setPeriod(slot);
@@ -65,6 +69,8 @@ export const TimeRegistrationRoute = () => {
     'Data Science and Artificial Intelligence',
     'Architecture and Urbanism',
   ];
+
+  
 
   return (
     <div>
