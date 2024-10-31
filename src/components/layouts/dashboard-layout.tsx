@@ -1,4 +1,4 @@
-import { Home, PanelLeft, User2, Clock3, CalendarClock } from 'lucide-react';
+import { Home, PanelLeft, User2, Clock3, CalendarClock , GraduationCap} from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useNavigate, NavLink, useNavigation } from 'react-router-dom';
 
@@ -103,6 +103,7 @@ const Logo = () => {
     //   icon: Users,
     // },
     { name: 'Availability', to: 'teacher-suitability-availability', icon: CalendarClock },
+    { name: 'Teachers', to: 'coordinator-suitability-availability', icon: GraduationCap },
   ].filter(Boolean) as SideNavigationItem[];
 
   return (
