@@ -3,17 +3,23 @@
   import WeekAvailability from '@/components/ui/week-availability';
   import { useMsal} from '@azure/msal-react';
   import { useEffect, useState } from 'react';
+  import {
+  Command,
+  CommandDialog,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+  CommandSeparator,
+  CommandShortcut,
+} from "@/components/ui/command"
 
 
   export const TeacherSuitabilityAndAvailabilityRoute = () => {
     const {instance, accounts} = useMsal();
     const [weekKey, setWeekKey] = useState(0);
-    const [selectedCourse, setSelectedCourse] = useState('Computer Engineering');
     const [selectedSubjects, setSelectedSubjects] = useState<string[]>([]);
-
-    const handleCourseChange = (course: string) => {
-      setSelectedCourse(course);
-    };
 
     const handleSubjectAdd = (subject: string) => {
       if (selectedSubjects.includes(subject)) {
@@ -165,7 +171,7 @@
             <div className="flex gap-4 justify-center items-center">
               <button className="mt-4 rounded bg-gray-200 px-4 py-2  transition duration-300 hover:bg-blue-400 hover:text-white"
                           onClick={() => document
-                        .getElementById('select-course')
+                        .getElementById('subject-possibilities')
                         ?.scrollIntoView({ behavior: 'smooth' })}>Fill suitabilities</button>
               <button className="mt-4 rounded bg-gray-200 px-4 py-2  transition duration-300 hover:bg-blue-400 hover:text-white"
                           onClick={() => document
@@ -174,32 +180,7 @@
             </div>
           </div>
         </div>
-        <div className="flex h-screen items-center" id='select-course'>
-          <div className="mx-auto max-w-7xl px-4 py-12 text-center sm:px-6 lg:px-8 lg:py-16" >
-            <h3 className="text-2xl font-bold">Select Your Course</h3>
-            {/* Show all the selected subjects*/}
-            <div className="grid grid-cols-1 gap-5 p-6 md:grid-cols-3 sm:grid-cols-1">
-              {subjects.map((subject) => (
-                Object.keys(subject).map((subjectName) => (
-                  <div key={subjectName} className={`rounded border p-2 transition duration-300 flex items-center justify-center cursor-pointer ${
-                selectedCourse === subjectName
-                  ? 'bg-blue-400 text-white'
-                  : 'bg-gray-200 hover:bg-blue-400 hover:text-white'
-              }`}
-                    onClick={() => {
-                      handleCourseChange(subjectName);
-                      document.getElementById('subject-possibilities')?.scrollIntoView({ behavior: 'smooth' });
-                    }}
-                    >
-                    <h4 className="text-lg font-bold text-center">{subjectName}</h4>
-                  </div>
-                ))
-              ))}
-            </div>
-            
-          </div>
-        </div>
-        <div id="subject-possibilities">
+        <div id="subject-possibilities" className='min-h-screen'>
           <div className="mx-auto max-w-7xl px-4 py-12 text-center sm:px-6 lg:px-8 lg:py-16">
               <h2 className="text-2xl font-semibold p-4">Selected Subjects:</h2>
               <div className="flex flex-wrap gap-2 justify-center text-center">
@@ -220,32 +201,35 @@
               </div>
             </div>
 
-          <h3 className="text-xl font-bold text-center">{selectedCourse} Subjects</h3>
-         <ScrollArea className="h-[400px] rounded-md border p-4 sm:h-[700px] lg:h-[400px]">
-          {
-            selectedCourse ? (
-              <div className="grid grid-cols-1 gap-5 p-6 sm:grid-cols-1">
-                {subjects.map((subject) => (
-                  Object.keys(subject).map((subjectName) => (
-                    subjectName === selectedCourse ? (
-                      subject[selectedCourse].map((tag) => (
-                        <div key={tag} className={`rounded border p-2 transition duration-300 flex items-center justify-center cursor-pointer ${
-                          selectedSubjects.includes(tag)
-                            ? 'bg-blue-400 text-white'
-                            : 'bg-gray-200 hover:bg-blue-400 hover:text-white'
-                        }`}
-                        onClick={() => handleSubjectAdd(tag)}
-                        >
-                          <h4 className="text-lg font-bold text-center">{tag}</h4>
-                        </div>
+          <Command className='min-h-[49vh]'> 
+              <CommandInput placeholder="Type a subject name..." />
+              <CommandList>
+                <CommandEmpty>No results found.</CommandEmpty>
+                <CommandGroup heading="Subjects">
+                  {
+                    // fazer dois for, um para os cursos e outro para as disciplinas
+                    subjects.map((subject) => (
+                      Object.keys(subject).map((course) => (
+                        subject[course].map((subjectName) => (
+                          <CommandItem key={subjectName}
+                            onSelect={() => {handleSubjectAdd(subjectName);}}
+                            className={`p-2 transition duration-300 flex items-center justify-center cursor-pointer ${
+                              selectedSubjects.includes(subjectName)
+                                ? 'bg-blue-400 text-white'
+                                : 'hover:bg-blue-400 hover:text-white'
+                            }`}
+                            >
+                            {subjectName}
+                          </CommandItem>
+                        ))
                       ))
-                    ) : null
-                  ))
-                ))}
-              </div>
-            ) : null
-          }
-        </ScrollArea>
+                    ))
+                  }
+                  
+                </CommandGroup>
+              </CommandList>
+            </Command>
+          
 
         </div>
         
