@@ -55,6 +55,15 @@ export const createAppRouter = () =>
             return { Component: TeacherSuitabilityAndAvailabilityRoute };
           },
         },
+        {
+          path: 'coordinator-suitability-availability',
+          lazy: async () => {
+            const { CoordinatorSuitabilityAndAvailabilityRoute } = await import(
+              './routes/app/coordinator-suitability-availability'
+            );
+            return { Component: CoordinatorSuitabilityAndAvailabilityRoute };
+          },
+        },
       ],
     },
     {
