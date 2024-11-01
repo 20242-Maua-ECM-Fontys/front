@@ -69,6 +69,134 @@ export const TimeRegistrationRoute = () => {
     'Data Science and Artificial Intelligence',
     'Architecture and Urbanism',
   ];
+  
+  const subjects: { [key: string]: string[] }[] = [
+      {
+        'Computer Engineering': [
+          'Computer Architecture',
+          'Computer Networks',
+          'Computer Programming',
+          'Computer Security',
+          'Data Structures',
+          'Databases',
+          'Digital Logic',
+          'Discrete Mathematics',
+          'Operating Systems',
+          'Software Engineering',
+        ]
+      },
+      {
+        'Electrical Engineering': [
+          'Analog Electronics',
+          'Circuit Analysis',
+          'Control Systems',
+          'Digital Electronics',
+          'Digital Signal Processing',
+          'Electromagnetics',
+          'Electronics',
+          'Linear Systems',
+          'Power Systems',
+          'Signals and Systems',
+        ]
+      },
+      {
+        'Mechanical Engineering': [
+          'Dynamics',
+          'Engineering Mechanics',
+          'Fluid Mechanics',
+          'Heat Transfer',
+          'Machine Design',
+          'Materials Science',
+          'Mechanics of Materials',
+          'Thermodynamics',
+          'Vibrations',
+        ]
+      },
+      {
+      'Civil Engineering': [
+        'Concrete Design',
+        'Construction Management',
+        'Environmental Engineering',
+        'Geotechnical Engineering',
+        'Hydraulics',
+        'Materials Testing',
+        'Reinforced Concrete',
+        'Steel Design',
+        'Structural Analysis',
+        'Surveying',
+        ]
+      },
+      {
+        'Chemical Engineering': [
+          'Chemical Kinetics',
+          'Chemical Process Control',
+          'Chemical Reaction Engineering',
+          'Chemical Thermodynamics',
+          'Fluid Mechanics',
+          'Heat Transfer',
+          'Mass Transfer',
+          'Materials Science',
+          'Process Design',
+          'Transport Phenomena',
+        ]
+      },
+      {
+        'Biomedical Engineering': [
+          'Biomechanics',
+          'Biomedical Instrumentation',
+          'Biomedical Signal Processing',
+          'Biomaterials',
+          'Biomechanics',
+          'Biomedical Instrumentation',
+          'Biomedical Signal Processing',
+          'Biomaterials',
+          'Biomedical Imaging',
+          'Physiology',
+        ]
+      },
+      {
+        'Aerospace Engineering': [
+          'Aerodynamics',
+          'Aerospace Materials',
+          'Aircraft Design',
+          'Aircraft Structures',
+          'Astrodynamics',
+          'Flight Dynamics',
+          'Propulsion',
+          'Spacecraft Design',
+          'Spacecraft Structures',
+          'Thermodynamics',
+        ]
+      },
+      {
+        'Industrial Engineering': [
+          'Engineering Management',
+          'Engineering Statistics',
+          'Facilities Planning',
+          'Human Factors Engineering',
+          'Industrial Automation',
+          'Industrial Engineering',
+          'Manufacturing Processes',
+          'Operations Research',
+          'Quality Control',
+          'Supply Chain Management',
+        ]
+      },
+      {
+        'Software Engineering': [
+          'Agile Software Development',
+          'Computer Programming',
+          'Data Structures',
+          'Databases',
+          'Operating Systems',
+          'Software Architecture',
+          'Software Design',
+          'Software Engineering',
+          'Software Testing',
+          'Web Development',
+        ]
+      },
+    ]
 
   
 
@@ -102,24 +230,26 @@ export const TimeRegistrationRoute = () => {
             Which course are you registering for?
           </h3>
           <div className="grid grid-cols-2 gap-5 p-6 sm:grid-cols-3">
-            {courses.map((courseOption) => (
-              <button
-                key={courseOption}
-                onClick={() => {
-                  handleCourseChange(courseOption);
-                  document
-                    .getElementById('period-possibilities')
-                    ?.scrollIntoView({ behavior: 'smooth' });
-                }}
-                className={`rounded border p-4 transition duration-300 ${
-                  course === courseOption
-                    ? 'bg-blue-500 text-white'
-                    : 'bg-gray-200'
-                } hover:bg-blue-400 hover:text-white`}
-              >
-                {courseOption}
-              </button>
-            ))}
+            
+            {subjects.map((subject) => {
+              const courseOption = Object.keys(subject)[0];
+              return (
+                <button
+                  key={courseOption}
+                  onClick={() => {
+                    handleCourseChange(courseOption);
+                    document
+                      .getElementById('period-possibilities')
+                      ?.scrollIntoView({ behavior: 'smooth' });
+                  }}
+                  className={`rounded border p-4 transition duration-300 ${
+                    course === courseOption ? 'bg-blue-500 text-white' : 'bg-gray-200'
+                  } hover:bg-blue-400 hover:text-white`}
+                >
+                  {courseOption}
+                </button>
+              );
+            })}
           </div>
         </div>
       </div>
