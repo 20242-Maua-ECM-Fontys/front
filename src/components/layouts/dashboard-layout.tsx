@@ -1,13 +1,19 @@
-import { Home, PanelLeft, User2, Clock3, CalendarClock , GraduationCap} from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useMsal } from '@azure/msal-react';
+import {
+  Home,
+  PanelLeft,
+  User2,
+  Clock3,
+  CalendarClock,
+  GraduationCap,
+} from 'lucide-react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate, NavLink, useNavigation } from 'react-router-dom';
 
 import { Button } from '@/components/ui/button';
 import { Drawer, DrawerContent, DrawerTrigger } from '@/components/ui/drawer';
-import { useLogout } from '@/lib/auth';
+import { useUser } from '@/hooks/use-user';
 import { cn } from '@/utils/cn';
-
-
 
 import {
   DropdownMenu,
@@ -15,104 +21,115 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '../ui/dropdown';
-import { Link } from '../ui/link';
-import { useMsal } from '@azure/msal-react';
 
 type SideNavigationItem = {
   name: string;
   to: string;
-  icon: (props: React.SVGProps<SVGSVGElement>) => JSX.Element;
+  icon: React.FC<React.SVGProps<SVGSVGElement>>;
 };
 
-const Logo = () => {
-  // return (
-    //   <Link className="flex items-center text-white" to="/">
-    //     <img className="h-8 w-auto" src={logo} alt="Workflow" />
-    //     {/* <span className="text-sm font-semibold text-white">Maua Grid</span> */}
-    //   </Link>
-    // );
-  };
-  
-  const Progress = () => {
-    const { state, location } = useNavigation();
-    
-    const [progress, setProgress] = useState(0);
-    
-    
-    useEffect(() => {
-      setProgress(0);
-    }, [location?.pathname]);
-    
-    useEffect(() => {
-      if (state === 'loading') {
-        const timer = setInterval(() => {
-          setProgress((oldProgress) => {
-            if (oldProgress === 100) {
-              clearInterval(timer);
-              return 100;
-            }
-            const newProgress = oldProgress + 10;
-            return newProgress > 100 ? 100 : newProgress;
-          });
-        }, 300);
-        
-        return () => {
-          clearInterval(timer);
-        };
-      }
-    }, [state]);
-    
-    if (state !== 'loading') {
-      return null;
+// const Logo = () => {
+//   // return (
+//   //   <Link className="flex items-center text-white" to="/">
+//   //     <img className="h-8 w-auto" src={logo} alt="Workflow" />
+//   //     {/* <span className="text-sm font-semibold text-white">Maua Grid</span> */}
+//   //   </Link>
+//   // );
+// };
+
+const Progress = () => {
+  const { state, location } = useNavigation();
+
+  const [progress, setProgress] = useState(0);
+
+  useEffect(() => {
+    setProgress(0);
+  }, [location?.pathname]);
+
+  useEffect(() => {
+    if (state === 'loading') {
+      const timer = setInterval(() => {
+        setProgress((oldProgress) => {
+          if (oldProgress === 100) {
+            clearInterval(timer);
+            return 100;
+          }
+          const newProgress = oldProgress + 10;
+          return newProgress > 100 ? 100 : newProgress;
+        });
+      }, 300);
+
+      return () => {
+        clearInterval(timer);
+      };
     }
-    
-    return (
-      <div
+  }, [state]);
+
+  if (state !== 'loading') {
+    return null;
+  }
+
+  return (
+    <div
       className="fixed left-0 top-0 h-1 bg-blue-500 transition-all duration-200 ease-in-out"
       style={{ width: `${progress}%` }}
-      ></div>
-    );
+    ></div>
+  );
+};
+
+export function DashboardLayout({ children }: { children: React.ReactNode }) {
+  const navigate = useNavigate();
+  const { instance, accounts } = useMsal();
+  const { role } = useUser();
+
+  useEffect(() => {
+    if (accounts.length === 0) {
+      navigate('/auth/login');
+    }
+    /* forçar update pagina*/
+  }, [navigate, accounts]);
+
+  const handleLogout = (instance: any) => {
+    instance.logoutPopup().catch((e: any) => {
+      console.error(e);
+    });
   };
-  
-  export function DashboardLayout({ children }: { children: React.ReactNode }) {
-    const navigate = useNavigate();
-    const { instance , accounts} = useMsal();
 
-    useEffect(() => {
-        if (accounts.length === 0) {
+  // const { checkAccess } = useAuthorization();
+  const getNavigationItems = (role: string): SideNavigationItem[] => {
+    const baseItems: SideNavigationItem[] = [
+      { name: 'Dashboard', to: 'dashboard', icon: Home },
+    ];
 
-        navigate('/auth/login');
-        }
-        /* forçar update pagina*/
-
-    }, [accounts]);
-
-    const handleLogout = (instance: any) => {
-        instance.logoutPopup().catch((e: any) => {
-            console.error(e);
-        });
+    if (role === 'STAFF') {
+      baseItems.push({
+        name: 'Time Registration',
+        to: 'time-registration',
+        icon: Clock3,
+      });
+    } else if (role === 'PROFESSOR') {
+      baseItems.push({
+        name: 'Availability',
+        to: 'teacher-suitability-availability',
+        icon: CalendarClock,
+      });
+    } else if (role === 'COORDINATOR') {
+      baseItems.push({
+        name: 'Teachers',
+        to: 'coordinator-suitability-availability',
+        icon: GraduationCap,
+      });
     }
 
-    // const { checkAccess } = useAuthorization();
-    const navigation = [
-    { name: 'Dashboard', to: 'dashboard', icon: Home },
-    { name: 'Time Registration', to: 'time-registration', icon: Clock3 },
-    // checkAccess({ allowedRoles: [ROLES.ADMIN] }) && {
-    //   name: 'Users',
-    //   to: './users',
-    //   icon: Users,
-    // },
-    { name: 'Availability', to: 'teacher-suitability-availability', icon: CalendarClock },
-    { name: 'Teachers', to: 'coordinator-suitability-availability', icon: GraduationCap },
-  ].filter(Boolean) as SideNavigationItem[];
+    return baseItems;
+  };
+
+  const navigation = getNavigationItems(role);
 
   return (
     <div className="flex min-h-screen w-full flex-col bg-muted/40">
       <aside className="fixed inset-y-0 left-0 z-10 hidden w-60 flex-col border-r bg-black sm:flex">
         <nav className="flex flex-col items-center gap-4 px-2 py-4">
-          <div className="flex h-16 shrink-0 items-center px-4">
-            <Logo />
-          </div>
           {navigation.map((item) => (
             <NavLink
               key={item.name}
@@ -120,8 +137,8 @@ const Logo = () => {
               end={item.name !== 'Discussions'}
               className={({ isActive }) =>
                 cn(
-                  'text-gray-300 hover:bg-gray-700 hover:text-white transition duration-600',
-                  'group flex w-full flex-1 items-center rounded-xl p-2 text-base font-medium transition duration-600',
+                  'duration-600 text-gray-300 transition hover:bg-gray-700 hover:text-white',
+                  'duration-600 group flex w-full flex-1 items-center rounded-xl p-2 text-base font-medium transition',
                   isActive && 'bg-gray-900 text-white',
                 )
               }
@@ -153,9 +170,6 @@ const Logo = () => {
               className="bg-black pt-10 text-white sm:max-w-60"
             >
               <nav className="grid gap-6 text-lg font-medium">
-                <div className="flex h-16 shrink-0 items-center px-4">
-                  <Logo />
-                </div>
                 {navigation.map((item) => (
                   <NavLink
                     key={item.name}
@@ -198,6 +212,16 @@ const Logo = () => {
                 className={cn('block w-full px-4 py-2 text-sm text-gray-700')}
               >
                 {accounts.length > 0 ? accounts[0].name : ''}
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                className={cn('block w-full px-4 py-2 text-sm text-gray-700')}
+              >
+                {accounts.length > 0 ? accounts[0].username : ''}
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                className={cn('block w-full px-4 py-2 text-sm text-gray-700')}
+              >
+                {accounts.length > 0 ? role : ''}
               </DropdownMenuItem>
               <DropdownMenuItem
                 className={cn('block w-full px-4 py-2 text-sm text-gray-700')}
