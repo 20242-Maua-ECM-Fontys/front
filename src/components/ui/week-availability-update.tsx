@@ -1,5 +1,5 @@
 import { ArrowRight, ArrowLeft } from 'lucide-react';
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 
 type WeekDays =
   | 'Monday'
@@ -11,14 +11,15 @@ type WeekDays =
 
 interface Availability {
   startTime: number; // em minutos
-  endTime: number;   // em minutos
+  endTime: number; // em minutos
   weekDay: string;
 }
 
 interface WeekAvailabilityTableProps {
   startHour: string;
   endHour: string;
-  initialAvailability: Availability[]; // Nova propriedade
+  initialAvailability: Availability[];
+  onAvailabilityChange: (newAvailability: Availability[]) => void; // Adicionei essa linha
 }
 
 const convertTimeStringToDecimal = (timeString: string): number => {
@@ -64,14 +65,19 @@ const WeekAvailabilityTable: React.FC<WeekAvailabilityTableProps> = ({
   startHour,
   endHour,
   initialAvailability, // Recebendo a lista de disponibilidade
+  onAvailabilityChange, // Adicionando a função de callback
 }) => {
-  const [availability, setAvailability] = useState<Availability[]>(initialAvailability);
+  const [availability, setAvailability] =
+    useState<Availability[]>(initialAvailability);
   const [visibleDayIndex, setVisibleDayIndex] = useState(0);
 
   const startHourDecimal = convertTimeStringToDecimal(startHour);
   const endHourDecimal = convertTimeStringToDecimal(endHour);
 
-  const timeIntervals = generateCustomTimeIntervals(startHourDecimal, endHourDecimal);
+  const timeIntervals = generateCustomTimeIntervals(
+    startHourDecimal,
+    endHourDecimal,
+  );
 
   const toggleTimeSlot = (day: WeekDays, interval: string) => {
     const [startTimeStr, endTimeStr] = interval.split(' - ');
@@ -84,16 +90,29 @@ const WeekAvailabilityTable: React.FC<WeekAvailabilityTableProps> = ({
 
     setAvailability((prev) => {
       const existingSlotIndex = prev.findIndex(
-        (slot) => slot.startTime === startTime && slot.endTime === endTime && slot.weekDay === weekDay
+        (slot) =>
+          slot.startTime === startTime &&
+          slot.endTime === endTime &&
+          slot.weekDay === weekDay,
       );
 
+      let updatedAvailability;
       if (existingSlotIndex >= 0) {
         // Remove o slot de tempo se já existir
-        return prev.filter((_, index) => index !== existingSlotIndex);
+        updatedAvailability = prev.filter(
+          (_, index) => index !== existingSlotIndex,
+        );
       } else {
         // Adiciona o novo slot de tempo
-        return [...prev, { startTime, endTime, weekDay }];
+        updatedAvailability = [...prev, { startTime, endTime, weekDay }];
       }
+
+      // Chama a função de callback do componente pai
+      if (onAvailabilityChange) {
+        onAvailabilityChange(updatedAvailability);
+      }
+
+      return updatedAvailability;
     });
   };
 
@@ -136,7 +155,14 @@ const WeekAvailabilityTable: React.FC<WeekAvailabilityTableProps> = ({
                 <th className="border-b-2 p-2 text-center text-sm md:text-base">
                   Time Intervals
                 </th>
-                {["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"].map((day, index) => (
+                {[
+                  'Monday',
+                  'Tuesday',
+                  'Wednesday',
+                  'Thursday',
+                  'Friday',
+                  'Saturday',
+                ].map((day, index) => (
                   <th
                     key={day}
                     className={`border-b-2 p-2 text-center text-sm md:text-base ${index !== visibleDayIndex ? 'hidden md:table-cell' : ''}`}
@@ -152,10 +178,17 @@ const WeekAvailabilityTable: React.FC<WeekAvailabilityTableProps> = ({
                   <td className="border bg-gray-100 p-2 text-sm md:text-base">
                     {interval}
                   </td>
-                  {["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"].map((day, index) => (
+                  {[
+                    'Monday',
+                    'Tuesday',
+                    'Wednesday',
+                    'Thursday',
+                    'Friday',
+                    'Saturday',
+                  ].map((day, index) => (
                     <td
                       key={day + interval}
-                      className={`duration-600 cursor-pointer border p-2 text-sm transition md:text-base ${index !== visibleDayIndex ? 'hidden md:table-cell' : ''} ${availability.some(slot => slot.startTime === convertTimeToMinutes(convertTimeStringToDecimal(interval.split(' - ')[0])) && slot.endTime === convertTimeToMinutes(convertTimeStringToDecimal(interval.split(' - ')[1])) && slot.weekDay === day.slice(0, 3).toUpperCase()) ? 'bg-blue-500 text-white' : 'hover:bg-blue-100'}`}
+                      className={`cursor-pointer border p-2 text-sm transition md:text-base ${index !== visibleDayIndex ? 'hidden md:table-cell' : ''} ${availability.some((slot) => slot.startTime === convertTimeToMinutes(convertTimeStringToDecimal(interval.split('-')[0])) && slot.endTime === convertTimeToMinutes(convertTimeStringToDecimal(interval.split('-')[1])) && slot.weekDay === day.slice(0, 3).toUpperCase()) ? 'bg-blue-500 text-white' : 'hover:bg-blue-100'}`}
                       onClick={() => toggleTimeSlot(day as WeekDays, interval)}
                     ></td>
                   ))}
@@ -163,7 +196,6 @@ const WeekAvailabilityTable: React.FC<WeekAvailabilityTableProps> = ({
               ))}
             </tbody>
           </table>
-          <pre>{JSON.stringify(availability, null, 2)}</pre>
         </div>
       </div>
     </div>
