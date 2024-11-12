@@ -73,18 +73,10 @@ const generateCustomTimeIntervals = (startHour: number, endHour: number) => {
 // eg: { Monday: ['08:00 - 08:10', '08:20 - 08:30'], Tuesday: ['08:00 - 08:10'] }
 const formatAvailability = (
   availability: Availability,
-): Record<WeekDays, { notEarlier: string; notLater: string }> => {
-  const formattedAvailability: Record<
-    WeekDays,
-    { notEarlier: string; notLater: string }
-  > = {
-    Monday: { notEarlier: '', notLater: '' },
-    Tuesday: { notEarlier: '', notLater: '' },
-    Wednesday: { notEarlier: '', notLater: '' },
-    Thursday: { notEarlier: '', notLater: '' },
-    Friday: { notEarlier: '', notLater: '' },
-    Saturday: { notEarlier: '', notLater: '' },
-  };
+): Partial<Record<WeekDays, { notEarlier: string; notLater: string }>> => {
+  const formattedAvailability: Partial<
+    Record<WeekDays, { notEarlier: string; notLater: string }>
+  > = {};
 
   Object.keys(availability).forEach((day) => {
     const dayAvailability = availability[day as WeekDays];
@@ -100,8 +92,8 @@ const formatAvailability = (
         dayAvailability[dayAvailability.length - 1].split(' - ')[1];
 
       formattedAvailability[day as WeekDays] = {
-        notEarlier: firstTime.replace(':', 'h'),
-        notLater: lastTime.replace(':', 'h'),
+        notEarlier: firstTime,
+        notLater: lastTime,
       };
     }
   });
@@ -215,7 +207,7 @@ export const WeekAvailabilityTable = ({
               ))}
             </tbody>
           </table>
-          <pre>{JSON.stringify(formatAvailability(availability), null, 2)}</pre>
+          {/* <pre>{JSON.stringify(formatAvailability(availability), null, 2)}</pre> */}
         </div>
       </div>
     </div>
