@@ -1,18 +1,16 @@
+import { useMsal } from '@azure/msal-react';
+
 import { ContentLayout } from '@/components/layouts';
-import { useUser } from '@/lib/auth';
-import { ROLES } from '@/lib/authorization';
-import { useMsal} from '@azure/msal-react';
 
 export const DashboardRoute = () => {
-  const {instance, accounts} = useMsal();
+  const { accounts } = useMsal();
 
   return (
     <ContentLayout title="Dashboard">
       <h1 className="text-xl">
         Welcome <b>{`${accounts[0]?.name}`}</b>
       </h1>
-          
-      
+
       {/* <h4 className="my-3">
         Your role is : <b>{user.data?.role}</b>
       </h4>
