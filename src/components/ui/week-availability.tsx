@@ -11,12 +11,12 @@ type WeekDays =
 type TimeSlot = string;
 
 interface Availability {
-  Monday?: TimeSlot[];
-  Tuesday?: TimeSlot[];
-  Wednesday?: TimeSlot[];
-  Thursday?: TimeSlot[];
-  Friday?: TimeSlot[];
-  Saturday?: TimeSlot[];
+  Monday: TimeSlot[];
+  Tuesday: TimeSlot[];
+  Wednesday: TimeSlot[];
+  Thursday: TimeSlot[];
+  Friday: TimeSlot[];
+  Saturday: TimeSlot[];
 }
 
 interface WeekAvailabilityTableProps {
@@ -24,40 +24,6 @@ interface WeekAvailabilityTableProps {
   endHour: string;
   resetAvailability?: boolean;
 }
-
-const convertTimeStringToDecimal = (timeString: string): number => {
-  const [hour, minute] = timeString.split(':').map(Number);
-  return hour + minute / 60;
-};
-
-const convertDecimalHourToTimeString = (hourDecimal: number): string => {
-  const hour = Math.floor(hourDecimal);
-  const minute = Math.round((hourDecimal - hour) * 60);
-  if (minute === 60) {
-    return `${String(hour + 1).padStart(2, '0')}:00`;
-  }
-  return `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`;
-};
-
-const generateCustomTimeIntervals = (startHour: number, endHour: number) => {
-  const timeIntervals: string[] = [];
-  let currentHour = startHour;
-  const intervalDuration = 100 / 60;
-
-  while (currentHour < endHour) {
-    const startTime = convertDecimalHourToTimeString(currentHour);
-    let endHourInterval = currentHour + intervalDuration;
-    if (endHourInterval > endHour) {
-      endHourInterval = endHour;
-    }
-    const endTime = convertDecimalHourToTimeString(endHourInterval);
-
-    timeIntervals.push(`${startTime} - ${endTime}`);
-    currentHour = endHourInterval + 10 / 60;
-  }
-
-  return timeIntervals;
-};
 
 const initialAvailability: Availability = {
   Monday: [],
@@ -68,46 +34,88 @@ const initialAvailability: Availability = {
   Saturday: [],
 };
 
-const formatAvailability = (availability: Availability) => {
-  const formattedAvailability: {
-    [day: string]: { notEarlier: string; notLater: string };
-  } = {};
+const convertTimeStringToDecimal = (timeString: string): number => {
+  const [hour, minute] = timeString.split(':').map(Number);
+  return hour + minute / 60;
+};
 
-  // order the time slots to be in ascending order
-  for (const day in availability) {
-    availability[day].sort((a, b) => {
-      const [hourA, minuteA] = a.split(' - ')[0].split(':').map(Number);
-      const [hourB, minuteB] = b.split(' - ')[0].split(':').map(Number);
+const convertDecimalToTimeString = (hourDecimal: number): string => {
+  const hour = Math.floor(hourDecimal);
+  const minute = Math.round((hourDecimal - hour) * 60);
+  if (minute === 60) {
+    return `${String(hour + 1).padStart(2, '0')}:00`;
+  }
+  return `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`;
+};
 
-      return hourA - hourB || minuteA - minuteB;
-    });
+// Array of time intervals between startHour and endHour
+// eg: generateCustomTimeIntervals(8, 18) => ['08:00 - 08:10', '08:10 - 08:20', ...]
+const generateCustomTimeIntervals = (startHour: number, endHour: number) => {
+  const timeIntervals: string[] = [];
+  let currentHour = startHour;
+  const intervalDuration = 100 / 60;
+
+  while (currentHour < endHour) {
+    const startTime = convertDecimalToTimeString(currentHour);
+    let endHourInterval = currentHour + intervalDuration;
+    if (endHourInterval > endHour) {
+      endHourInterval = endHour;
+    }
+    const endTime = convertDecimalToTimeString(endHourInterval);
+
+    timeIntervals.push(`${startTime} - ${endTime}`);
+    currentHour = endHourInterval + 10 / 60;
   }
 
-  for (const day in availability) {
-    if (availability[day].length > 0) {
-      // Extract the first and last time of the day
-      const firstTime = availability[day][0].split(' - ')[0]; // catch the start time of the first interval
-      const lastTime =
-        availability[day][availability[day].length - 1].split(' - ')[1]; // catch the end time of the last interval
+  return timeIntervals;
+};
 
-      // Format and store the availability
-      formattedAvailability[day] = {
-        notEarlier: firstTime.replace(':', 'h'), // format to HHhMM
+// eg: { Monday: ['08:00 - 08:10', '08:20 - 08:30'], Tuesday: ['08:00 - 08:10'] }
+const formatAvailability = (
+  availability: Availability,
+): Record<WeekDays, { notEarlier: string; notLater: string }> => {
+  const formattedAvailability: Record<
+    WeekDays,
+    { notEarlier: string; notLater: string }
+  > = {
+    Monday: { notEarlier: '', notLater: '' },
+    Tuesday: { notEarlier: '', notLater: '' },
+    Wednesday: { notEarlier: '', notLater: '' },
+    Thursday: { notEarlier: '', notLater: '' },
+    Friday: { notEarlier: '', notLater: '' },
+    Saturday: { notEarlier: '', notLater: '' },
+  };
+
+  Object.keys(availability).forEach((day) => {
+    const dayAvailability = availability[day as WeekDays];
+    if (dayAvailability.length > 0) {
+      dayAvailability.sort((a, b) => {
+        const [hourA, minuteA] = a.split(' - ')[0].split(':').map(Number);
+        const [hourB, minuteB] = b.split(' - ')[0].split(':').map(Number);
+        return hourA - hourB || minuteA - minuteB;
+      });
+
+      const firstTime = dayAvailability[0].split(' - ')[0];
+      const lastTime =
+        dayAvailability[dayAvailability.length - 1].split(' - ')[1];
+
+      formattedAvailability[day as WeekDays] = {
+        notEarlier: firstTime.replace(':', 'h'),
         notLater: lastTime.replace(':', 'h'),
       };
     }
-  }
+  });
 
   return formattedAvailability;
 };
 
-const WeekAvailabilityTable: React.FC<WeekAvailabilityTableProps> = ({
+export const WeekAvailabilityTable = ({
   startHour,
   endHour,
-}) => {
+}: WeekAvailabilityTableProps) => {
   const [availability, setAvailability] =
     useState<Availability>(initialAvailability);
-  const [visibleDayIndex, setVisibleDayIndex] = useState(0);
+  const [visibleDayIndex, setVisibleDayIndex] = useState<number>(0);
 
   const startHourDecimal = convertTimeStringToDecimal(startHour);
   const endHourDecimal = convertTimeStringToDecimal(endHour);
@@ -117,44 +125,36 @@ const WeekAvailabilityTable: React.FC<WeekAvailabilityTableProps> = ({
     endHourDecimal,
   );
 
-  const toggleTimeSlot = (day: WeekDays, time: TimeSlot) => {
-    setAvailability((prev) => {
-      const dayAvailability = prev[day] || [];
-      const isTimeSelected = dayAvailability.includes(time);
-
-      return {
-        ...prev,
-        [day]: isTimeSelected
-          ? dayAvailability.filter((t) => t !== time)
-          : [...dayAvailability, time],
-      };
+  const toggleTimeSlot = (day: WeekDays, timeSlot: TimeSlot) => {
+    setAvailability((prevAvailability) => {
+      const dayAvailability = prevAvailability[day];
+      const newDayAvailability = dayAvailability.includes(timeSlot)
+        ? dayAvailability.filter((slot) => slot !== timeSlot)
+        : [...dayAvailability, timeSlot];
+      return { ...prevAvailability, [day]: newDayAvailability };
     });
   };
 
   const handleNextDay = () => {
-    if (visibleDayIndex < Object.keys(initialAvailability).length - 1) {
-      setVisibleDayIndex(visibleDayIndex + 1);
-    }
+    setVisibleDayIndex((prevIndex) => (prevIndex + 1) % 6);
   };
 
   const handlePreviousDay = () => {
-    if (visibleDayIndex > 0) {
-      setVisibleDayIndex(visibleDayIndex - 1);
-    }
+    setVisibleDayIndex((prevIndex) => (prevIndex - 1 + 6) % 6);
   };
 
   return (
     <div className="container mx-auto p-4">
       <div className="mb-2 flex justify-center md:hidden">
         <button
-          className="mx-1 p-2 text-blue-500 hover:text-blue-700 focus:outline-none disabled:opacity-50 "
+          className="mx-1 p-2 text-blue-500 hover:text-blue-700 focus:outline-none disabled:opacity-50"
           onClick={handlePreviousDay}
           disabled={visibleDayIndex === 0}
         >
           <ArrowLeft size={24} />
         </button>
         <button
-          className="mx-1 p-2 text-blue-500 hover:text-blue-700 focus:outline-none disabled:opacity-50 "
+          className="mx-1 p-2 text-blue-500 hover:text-blue-700 focus:outline-none disabled:opacity-50"
           onClick={handleNextDay}
           disabled={
             visibleDayIndex === Object.keys(initialAvailability).length - 1
@@ -193,15 +193,23 @@ const WeekAvailabilityTable: React.FC<WeekAvailabilityTableProps> = ({
                   {Object.keys(initialAvailability).map((day, index) => (
                     <td
                       key={day + interval}
-                      className={`duration-600 cursor-pointer border p-2 text-sm transition md:text-base ${
+                      className={`w-40 cursor-pointer select-none border transition duration-300 ${
                         index !== visibleDayIndex ? 'hidden md:table-cell' : ''
                       } ${
                         availability[day as WeekDays].includes(interval)
                           ? 'bg-blue-500 text-white'
                           : 'hover:bg-blue-100'
                       }`}
-                      onClick={() => toggleTimeSlot(day as WeekDays, interval)}
-                    ></td>
+                    >
+                      <button
+                        className={'size-full'}
+                        onClick={() =>
+                          toggleTimeSlot(day as WeekDays, interval)
+                        }
+                      >
+                        &nbsp;
+                      </button>
+                    </td>
                   ))}
                 </tr>
               ))}
@@ -213,5 +221,3 @@ const WeekAvailabilityTable: React.FC<WeekAvailabilityTableProps> = ({
     </div>
   );
 };
-
-export default WeekAvailabilityTable;
