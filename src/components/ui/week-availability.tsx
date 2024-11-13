@@ -71,35 +71,35 @@ const generateCustomTimeIntervals = (startHour: number, endHour: number) => {
 };
 
 // eg: { Monday: ['08:00 - 08:10', '08:20 - 08:30'], Tuesday: ['08:00 - 08:10'] }
-const formatAvailability = (
-  availability: Availability,
-): Partial<Record<WeekDays, { notEarlier: string; notLater: string }>> => {
-  const formattedAvailability: Partial<
-    Record<WeekDays, { notEarlier: string; notLater: string }>
-  > = {};
+// const formatAvailability = (
+//   availability: Availability,
+// ): Partial<Record<WeekDays, { notEarlier: string; notLater: string }>> => {
+//   const formattedAvailability: Partial<
+//     Record<WeekDays, { notEarlier: string; notLater: string }>
+//   > = {};
 
-  Object.keys(availability).forEach((day) => {
-    const dayAvailability = availability[day as WeekDays];
-    if (dayAvailability.length > 0) {
-      dayAvailability.sort((a, b) => {
-        const [hourA, minuteA] = a.split(' - ')[0].split(':').map(Number);
-        const [hourB, minuteB] = b.split(' - ')[0].split(':').map(Number);
-        return hourA - hourB || minuteA - minuteB;
-      });
+//   Object.keys(availability).forEach((day) => {
+//     const dayAvailability = availability[day as WeekDays];
+//     if (dayAvailability.length > 0) {
+//       dayAvailability.sort((a, b) => {
+//         const [hourA, minuteA] = a.split(' - ')[0].split(':').map(Number);
+//         const [hourB, minuteB] = b.split(' - ')[0].split(':').map(Number);
+//         return hourA - hourB || minuteA - minuteB;
+//       });
 
-      const firstTime = dayAvailability[0].split(' - ')[0];
-      const lastTime =
-        dayAvailability[dayAvailability.length - 1].split(' - ')[1];
+//       const firstTime = dayAvailability[0].split(' - ')[0];
+//       const lastTime =
+//         dayAvailability[dayAvailability.length - 1].split(' - ')[1];
 
-      formattedAvailability[day as WeekDays] = {
-        notEarlier: firstTime,
-        notLater: lastTime,
-      };
-    }
-  });
+//       formattedAvailability[day as WeekDays] = {
+//         notEarlier: firstTime,
+//         notLater: lastTime,
+//       };
+//     }
+//   });
 
-  return formattedAvailability;
-};
+//   return formattedAvailability;
+// };
 
 export const WeekAvailabilityTable = ({
   startHour,
@@ -136,7 +136,7 @@ export const WeekAvailabilityTable = ({
   };
 
   return (
-    <div className="container mx-auto p-4">
+    <div className="container p-4">
       <div className="mb-2 flex justify-center md:hidden">
         <button
           className="mx-1 p-2 text-blue-500 hover:text-blue-700 focus:outline-none disabled:opacity-50"
@@ -158,7 +158,7 @@ export const WeekAvailabilityTable = ({
 
       <div className="relative overflow-hidden">
         <div className="overflow-auto">
-          <table className="w-full table-auto border border-gray-300">
+          <table className="w-full table-fixed border border-gray-300">
             <thead>
               <tr>
                 <th className="border-b-2 p-2 text-center text-sm md:text-base">
@@ -185,16 +185,21 @@ export const WeekAvailabilityTable = ({
                   {Object.keys(initialAvailability).map((day, index) => (
                     <td
                       key={day + interval}
-                      className={`w-40 cursor-pointer select-none border transition duration-300 ${
+                      className={`cursor-pointer select-none border p-0 transition duration-300 border-y-dashed ${
                         index !== visibleDayIndex ? 'hidden md:table-cell' : ''
                       } ${
                         availability[day as WeekDays].includes(interval)
-                          ? 'bg-blue-500 text-white'
-                          : 'hover:bg-blue-100'
-                      }`}
+                          ? 'border-y-blue-500'
+                          : ''
+                      } `}
                     >
                       <button
-                        className={'size-full'}
+                        // eslint-disable-next-line tailwindcss/enforces-shorthand
+                        className={`size-full p-2 ${
+                          availability[day as WeekDays].includes(interval)
+                            ? 'bg-blue-500 text-white'
+                            : 'hover:bg-blue-100'
+                        }`}
                         onClick={() =>
                           toggleTimeSlot(day as WeekDays, interval)
                         }
@@ -207,7 +212,6 @@ export const WeekAvailabilityTable = ({
               ))}
             </tbody>
           </table>
-          {/* <pre>{JSON.stringify(formatAvailability(availability), null, 2)}</pre> */}
         </div>
       </div>
     </div>
