@@ -7,7 +7,6 @@ import {
 
 import { AppRoot } from './routes/app/root';
 
-
 export const createAppRouter = () =>
   createBrowserRouter([
     {
@@ -20,7 +19,6 @@ export const createAppRouter = () =>
         const { LoginRoute } = await import('./routes/auth/login');
         return { Component: LoginRoute };
       },
-
     },
     {
       path: '/app',
@@ -45,7 +43,7 @@ export const createAppRouter = () =>
             const { DashboardRoute } = await import('./routes/app/dashboard');
             return { Component: DashboardRoute };
           },
-        }
+        },
       ],
     },
     {
