@@ -1,13 +1,11 @@
+import { useMsal } from '@azure/msal-react';
 import { Home, PanelLeft, User2, Clock3 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useNavigate, NavLink, useNavigation } from 'react-router-dom';
 
 import { Button } from '@/components/ui/button';
 import { Drawer, DrawerContent, DrawerTrigger } from '@/components/ui/drawer';
-import { useLogout } from '@/lib/auth';
 import { cn } from '@/utils/cn';
-
-
 
 import {
   DropdownMenu,
@@ -15,8 +13,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '../ui/dropdown';
-import { Link } from '../ui/link';
-import { useMsal } from '@azure/msal-react';
 
 type SideNavigationItem = {
   name: string;
@@ -24,77 +20,65 @@ type SideNavigationItem = {
   icon: (props: React.SVGProps<SVGSVGElement>) => JSX.Element;
 };
 
-const Logo = () => {
-  // return (
-    //   <Link className="flex items-center text-white" to="/">
-    //     <img className="h-8 w-auto" src={logo} alt="Workflow" />
-    //     {/* <span className="text-sm font-semibold text-white">Maua Grid</span> */}
-    //   </Link>
-    // );
-  };
-  
-  const Progress = () => {
-    const { state, location } = useNavigation();
-    
-    const [progress, setProgress] = useState(0);
-    
-    
-    useEffect(() => {
-      setProgress(0);
-    }, [location?.pathname]);
-    
-    useEffect(() => {
-      if (state === 'loading') {
-        const timer = setInterval(() => {
-          setProgress((oldProgress) => {
-            if (oldProgress === 100) {
-              clearInterval(timer);
-              return 100;
-            }
-            const newProgress = oldProgress + 10;
-            return newProgress > 100 ? 100 : newProgress;
-          });
-        }, 300);
-        
-        return () => {
-          clearInterval(timer);
-        };
-      }
-    }, [state]);
-    
-    if (state !== 'loading') {
-      return null;
+const Progress = () => {
+  const { state, location } = useNavigation();
+
+  const [progress, setProgress] = useState(0);
+
+  useEffect(() => {
+    setProgress(0);
+  }, [location?.pathname]);
+
+  useEffect(() => {
+    if (state === 'loading') {
+      const timer = setInterval(() => {
+        setProgress((oldProgress) => {
+          if (oldProgress === 100) {
+            clearInterval(timer);
+            return 100;
+          }
+          const newProgress = oldProgress + 10;
+          return newProgress > 100 ? 100 : newProgress;
+        });
+      }, 300);
+
+      return () => {
+        clearInterval(timer);
+      };
     }
-    
-    return (
-      <div
+  }, [state]);
+
+  if (state !== 'loading') {
+    return null;
+  }
+
+  return (
+    <div
       className="fixed left-0 top-0 h-1 bg-blue-500 transition-all duration-200 ease-in-out"
       style={{ width: `${progress}%` }}
-      ></div>
-    );
-  };
-  
-  export function DashboardLayout({ children }: { children: React.ReactNode }) {
-    const navigate = useNavigate();
-    const { instance , accounts} = useMsal();
+    ></div>
+  );
+};
 
-    useEffect(() => {
-        if (accounts.length === 0) {
+export function DashboardLayout({ children }: { children: React.ReactNode }) {
+  const navigate = useNavigate();
+  const { instance, accounts } = useMsal();
 
-        navigate('/auth/login');
-        }
-        /* forçar update pagina*/
-
-    }, [accounts]);
-
-    const handleLogout = (instance: any) => {
-        instance.logoutPopup().catch((e: any) => {
-            console.error(e);
-        });
+  useEffect(() => {
+    if (accounts.length === 0) {
+      navigate('/auth/login');
     }
+    /* forçar update pagina*/
+  }, [accounts, navigate]);
 
-    // const { checkAccess } = useAuthorization();
-    const navigation = [
+  const handleLogout = (instance: any) => {
+    instance.logoutPopup().catch((e: any) => {
+      console.error(e);
+    });
+  };
+
+  // const { checkAccess } = useAuthorization();
+  const navigation = [
     { name: 'Dashboard', to: 'dashboard', icon: Home },
     { name: 'Time Registration', to: 'time-registration', icon: Clock3 },
     // checkAccess({ allowedRoles: [ROLES.ADMIN] }) && {
@@ -108,9 +92,6 @@ const Logo = () => {
     <div className="flex min-h-screen w-full flex-col bg-muted/40">
       <aside className="fixed inset-y-0 left-0 z-10 hidden w-60 flex-col border-r bg-black sm:flex">
         <nav className="flex flex-col items-center gap-4 px-2 py-4">
-          <div className="flex h-16 shrink-0 items-center px-4">
-            <Logo />
-          </div>
           {navigation.map((item) => (
             <NavLink
               key={item.name}
@@ -151,9 +132,6 @@ const Logo = () => {
               className="bg-black pt-10 text-white sm:max-w-60"
             >
               <nav className="grid gap-6 text-lg font-medium">
-                <div className="flex h-16 shrink-0 items-center px-4">
-                  <Logo />
-                </div>
                 {navigation.map((item) => (
                   <NavLink
                     key={item.name}
