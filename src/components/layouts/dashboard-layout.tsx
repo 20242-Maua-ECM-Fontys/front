@@ -1,11 +1,10 @@
-import { Home, PanelLeft, User2 } from 'lucide-react';
+import { useMsal } from '@azure/msal-react';
+import { Home, PanelLeft, User2, Clock3 } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { NavLink, useNavigation } from 'react-router-dom';
+import { useNavigate, NavLink, useNavigation } from 'react-router-dom';
 
-import logo from '@/assets/images/MauaGrid-logo.svg';
 import { Button } from '@/components/ui/button';
 import { Drawer, DrawerContent, DrawerTrigger } from '@/components/ui/drawer';
-import { useLogout } from '@/lib/auth';
 import { cn } from '@/utils/cn';
 
 import {
@@ -14,21 +13,11 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '../ui/dropdown';
-import { Link } from '../ui/link';
 
 type SideNavigationItem = {
   name: string;
   to: string;
   icon: (props: React.SVGProps<SVGSVGElement>) => JSX.Element;
-};
-
-const Logo = () => {
-  return (
-    <Link className="flex items-center text-white" to="/">
-      <img className="h-8 w-auto" src={logo} alt="Workflow" />
-      {/* <span className="text-sm font-semibold text-white">Maua Grid</span> */}
-    </Link>
-  );
 };
 
 const Progress = () => {
@@ -72,10 +61,26 @@ const Progress = () => {
 };
 
 export function DashboardLayout({ children }: { children: React.ReactNode }) {
-  const logout = useLogout();
+  const navigate = useNavigate();
+  const { instance, accounts } = useMsal();
+
+  useEffect(() => {
+    if (accounts.length === 0) {
+      navigate('/auth/login');
+    }
+    /* forçar update pagina*/
+  }, [accounts, navigate]);
+
+  const handleLogout = (instance: any) => {
+    instance.logoutPopup().catch((e: any) => {
+      console.error(e);
+    });
+  };
+
   // const { checkAccess } = useAuthorization();
   const navigation = [
-    { name: 'Dashboard', to: '.', icon: Home },
+    { name: 'Dashboard', to: 'dashboard', icon: Home },
+    { name: 'Time Registration', to: 'time-registration', icon: Clock3 },
     // checkAccess({ allowedRoles: [ROLES.ADMIN] }) && {
     //   name: 'Users',
     //   to: './users',
@@ -87,9 +92,6 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
     <div className="flex min-h-screen w-full flex-col bg-muted/40">
       <aside className="fixed inset-y-0 left-0 z-10 hidden w-60 flex-col border-r bg-black sm:flex">
         <nav className="flex flex-col items-center gap-4 px-2 py-4">
-          <div className="flex h-16 shrink-0 items-center px-4">
-            <Logo />
-          </div>
           {navigation.map((item) => (
             <NavLink
               key={item.name}
@@ -130,9 +132,6 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
               className="bg-black pt-10 text-white sm:max-w-60"
             >
               <nav className="grid gap-6 text-lg font-medium">
-                <div className="flex h-16 shrink-0 items-center px-4">
-                  <Logo />
-                </div>
                 {navigation.map((item) => (
                   <NavLink
                     key={item.name}
@@ -173,7 +172,12 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
             <DropdownMenuContent align="end">
               <DropdownMenuItem
                 className={cn('block w-full px-4 py-2 text-sm text-gray-700')}
-                onClick={() => logout.mutate({})}
+              >
+                {accounts.length > 0 ? accounts[0].name : ''}
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                className={cn('block w-full px-4 py-2 text-sm text-gray-700')}
+                onClick={() => handleLogout(instance)}
               >
                 Sign Out
               </DropdownMenuItem>

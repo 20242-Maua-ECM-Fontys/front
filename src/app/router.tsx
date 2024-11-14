@@ -11,12 +11,23 @@ export const createAppRouter = () =>
   createBrowserRouter([
     {
       path: '/',
-      element: <Navigate to="/app" replace />,
+      element: <Navigate to="/auth/login" replace />,
+    },
+    {
+      path: '/auth/login',
+      lazy: async () => {
+        const { LoginRoute } = await import('./routes/auth/login');
+        return { Component: LoginRoute };
+      },
     },
     {
       path: '/app',
       element: <AppRoot />,
       children: [
+        {
+          path: '',
+          element: <Navigate to="dashboard" replace />,
+        },
         {
           path: 'time-registration',
           lazy: async () => {
@@ -24,6 +35,13 @@ export const createAppRouter = () =>
               './routes/app/time-registration'
             );
             return { Component: TimeRegistrationRoute };
+          },
+        },
+        {
+          path: 'dashboard',
+          lazy: async () => {
+            const { DashboardRoute } = await import('./routes/app/dashboard');
+            return { Component: DashboardRoute };
           },
         },
       ],

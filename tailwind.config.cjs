@@ -72,5 +72,14 @@ module.exports = {
       },
     },
   },
-  plugins: [require('tailwindcss-animate'), require('@tailwindcss/typography')],
+  plugins: [require('tailwindcss-animate'), require('@tailwindcss/typography'),
+  function ({ addUtilities }) {
+    addUtilities({
+      '.border-y-dashed': {
+        borderTopStyle: 'dashed',
+        borderBottomStyle: 'dashed',
+      },
+    })
+  }
+  ],
 };

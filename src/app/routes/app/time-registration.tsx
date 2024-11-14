@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-import WeekAvailability from '@/components/ui/week-availability';
+import { WeekAvailabilityTable } from '../../../features/time-registration/components/week-availability';
 
 export const TimeRegistrationRoute = () => {
   const [timeSlot, setTimeSlot] = useState<{ start: string; end: string }>({
@@ -75,7 +75,7 @@ export const TimeRegistrationRoute = () => {
           </h2>
           <p>Building your Schedules in a straightforward manner</p>
           <button
-            className="mt-4 rounded bg-gray-200 px-4 py-2  transition duration-300 hover:bg-blue-400 hover:text-white"
+            className="mt-4 rounded bg-gray-200 px-4 py-2 transition duration-300 hover:bg-blue-400 hover:text-white"
             onClick={() =>
               document
                 .getElementById('course-registration')
@@ -240,7 +240,7 @@ export const TimeRegistrationRoute = () => {
             <p>Evening</p>
           </button>
         </div>
-        <WeekAvailability
+        <WeekAvailabilityTable
           startHour={timeSlot.start}
           endHour={timeSlot.end}
           key={weekKey}
