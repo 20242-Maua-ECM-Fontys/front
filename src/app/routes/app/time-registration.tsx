@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-import { WeekAvailabilityTable } from '@/components/ui/week-availability';
+import { WeekAvailabilityTable } from '../../../features/time-registration/components/week-availability';
 
 export const TimeRegistrationRoute = () => {
   const [timeSlot, setTimeSlot] = useState<{ start: string; end: string }>({

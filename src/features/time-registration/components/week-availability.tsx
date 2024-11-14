@@ -1,29 +1,16 @@
 import { ArrowRight, ArrowLeft } from 'lucide-react';
 import React, { useState } from 'react';
 
-type WeekDays =
-  | 'Monday'
-  | 'Tuesday'
-  | 'Wednesday'
-  | 'Thursday'
-  | 'Friday'
-  | 'Saturday';
-type TimeSlot = string;
-
-interface Availability {
-  Monday: TimeSlot[];
-  Tuesday: TimeSlot[];
-  Wednesday: TimeSlot[];
-  Thursday: TimeSlot[];
-  Friday: TimeSlot[];
-  Saturday: TimeSlot[];
-}
-
-interface WeekAvailabilityTableProps {
-  startHour: string;
-  endHour: string;
-  resetAvailability?: boolean;
-}
+import type {
+  Availability,
+  TimeSlot,
+  WeekAvailabilityTableProps,
+  WeekDays,
+} from '../types/availability';
+import {
+  convertTimeStringToDecimal,
+  generateCustomTimeIntervals,
+} from '../utils/custom-time-intervals';
 
 const initialAvailability: Availability = {
   Monday: [],
@@ -32,42 +19,6 @@ const initialAvailability: Availability = {
   Thursday: [],
   Friday: [],
   Saturday: [],
-};
-
-const convertTimeStringToDecimal = (timeString: string): number => {
-  const [hour, minute] = timeString.split(':').map(Number);
-  return hour + minute / 60;
-};
-
-const convertDecimalToTimeString = (hourDecimal: number): string => {
-  const hour = Math.floor(hourDecimal);
-  const minute = Math.round((hourDecimal - hour) * 60);
-  if (minute === 60) {
-    return `${String(hour + 1).padStart(2, '0')}:00`;
-  }
-  return `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`;
-};
-
-// Array of time intervals between startHour and endHour
-// eg: generateCustomTimeIntervals(8, 18) => ['08:00 - 08:10', '08:10 - 08:20', ...]
-const generateCustomTimeIntervals = (startHour: number, endHour: number) => {
-  const timeIntervals: string[] = [];
-  let currentHour = startHour;
-  const intervalDuration = 100 / 60;
-
-  while (currentHour < endHour) {
-    const startTime = convertDecimalToTimeString(currentHour);
-    let endHourInterval = currentHour + intervalDuration;
-    if (endHourInterval > endHour) {
-      endHourInterval = endHour;
-    }
-    const endTime = convertDecimalToTimeString(endHourInterval);
-
-    timeIntervals.push(`${startTime} - ${endTime}`);
-    currentHour = endHourInterval + 10 / 60;
-  }
-
-  return timeIntervals;
 };
 
 // eg: { Monday: ['08:00 - 08:10', '08:20 - 08:30'], Tuesday: ['08:00 - 08:10'] }
@@ -127,27 +78,23 @@ export const WeekAvailabilityTable = ({
     });
   };
 
-  const handleNextDay = () => {
-    setVisibleDayIndex((prevIndex) => (prevIndex + 1) % 6);
-  };
-
-  const handlePreviousDay = () => {
-    setVisibleDayIndex((prevIndex) => (prevIndex - 1 + 6) % 6);
-  };
-
   return (
     <div className="container p-4">
       <div className="mb-2 flex justify-center md:hidden">
         <button
           className="mx-1 p-2 text-blue-500 hover:text-blue-700 focus:outline-none disabled:opacity-50"
-          onClick={handlePreviousDay}
+          // Previous day
+          onClick={() =>
+            setVisibleDayIndex((prevIndex) => (prevIndex - 1 + 6) % 6)
+          }
           disabled={visibleDayIndex === 0}
         >
           <ArrowLeft size={24} />
         </button>
         <button
           className="mx-1 p-2 text-blue-500 hover:text-blue-700 focus:outline-none disabled:opacity-50"
-          onClick={handleNextDay}
+          // Next day
+          onClick={() => setVisibleDayIndex((prevIndex) => (prevIndex + 1) % 6)}
           disabled={
             visibleDayIndex === Object.keys(initialAvailability).length - 1
           }
@@ -194,7 +141,6 @@ export const WeekAvailabilityTable = ({
                       } `}
                     >
                       <button
-                        // eslint-disable-next-line tailwindcss/enforces-shorthand
                         className={`size-full p-2 ${
                           availability[day as WeekDays].includes(interval)
                             ? 'bg-blue-500 text-white'
