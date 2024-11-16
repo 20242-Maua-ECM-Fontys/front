@@ -18,6 +18,7 @@
 
 # misc
 .DS_Store
+.vite
 .env
 .env.local
 .env.development.local
