@@ -1,4 +1,4 @@
-import { ArrowRight, ArrowLeft } from 'lucide-react';
+import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { useState } from 'react';
 
 import { Button } from '@/components/ui/button';
@@ -84,7 +84,7 @@ export const CreateStaffAvailability = ({
       onSuccess: () => {
         addNotification({
           type: 'success',
-          title: 'CSV uploaded successfully',
+          title: 'Availability registered with success',
         });
       },
     },
