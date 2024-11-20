@@ -11,6 +11,8 @@ import { Spinner } from '@/components/ui/spinner';
 import { queryConfig } from '@/lib/react-query';
 import { msalConfig } from 'src/components/layouts/auth-config';
 
+import { Notifications } from '../components/ui/notifications';
+
 type AppProviderProps = {
   children: React.ReactNode;
 };
@@ -39,6 +41,7 @@ export const AppProvider = ({ children }: AppProviderProps) => {
           <QueryClientProvider client={queryClient}>
             <MsalProvider instance={msalInstance}>
               {import.meta.env.DEV && <ReactQueryDevtools />}
+              <Notifications />
               {children}
             </MsalProvider>
           </QueryClientProvider>
