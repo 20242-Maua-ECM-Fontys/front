@@ -2,14 +2,22 @@ import React, { useState } from 'react';
 
 import { CreateStaffAvailability } from '@/features/time-registration/components/create-staff-availability';
 
+import { useSchedules } from '../../../features/time-registration/api/get-all-schedules';
+import type { Schedule } from '../../../types/api';
+
 export const TimeRegistrationRoute = () => {
+  const scheduleQuery = useSchedules({});
+
+  const schedules = scheduleQuery?.data?.courses;
+
   const [timeSlot, setTimeSlot] = useState<{ start: string; end: string }>({
     start: '07:40',
     end: '13:00',
   });
 
   const [period, setPeriod] = useState('Morning');
-  const [semester, setSemester] = useState('');
+  const [year, setYear] = useState<number>();
+  const [semester, setSemester] = useState<string>();
   const [course, setCourse] = useState('');
   const [weekKey, setWeekKey] = useState(0);
   const [isEngineering, setIsEngineering] = useState(false);
@@ -35,7 +43,7 @@ export const TimeRegistrationRoute = () => {
   const handleCourseChange = (course: string) => {
     setCourse(course);
     const engineeringCourses = [
-      'Computer Engineering',
+      'Compute Engineering',
       'Electrical Engineering',
       'Mechanical Engineering',
       'Civil Engineering',
@@ -46,29 +54,24 @@ export const TimeRegistrationRoute = () => {
     setIsEngineering(engineeringCourses.includes(course));
   };
 
-  const handleSemesterChange = (semester: string) => {
-    setSemester(semester);
+  const getScheduleId = () => {
+    if (schedules && course && year) {
+      const courseSchedules = schedules[course];
+      if (courseSchedules) {
+        const schedule = courseSchedules.find(
+          (schedule: Schedule) => schedule.courseGrade === year,
+        );
+        return schedule?.scheduleId || '';
+      }
+    }
+    return '';
   };
 
-  const courses = [
-    'Computer Science',
-    'Information Technology',
-    'Computer Engineering',
-    'Electrical Engineering',
-    'Mechanical Engineering',
-    'Civil Engineering',
-    'Chemical Engineering',
-    'Production Engineering',
-    'Control and Automation Engineering',
-    'International Relations',
-    'Business Administration',
-    'Data Science and Artificial Intelligence',
-    'Architecture and Urbanism',
-  ];
+  const scheduleId = getScheduleId();
 
   return (
     <div>
-      <div className="flex h-screen items-center bg-white">
+      <div className="flex h-screen items-center">
         <div className="mx-auto max-w-7xl px-4 py-12 text-center sm:px-6 lg:px-8 lg:py-16">
           <h2 className="p-4 text-3xl font-extrabold tracking-tight text-gray-900 sm:text-4xl">
             <span className="block">Time Registration</span>
@@ -91,12 +94,12 @@ export const TimeRegistrationRoute = () => {
         className="mx-auto flex h-screen max-w-7xl items-center justify-center p-4 text-center sm:px-6 lg:px-8 lg:py-10"
         id="course-registration"
       >
-        <div className="flex flex-col items-center bg-white p-6">
+        <div className="flex flex-col items-center p-6">
           <h3 className="text-2xl font-bold">
             Which course are you registering for?
           </h3>
-          <div className="grid grid-cols-2 gap-5 p-6 sm:grid-cols-3">
-            {courses.map((courseOption) => (
+          <div className="grid grid-cols-2 gap-5 p-6 md:grid-cols-3">
+            {Object.keys(schedules || {}).map((courseOption) => (
               <button
                 key={courseOption}
                 onClick={() => {
@@ -105,7 +108,7 @@ export const TimeRegistrationRoute = () => {
                     .getElementById('period-possibilities')
                     ?.scrollIntoView({ behavior: 'smooth' });
                 }}
-                className={`rounded border p-4 transition duration-300 ${
+                className={`min-h-20 rounded border p-2 transition duration-300 ${
                   course === courseOption
                     ? 'bg-blue-500 text-white'
                     : 'bg-gray-200'
@@ -125,26 +128,26 @@ export const TimeRegistrationRoute = () => {
         <h3 className="text-2xl font-bold">
           Which period are you registering for?
         </h3>
-        <div className="grid grid-cols-2 gap-5 p-6 sm:grid-cols-3">
+        <div className="grid grid-cols-2 gap-5 p-6 md:grid-cols-3">
           {isEngineering ? (
             <>
               {['1st Year', '2nd Year', '3rd Year', '4th Year', '5th Year'].map(
-                (year) => (
+                (yearOption, index) => (
                   <button
-                    key={year}
+                    key={yearOption}
                     onClick={() => {
-                      handleSemesterChange(year);
+                      setYear(index + 1);
                       document
                         .getElementById('table-possibilities')
                         ?.scrollIntoView({ behavior: 'smooth' });
                     }}
                     className={`rounded border p-4 transition duration-300 ${
-                      semester === year
+                      year === index + 1
                         ? 'bg-blue-500 text-white'
                         : 'bg-gray-200'
                     } hover:bg-blue-400 hover:text-white`}
                   >
-                    {year}
+                    {yearOption}
                   </button>
                 ),
               )}
@@ -162,11 +165,12 @@ export const TimeRegistrationRoute = () => {
                 '8th Semester',
                 '9th Semester',
                 '10th Semester',
-              ].map((semesterOption) => (
+              ].map((semesterOption, index) => (
                 <button
                   key={semesterOption}
                   onClick={() => {
-                    handleSemesterChange(semesterOption);
+                    setYear(Math.ceil((index + 1) / 2));
+                    setSemester(semesterOption);
                     document
                       .getElementById('table-possibilities')
                       ?.scrollIntoView({ behavior: 'smooth' });
@@ -190,7 +194,7 @@ export const TimeRegistrationRoute = () => {
         id="table-possibilities"
       >
         <h3 className="mb-4 text-center text-xl font-bold">
-          Set Your Availability
+          What are your available time slots?
         </h3>
         <div className="grid grid-cols-1 gap-5 p-6 sm:grid-cols-3">
           <button
@@ -244,6 +248,7 @@ export const TimeRegistrationRoute = () => {
           startHour={timeSlot.start}
           endHour={timeSlot.end}
           key={weekKey}
+          scheduleId={scheduleId}
         />
       </div>
     </div>

@@ -5,16 +5,18 @@ import { Button } from '@/components/ui/button';
 
 import { useNotifications } from '../../../components/ui/notifications';
 import { useCreateStaffAvailability } from '../api/create-staff-availability';
-import type {
-  Availability,
-  TimeSlot,
-  WeekAvailabilityTableProps,
-  WeekDays,
-} from '../types/availability';
+import type { Availability, TimeSlot, WeekDays } from '../types/availability';
 import {
   convertTimeStringToDecimal,
   generateCustomTimeIntervals,
 } from '../utils/create-staff-availability';
+
+export type CreateStaffAvailabilityProps = {
+  startHour: string;
+  endHour: string;
+  resetAvailability?: boolean;
+  scheduleId: string;
+};
 
 const initialAvailability: Availability = {
   MON: [],
@@ -65,7 +67,8 @@ const formatAvailability = (
 export const CreateStaffAvailability = ({
   startHour,
   endHour,
-}: WeekAvailabilityTableProps) => {
+  scheduleId,
+}: CreateStaffAvailabilityProps) => {
   const { addNotification } = useNotifications();
   const [availability, setAvailability] =
     useState<Availability>(initialAvailability);
@@ -131,7 +134,7 @@ export const CreateStaffAvailability = ({
             <thead>
               <tr>
                 <th className="border-b-2 p-2 text-center text-sm md:text-base">
-                  Time Intervals
+                  Shift
                 </th>
                 {Object.keys(initialAvailability).map((day, index) => (
                   <th
@@ -154,7 +157,7 @@ export const CreateStaffAvailability = ({
                   {Object.keys(initialAvailability).map((day, index) => (
                     <td
                       key={day + interval}
-                      className={`cursor-pointer select-none border p-0 transition duration-300 border-y-dashed ${
+                      className={`h-12 cursor-pointer select-none border p-0 transition duration-300 border-y-dashed ${
                         index !== visibleDayIndex ? 'hidden md:table-cell' : ''
                       } ${
                         availability[day as WeekDays].includes(interval)
@@ -181,11 +184,11 @@ export const CreateStaffAvailability = ({
             </tbody>
           </table>
 
-          <div className="flex w-full justify-end p-4">
+          <div className="flex w-full justify-end pt-4">
             <Button
               onClick={() => {
                 createStaffAvailabilityMutation.mutate({
-                  scheduleId: '1S-2CIC-D4@2024(SCS)',
+                  scheduleId: scheduleId,
                   data: formatAvailability(availability),
                 });
               }}
