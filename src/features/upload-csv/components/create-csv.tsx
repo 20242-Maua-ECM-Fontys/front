@@ -4,8 +4,6 @@ import { useRef } from 'react';
 import { useNotifications } from '@/components/ui/notifications';
 
 import { useCreateCsv } from '../api/create-csv';
-import { useFileStore } from '../stores/file-store';
-import { dragOverHandler } from '../utils/create-csv';
 
 export const CreateCSV = () => {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -20,14 +18,12 @@ export const CreateCSV = () => {
       },
     },
   });
-  const { setFile } = useFileStore();
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     const formData = new FormData();
     formData.append('file', file as Blob);
     if (formData) {
-      setFile(formData);
       createCsvMutation.mutate({ data: formData });
     }
   };
@@ -38,7 +34,6 @@ export const CreateCSV = () => {
     const formData = new FormData();
     formData.append('file', file);
     if (formData) {
-      setFile(formData);
       createCsvMutation.mutate({ data: formData });
     }
   };
@@ -49,7 +44,7 @@ export const CreateCSV = () => {
         id="drop-zone"
         className="flex h-1/2 w-full max-w-xl select-none flex-col items-center justify-center rounded-lg border border-dashed border-slate-500 p-4"
         onDrop={handleDrop}
-        onDragOver={dragOverHandler}
+        onDragOver={(e) => e.preventDefault()}
         onClick={() => fileInputRef.current?.click()}
         role="button"
         tabIndex={0}
