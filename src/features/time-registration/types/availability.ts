@@ -10,9 +10,3 @@ export interface Availability {
   FRI: TimeSlot[];
   SAT: TimeSlot[];
 }
-
-export interface WeekAvailabilityTableProps {
-  startHour: string;
-  endHour: string;
-  resetAvailability?: boolean;
-}
