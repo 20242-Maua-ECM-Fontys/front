@@ -29,6 +29,13 @@ export const createAppRouter = () =>
           element: <Navigate to="dashboard" replace />,
         },
         {
+          path: 'upload',
+          lazy: async () => {
+            const { UploadRoute } = await import('./routes/app/upload');
+            return { Component: UploadRoute };
+          },
+        },
+        {
           path: 'time-registration',
           lazy: async () => {
             const { TimeRegistrationRoute } = await import(
