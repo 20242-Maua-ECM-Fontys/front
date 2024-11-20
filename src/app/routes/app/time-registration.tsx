@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-import { WeekAvailabilityTable } from '../../../features/time-registration/components/week-availability';
+import { CreateStaffAvailability } from '@/features/time-registration/components/create-staff-availability';
 
 export const TimeRegistrationRoute = () => {
   const [timeSlot, setTimeSlot] = useState<{ start: string; end: string }>({
@@ -240,7 +240,7 @@ export const TimeRegistrationRoute = () => {
             <p>Evening</p>
           </button>
         </div>
-        <WeekAvailabilityTable
+        <CreateStaffAvailability
           startHour={timeSlot.start}
           endHour={timeSlot.end}
           key={weekKey}
