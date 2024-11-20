@@ -1,5 +1,5 @@
 import { useMsal } from '@azure/msal-react';
-import { Home, PanelLeft, User2, Clock3 } from 'lucide-react';
+import { Home, PanelLeft, User2, Clock3, Upload } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useNavigate, NavLink, useNavigation } from 'react-router-dom';
 
@@ -81,6 +81,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
   const navigation = [
     { name: 'Dashboard', to: 'dashboard', icon: Home },
     { name: 'Time Registration', to: 'time-registration', icon: Clock3 },
+    { name: 'Upload CSV', to: 'upload', icon: Upload },
     // checkAccess({ allowedRoles: [ROLES.ADMIN] }) && {
     //   name: 'Users',
     //   to: './users',
