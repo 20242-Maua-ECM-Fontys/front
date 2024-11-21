@@ -269,9 +269,6 @@ export const TimeRegistrationRoute = () => {
             <p>Evening</p>
           </button>
         </div>
-        {scheduleId}
-        {course}
-        {year}
         <CreateStaffAvailability
           startHour={timeSlot.start}
           endHour={timeSlot.end}
