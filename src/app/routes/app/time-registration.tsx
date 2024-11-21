@@ -10,6 +10,33 @@ export const TimeRegistrationRoute = () => {
 
   const schedules = scheduleQuery?.data?.courses;
 
+  const semesters = schedules
+    ? Object.values(schedules)
+        .flat()
+        .filter((schedule) => schedule.schedulePeriod !== 'ANNUAL')
+        .map((schedule) => {
+          const { courseGrade, schedulePeriod } = schedule;
+          const semester = `${courseGrade * 2 - (schedulePeriod === '1SEM' ? 1 : 0)}º Semester`;
+          return semester;
+        })
+    : [];
+
+  const uniqueSemesters = Array.from(new Set(semesters));
+
+  const courseGrades = scheduleQuery?.data?.courses
+    ? Object.values(scheduleQuery?.data?.courses)
+        .flat()
+        .map((schedule) => schedule.courseGrade)
+    : [];
+
+  const yearOptions = [
+    '1st Year',
+    '2nd Year',
+    '3rd Year',
+    '4th Year',
+    '5th Year',
+  ].filter((_, index) => courseGrades.includes(index + 1));
+
   const [timeSlot, setTimeSlot] = useState<{ start: string; end: string }>({
     start: '07:40',
     end: '13:00',
@@ -131,41 +158,28 @@ export const TimeRegistrationRoute = () => {
         <div className="grid grid-cols-2 gap-5 p-6 md:grid-cols-3">
           {isEngineering ? (
             <>
-              {['1st Year', '2nd Year', '3rd Year', '4th Year', '5th Year'].map(
-                (yearOption, index) => (
-                  <button
-                    key={yearOption}
-                    onClick={() => {
-                      setYear(index + 1);
-                      document
-                        .getElementById('table-possibilities')
-                        ?.scrollIntoView({ behavior: 'smooth' });
-                    }}
-                    className={`rounded border p-4 transition duration-300 ${
-                      year === index + 1
-                        ? 'bg-blue-500 text-white'
-                        : 'bg-gray-200'
-                    } hover:bg-blue-400 hover:text-white`}
-                  >
-                    {yearOption}
-                  </button>
-                ),
-              )}
+              {yearOptions.map((yearOption, index) => (
+                <button
+                  key={yearOption}
+                  onClick={() => {
+                    setYear(index + 1);
+                    document
+                      .getElementById('table-possibilities')
+                      ?.scrollIntoView({ behavior: 'smooth' });
+                  }}
+                  className={`rounded border p-4 transition duration-300 ${
+                    year === index + 1
+                      ? 'bg-blue-500 text-white'
+                      : 'bg-gray-200'
+                  } hover:bg-blue-400 hover:text-white`}
+                >
+                  {yearOption}
+                </button>
+              ))}
             </>
           ) : (
             <>
-              {[
-                '1st Semester',
-                '2nd Semester',
-                '3rd Semester',
-                '4th Semester',
-                '5th Semester',
-                '6th Semester',
-                '7th Semester',
-                '8th Semester',
-                '9th Semester',
-                '10th Semester',
-              ].map((semesterOption, index) => (
+              {uniqueSemesters.map((semesterOption, index) => (
                 <button
                   key={semesterOption}
                   onClick={() => {
