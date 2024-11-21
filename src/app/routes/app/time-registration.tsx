@@ -29,7 +29,7 @@ export const TimeRegistrationRoute = () => {
         .map((schedule) => schedule.courseGrade)
     : [];
 
-  const yearOptions = [
+  const uniqueYears = [
     '1st Year',
     '2nd Year',
     '3rd Year',
@@ -70,7 +70,7 @@ export const TimeRegistrationRoute = () => {
   const handleCourseChange = (course: string) => {
     setCourse(course);
     const engineeringCourses = [
-      'Compute Engineering',
+      'Computer Engineering',
       'Electrical Engineering',
       'Mechanical Engineering',
       'Civil Engineering',
@@ -158,32 +158,43 @@ export const TimeRegistrationRoute = () => {
         <div className="grid grid-cols-2 gap-5 p-6 md:grid-cols-3">
           {isEngineering ? (
             <>
-              {yearOptions.map((yearOption, index) => (
-                <button
-                  key={yearOption}
-                  onClick={() => {
-                    setYear(index + 1);
-                    document
-                      .getElementById('table-possibilities')
-                      ?.scrollIntoView({ behavior: 'smooth' });
-                  }}
-                  className={`rounded border p-4 transition duration-300 ${
-                    year === index + 1
-                      ? 'bg-blue-500 text-white'
-                      : 'bg-gray-200'
-                  } hover:bg-blue-400 hover:text-white`}
-                >
-                  {yearOption}
-                </button>
-              ))}
+              {uniqueYears.map((yearOption) => {
+                const yearMatch = yearOption.match(/\d+/);
+                const extractedYear = yearMatch
+                  ? parseInt(yearMatch[0], 10)
+                  : 1;
+                return (
+                  <button
+                    key={yearOption}
+                    onClick={() => {
+                      setYear(extractedYear);
+                      document
+                        .getElementById('table-possibilities')
+                        ?.scrollIntoView({ behavior: 'smooth' });
+                    }}
+                    className={`rounded border p-4 transition duration-300 ${
+                      year === extractedYear
+                        ? 'bg-blue-500 text-white'
+                        : 'bg-gray-200'
+                    } hover:bg-blue-400 hover:text-white`}
+                  >
+                    {yearOption}
+                  </button>
+                );
+              })}
             </>
           ) : (
             <>
-              {uniqueSemesters.map((semesterOption, index) => (
+              {uniqueSemesters.map((semesterOption) => (
                 <button
                   key={semesterOption}
                   onClick={() => {
-                    setYear(Math.ceil((index + 1) / 2));
+                    const semesterMatch = semesterOption.match(/\d+/);
+                    const semesterNumber = semesterMatch
+                      ? parseInt(semesterMatch[0], 10)
+                      : 1;
+                    const calculatedYear = Math.ceil(semesterNumber / 2);
+                    setYear(calculatedYear);
                     setSemester(semesterOption);
                     document
                       .getElementById('table-possibilities')
@@ -258,6 +269,9 @@ export const TimeRegistrationRoute = () => {
             <p>Evening</p>
           </button>
         </div>
+        {scheduleId}
+        {course}
+        {year}
         <CreateStaffAvailability
           startHour={timeSlot.start}
           endHour={timeSlot.end}
