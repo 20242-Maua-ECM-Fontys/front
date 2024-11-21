@@ -11,6 +11,7 @@ import {
   CommandList,
 } from '@/components/ui/command';
 import WeekAvailability from '@/components/ui/week-availability-update';
+import { toast } from '@/hooks/use-toast';
 
 export const CoordinatorSuitabilityAndAvailabilityRoute = () => {
   interface Subject {
@@ -58,6 +59,7 @@ export const CoordinatorSuitabilityAndAvailabilityRoute = () => {
   const [professors, setProfessors] = useState<Professors | null>(null);
   const [loading, setLoading] = useState(true);
   const [subjects, setSubjects] = useState<Subject[]>([]);
+  const [professorId, setProfessorId] = useState<number | null>(null);
 
   const handleGetProfessors = async () => {
     try {
@@ -70,7 +72,12 @@ export const CoordinatorSuitabilityAndAvailabilityRoute = () => {
     }
   };
 
-  const handleProfessorSelect = (professor: Professor) => {
+  const handleProfessorSelect = (
+    professor: Professor,
+    professorIdString: string,
+  ) => {
+    const professorId = parseInt(professorIdString);
+    setProfessorId(professorId);
     setSelectedProfessor(professor);
     setSelectedSubjects(professor.suitabilities.map((s) => s.codeSubject));
     setWeekKey((prevKey) => prevKey + 1);
@@ -104,6 +111,54 @@ export const CoordinatorSuitabilityAndAvailabilityRoute = () => {
 
   const handleAvailabilityChange = (newAvailability: Availability[]) => {
     setAvailability(newAvailability);
+  };
+
+  const handleUpdateSubjects = async (selectedSubjects: string[]) => {
+    try {
+      const response = await axios.put(
+        import.meta.env.VITE_APP_API_URL + 'update_suitabilities',
+        {
+          userId: professorId,
+          subjectCodes: selectedSubjects,
+        },
+      );
+      toast({
+        title: 'Success',
+        description: 'Subjects updated successfully',
+      });
+      console.log(response);
+    } catch (error) {
+      toast({
+        variant: 'destructive',
+        title: 'Error',
+        description: 'Error updating subjects',
+      });
+      console.log(error);
+    }
+  };
+
+  const handleUpdateAvailability = async (availability: Availability[]) => {
+    try {
+      const response = await axios.put(
+        import.meta.env.VITE_APP_API_URL + 'update_availabilities',
+        {
+          userId: professorId,
+          availabilities: availability,
+        },
+      );
+      toast({
+        title: 'Success',
+        description: 'Availability updated successfully',
+      });
+      console.log(response);
+    } catch (error) {
+      toast({
+        variant: 'destructive',
+        title: 'Error',
+        description: 'Error updating availability',
+      });
+      console.log(error);
+    }
   };
   return (
     <div>
@@ -143,7 +198,10 @@ export const CoordinatorSuitabilityAndAvailabilityRoute = () => {
                     <CommandItem
                       key={professorId}
                       onSelect={() => {
-                        handleProfessorSelect(professors[professorId]);
+                        handleProfessorSelect(
+                          professors[professorId],
+                          professorId,
+                        );
                         document
                           .getElementById('subject-possibilities')
                           ?.scrollIntoView({ behavior: 'smooth' });
@@ -197,7 +255,10 @@ export const CoordinatorSuitabilityAndAvailabilityRoute = () => {
         </Command>
         <div className="flex items-center justify-center gap-4">
           {selectedProfessor ? (
-            <Button className="mt-4 rounded bg-gray-400 px-4 py-2 transition duration-300 hover:bg-blue-400 hover:text-white">
+            <Button
+              className="mt-4 rounded bg-gray-400 px-4 py-2 transition duration-300 hover:bg-blue-400 hover:text-white"
+              onClick={() => handleUpdateSubjects(selectedSubjects)}
+            >
               Save
             </Button>
           ) : (
@@ -225,6 +286,23 @@ export const CoordinatorSuitabilityAndAvailabilityRoute = () => {
           onAvailabilityChange={handleAvailabilityChange}
           key={weekKey}
         />
+        <div className="flex items-center justify-center gap-4">
+          {selectedProfessor ? (
+            <Button
+              className="mt-4 rounded bg-gray-400 px-4 py-2 transition duration-300 hover:bg-blue-400 hover:text-white"
+              onClick={() => handleUpdateAvailability(availability)}
+            >
+              Save
+            </Button>
+          ) : (
+            <Button
+              disabled
+              className="mt-4 rounded bg-gray-200 px-4 py-2 text-black transition duration-300"
+            >
+              Save
+            </Button>
+          )}
+        </div>
       </div>
     </div>
   );

@@ -59,11 +59,11 @@ export const TeacherSuitabilityAndAvailabilityRoute = () => {
 
   const handleUpdateSubjects = async (selectedSubjects: string[]) => {
     try {
-      const response = await axios.post(
+      const response = await axios.put(
         import.meta.env.VITE_APP_API_URL + 'update_suitabilities',
         {
           userId: userId,
-          suitabilities: selectedSubjects,
+          subjectCodes: selectedSubjects,
         },
       );
       toast({
@@ -83,7 +83,7 @@ export const TeacherSuitabilityAndAvailabilityRoute = () => {
 
   const handleUpdateAvailability = async (availability: Availability[]) => {
     try {
-      const response = await axios.post(
+      const response = await axios.put(
         import.meta.env.VITE_APP_API_URL + 'update_availabilities',
         {
           userId: userId,
