@@ -80,8 +80,8 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
   // const { checkAccess } = useAuthorization();
   const navigation = [
     { name: 'Dashboard', to: 'dashboard', icon: Home },
-    { name: 'Time Registration', to: 'time-registration', icon: Clock3 },
     { name: 'Upload CSV', to: 'upload', icon: Upload },
+    { name: 'Time Registration', to: 'time-registration', icon: Clock3 },
     // checkAccess({ allowedRoles: [ROLES.ADMIN] }) && {
     //   name: 'Users',
     //   to: './users',

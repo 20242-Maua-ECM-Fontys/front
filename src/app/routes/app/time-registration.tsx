@@ -1,15 +1,50 @@
 import React, { useState } from 'react';
 
-import { WeekAvailabilityTable } from '../../../features/time-registration/components/week-availability';
+import { CreateStaffAvailability } from '@/features/time-registration/components/create-staff-availability';
+
+import { useSchedules } from '../../../features/time-registration/api/get-all-schedules';
+import type { Schedule } from '../../../types/api';
 
 export const TimeRegistrationRoute = () => {
+  const scheduleQuery = useSchedules({});
+
+  const schedules = scheduleQuery?.data?.courses;
+
+  const semesters = schedules
+    ? Object.values(schedules)
+        .flat()
+        .filter((schedule) => schedule.schedulePeriod !== 'ANNUAL')
+        .map((schedule) => {
+          const { courseGrade, schedulePeriod } = schedule;
+          const semester = `${courseGrade * 2 - (schedulePeriod === '1SEM' ? 1 : 0)}º Semester`;
+          return semester;
+        })
+    : [];
+
+  const uniqueSemesters = Array.from(new Set(semesters));
+
+  const courseGrades = scheduleQuery?.data?.courses
+    ? Object.values(scheduleQuery?.data?.courses)
+        .flat()
+        .map((schedule) => schedule.courseGrade)
+    : [];
+
+  const uniqueYears = [
+    '1st Year',
+    '2nd Year',
+    '3rd Year',
+    '4th Year',
+    '5th Year',
+  ].filter((_, index) => courseGrades.includes(index + 1));
+
   const [timeSlot, setTimeSlot] = useState<{ start: string; end: string }>({
     start: '07:40',
     end: '13:00',
   });
 
   const [period, setPeriod] = useState('Morning');
-  const [semester, setSemester] = useState('');
+  const [year, setYear] = useState<number>();
+  const [semester, setSemester] = useState<string>();
   const [course, setCourse] = useState('');
   const [weekKey, setWeekKey] = useState(0);
   const [isEngineering, setIsEngineering] = useState(false);
@@ -46,29 +81,24 @@ export const TimeRegistrationRoute = () => {
     setIsEngineering(engineeringCourses.includes(course));
   };
 
-  const handleSemesterChange = (semester: string) => {
-    setSemester(semester);
+  const getScheduleId = () => {
+    if (schedules && course && year) {
+      const courseSchedules = schedules[course];
+      if (courseSchedules) {
+        const schedule = courseSchedules.find(
+          (schedule: Schedule) => schedule.courseGrade === year,
+        );
+        return schedule?.scheduleId || '';
+      }
+    }
+    return '';
   };
 
-  const courses = [
-    'Computer Science',
-    'Information Technology',
-    'Computer Engineering',
-    'Electrical Engineering',
-    'Mechanical Engineering',
-    'Civil Engineering',
-    'Chemical Engineering',
-    'Production Engineering',
-    'Control and Automation Engineering',
-    'International Relations',
-    'Business Administration',
-    'Data Science and Artificial Intelligence',
-    'Architecture and Urbanism',
-  ];
+  const scheduleId = getScheduleId();
 
   return (
     <div>
-      <div className="flex h-screen items-center bg-white">
+      <div className="flex h-screen items-center">
         <div className="mx-auto max-w-7xl px-4 py-12 text-center sm:px-6 lg:px-8 lg:py-16">
           <h2 className="p-4 text-3xl font-extrabold tracking-tight text-gray-900 sm:text-4xl">
             <span className="block">Time Registration</span>
@@ -91,12 +121,12 @@ export const TimeRegistrationRoute = () => {
         className="mx-auto flex h-screen max-w-7xl items-center justify-center p-4 text-center sm:px-6 lg:px-8 lg:py-10"
         id="course-registration"
       >
-        <div className="flex flex-col items-center bg-white p-6">
+        <div className="flex flex-col items-center p-6">
           <h3 className="text-2xl font-bold">
             Which course are you registering for?
           </h3>
-          <div className="grid grid-cols-2 gap-5 p-6 sm:grid-cols-3">
-            {courses.map((courseOption) => (
+          <div className="grid grid-cols-2 gap-5 p-6 md:grid-cols-3">
+            {Object.keys(schedules || {}).map((courseOption) => (
               <button
                 key={courseOption}
                 onClick={() => {
@@ -105,7 +135,7 @@ export const TimeRegistrationRoute = () => {
                     .getElementById('period-possibilities')
                     ?.scrollIntoView({ behavior: 'smooth' });
                 }}
-                className={`rounded border p-4 transition duration-300 ${
+                className={`min-h-20 rounded border p-2 transition duration-300 ${
                   course === courseOption
                     ? 'bg-blue-500 text-white'
                     : 'bg-gray-200'
@@ -125,48 +155,47 @@ export const TimeRegistrationRoute = () => {
         <h3 className="text-2xl font-bold">
           Which period are you registering for?
         </h3>
-        <div className="grid grid-cols-2 gap-5 p-6 sm:grid-cols-3">
+        <div className="grid grid-cols-2 gap-5 p-6 md:grid-cols-3">
           {isEngineering ? (
             <>
-              {['1st Year', '2nd Year', '3rd Year', '4th Year', '5th Year'].map(
-                (year) => (
+              {uniqueYears.map((yearOption) => {
+                const yearMatch = yearOption.match(/\d+/);
+                const extractedYear = yearMatch
+                  ? parseInt(yearMatch[0], 10)
+                  : 1;
+                return (
                   <button
-                    key={year}
+                    key={yearOption}
                     onClick={() => {
-                      handleSemesterChange(year);
+                      setYear(extractedYear);
                       document
                         .getElementById('table-possibilities')
                         ?.scrollIntoView({ behavior: 'smooth' });
                     }}
                     className={`rounded border p-4 transition duration-300 ${
-                      semester === year
+                      year === extractedYear
                         ? 'bg-blue-500 text-white'
                         : 'bg-gray-200'
                     } hover:bg-blue-400 hover:text-white`}
                   >
-                    {year}
+                    {yearOption}
                   </button>
-                ),
-              )}
+                );
+              })}
             </>
           ) : (
             <>
-              {[
-                '1st Semester',
-                '2nd Semester',
-                '3rd Semester',
-                '4th Semester',
-                '5th Semester',
-                '6th Semester',
-                '7th Semester',
-                '8th Semester',
-                '9th Semester',
-                '10th Semester',
-              ].map((semesterOption) => (
+              {uniqueSemesters.map((semesterOption) => (
                 <button
                   key={semesterOption}
                   onClick={() => {
-                    handleSemesterChange(semesterOption);
+                    const semesterMatch = semesterOption.match(/\d+/);
+                    const semesterNumber = semesterMatch
+                      ? parseInt(semesterMatch[0], 10)
+                      : 1;
+                    const calculatedYear = Math.ceil(semesterNumber / 2);
+                    setYear(calculatedYear);
+                    setSemester(semesterOption);
                     document
                       .getElementById('table-possibilities')
                       ?.scrollIntoView({ behavior: 'smooth' });
@@ -190,7 +219,7 @@ export const TimeRegistrationRoute = () => {
         id="table-possibilities"
       >
         <h3 className="mb-4 text-center text-xl font-bold">
-          Set Your Availability
+          What are your available time slots?
         </h3>
         <div className="grid grid-cols-1 gap-5 p-6 sm:grid-cols-3">
           <button
@@ -240,10 +269,11 @@ export const TimeRegistrationRoute = () => {
             <p>Evening</p>
           </button>
         </div>
-        <WeekAvailabilityTable
+        <CreateStaffAvailability
           startHour={timeSlot.start}
           endHour={timeSlot.end}
           key={weekKey}
+          scheduleId={scheduleId}
         />
       </div>
     </div>

@@ -1,20 +1,16 @@
-export type BaseEntity = {
-  id: string;
-  createdAt: number;
-};
-
-export type Entity<T> = {
-  [K in keyof T]: T[K];
-} & BaseEntity;
-
-export type User = Entity<{
+export type User = {
   firstName: string;
   lastName: string;
   email: string;
   role: 'STAFF' | 'COORDINATOR' | 'PROFESSOR';
-}>;
+};
 
-export type AuthResponse = {
-  jwt: string;
-  user: User;
+export type Schedule = {
+  scheduleId: string;
+  courseGrade: number;
+  schedulePeriod: 'ANNUAL' | '1SEM';
+};
+
+export type Courses = {
+  [courseName: string]: Schedule[];
 };
