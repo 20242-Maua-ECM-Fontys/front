@@ -7,7 +7,6 @@ import {
 
 import { AppRoot } from './routes/app/root';
 
-
 export const createAppRouter = () =>
   createBrowserRouter([
     {
@@ -20,7 +19,6 @@ export const createAppRouter = () =>
         const { LoginRoute } = await import('./routes/auth/login');
         return { Component: LoginRoute };
       },
-
     },
     {
       path: '/app',
@@ -62,6 +60,15 @@ export const createAppRouter = () =>
               './routes/app/coordinator-suitability-availability'
             );
             return { Component: CoordinatorSuitabilityAndAvailabilityRoute };
+          },
+        },
+        {
+          path: 'coordinator-schedule',
+          lazy: async () => {
+            const { CoordinatorScheduleRoute } = await import(
+              './routes/app/coordinator-schedule'
+            );
+            return { Component: CoordinatorScheduleRoute };
           },
         },
       ],
