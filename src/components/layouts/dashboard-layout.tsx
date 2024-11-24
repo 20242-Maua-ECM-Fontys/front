@@ -6,6 +6,7 @@ import {
   Clock3,
   CalendarClock,
   GraduationCap,
+  TableCellsMerge,
 } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { useNavigate, NavLink, useNavigation } from 'react-router-dom';
@@ -100,7 +101,6 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
     const baseItems: SideNavigationItem[] = [
       { name: 'Dashboard', to: 'dashboard', icon: Home },
     ];
-
     if (role === 'STAFF') {
       baseItems.push({
         name: 'Time Registration',
@@ -118,6 +118,11 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
         name: 'Teachers',
         to: 'coordinator-suitability-availability',
         icon: GraduationCap,
+      });
+      baseItems.push({
+        name: 'Schedule',
+        to: 'coordinator-schedule',
+        icon: TableCellsMerge,
       });
     }
 
@@ -218,11 +223,13 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
               >
                 {accounts.length > 0 ? accounts[0].username : ''}
               </DropdownMenuItem>
-              <DropdownMenuItem
-                className={cn('block w-full px-4 py-2 text-sm text-gray-700')}
-              >
-                {accounts.length > 0 ? role : ''}
-              </DropdownMenuItem>
+              {role ? (
+                <DropdownMenuItem
+                  className={cn('block w-full px-4 py-2 text-sm text-gray-700')}
+                >
+                  {accounts.length > 0 ? role : ''}
+                </DropdownMenuItem>
+              ) : null}
               <DropdownMenuItem
                 className={cn('block w-full px-4 py-2 text-sm text-gray-700')}
                 onClick={() => handleLogout(instance)}
