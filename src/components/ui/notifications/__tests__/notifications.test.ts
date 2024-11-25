@@ -1,4 +1,5 @@
 import { renderHook, act } from '@testing-library/react';
+
 import { useNotifications, Notification } from '../notifications-store';
 
 test('should add and remove notifications', () => {

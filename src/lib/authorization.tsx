@@ -1,13 +1,12 @@
-import React from 'react';
+// import React from 'react';
 
+// export enum ROLES {
+//   STAFF = 'STAFF',
+//   PROFESSOR = 'USER',
+//   COORDINATOR = 'COORDINATOR',
+// }
 
-export enum ROLES {
-  STAFF = 'STAFF',
-  PROFESSOR = 'USER',
-  COORDINATOR = 'COORDINATOR',
-}
-
-type RoleTypes = keyof typeof ROLES;
+// type RoleTypes = keyof typeof ROLES;
 
 // export const POLICIES = {
 //   'comment:delete': (user: User, comment: Comment) => {
@@ -43,19 +42,19 @@ type RoleTypes = keyof typeof ROLES;
 //   return { checkAccess, role: user.data.role };
 // };
 
-type AuthorizationProps = {
-  forbiddenFallback?: React.ReactNode;
-  children: React.ReactNode;
-} & (
-  | {
-      allowedRoles: RoleTypes[];
-      policyCheck?: never;
-    }
-  | {
-      allowedRoles?: never;
-      policyCheck: boolean;
-    }
-);
+// type AuthorizationProps = {
+//   forbiddenFallback?: React.ReactNode;
+//   children: React.ReactNode;
+// } & (
+//   | {
+//       allowedRoles: RoleTypes[];
+//       policyCheck?: never;
+//     }
+//   | {
+//       allowedRoles?: never;
+//       policyCheck: boolean;
+//     }
+// );
 
 // export const Authorization = ({
 //   policyCheck,
