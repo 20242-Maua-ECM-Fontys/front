@@ -40,7 +40,7 @@ jobs:
 
         - name: Build and Export
           run: |
-            npm build
+            npm run build
           env: 
             VITE_STAGE: ${{ github.ref_name }}
             VITE_APP_API_URL: ${{ vars.VITE_APP_API_URL }}
