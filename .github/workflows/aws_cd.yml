@@ -33,7 +33,7 @@ jobs:
 
         - name: Installing Dependencies
           run: |
-            npm global add aws-cdk
+            npm install -g aws-cdk
             npm install
             cd iac
             npm install
