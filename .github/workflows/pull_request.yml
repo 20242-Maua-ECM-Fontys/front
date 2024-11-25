@@ -48,4 +48,4 @@ jobs:
           GH_TOKEN: ${{ secrets.PAT_TOKEN }} 
         run: |
           reviewers=$(gh api "repos/${{ github.repository }}/collaborators?permission=admin" --jq '[.[] | .login] | join(",")')
-          gh pr create -B main -H dev --title "Merge branch dev -> main - Criado Automatico" --body "Criado Automaticamente" --reviewer "$reviewers" --repo ${{ github.repository }} -t "Merge dev into main" -b "Automatic PR" -R ${{ github.repository }}
+          gh pr create -B main -H dev --title "Merge branch dev -> main - Auto Created" --body "Auto Created" --reviewer "$reviewers" --repo ${{ github.repository }} -t "Merge dev into main" -b "Automatic PR" -R ${{ github.repository }}
