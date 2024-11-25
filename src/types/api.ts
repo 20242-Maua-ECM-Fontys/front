@@ -14,3 +14,8 @@ export type Schedule = {
 export type Courses = {
   [courseName: string]: Schedule[];
 };
+
+export type AuthResponse = {
+  token: string;
+  user: User;
+};
