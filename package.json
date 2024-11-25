@@ -15,6 +15,8 @@
     "run-mock-server": "vite-node mock-server.ts | pino-pretty -c"
   },
   "dependencies": {
+    "@azure/msal-browser": "^3.27.0",
+    "@azure/msal-react": "^2.2.0",
     "@hookform/resolvers": "^3.3.4",
     "@ngneat/falso": "^7.2.0",
     "@radix-ui/react-dialog": "^1.0.5",
