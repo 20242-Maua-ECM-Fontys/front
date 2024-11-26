@@ -7,7 +7,7 @@ export const DashboardRoute = () => {
 
   return (
     <ContentLayout title="Dashboard">
-      <AnimatedGridPattern className="fixed inset-0 z-0 h-full w-full opacity-30" />
+      <AnimatedGridPattern className="fixed inset-0 z-0 w-full opacity-30 skew-y-12 inset-y-[-30%] h-[200%]" />
       
       <div className="z-10 flex items-center justify-center">
         <h1 className="text-2xl font-bold text-center">
