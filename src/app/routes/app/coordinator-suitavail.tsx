@@ -12,7 +12,7 @@ import {
 } from '@/components/ui/command';
 import WeekAvailability from '@/components/ui/week-availability-update';
 
-export const CoordinatorSuitabilityAndAvailabilityRoute = () => {
+export const CoordinatorSuitAvailRoute = () => {
   interface Subject {
     codeSubject: string;
     subjectName: string;
@@ -54,9 +54,9 @@ export const CoordinatorSuitabilityAndAvailabilityRoute = () => {
   const [selectedProfessor, setSelectedProfessor] = useState<Professor | null>(
     null,
   );
-  const [availability, setAvailability] = useState<Availability[]>([]);
+  const [, setAvailability] = useState<Availability[]>([]);
   const [professors, setProfessors] = useState<Professors | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [, setLoading] = useState(true);
   const [subjects, setSubjects] = useState<Subject[]>([]);
 
   const handleGetProfessors = async () => {
@@ -143,13 +143,13 @@ export const CoordinatorSuitabilityAndAvailabilityRoute = () => {
                     <CommandItem
                       key={professorId}
                       onSelect={() => {
-                        handleProfessorSelect(professors[professorId]);
+                        handleProfessorSelect(professors[Number(professorId)]);
                         document
                           .getElementById('subject-possibilities')
                           ?.scrollIntoView({ behavior: 'smooth' });
                       }}
                     >
-                      {professors[professorId].name}
+                      {professors[Number(professorId)].name}
                     </CommandItem>
                   ))}
               </CommandGroup>

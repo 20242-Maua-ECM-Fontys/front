@@ -110,13 +110,13 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
     } else if (role === 'PROFESSOR') {
       baseItems.push({
         name: 'Availability',
-        to: 'teacher-suitability-availability',
+        to: 'teacher-suitavail',
         icon: CalendarClock,
       });
     } else if (role === 'COORDINATOR') {
       baseItems.push({
         name: 'Teachers',
-        to: 'coordinator-suitability-availability',
+        to: 'coord-suitavail',
         icon: GraduationCap,
       });
     }

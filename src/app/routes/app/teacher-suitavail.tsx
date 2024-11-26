@@ -13,7 +13,7 @@ import WeekAvailability from '@/components/ui/week-availability-update';
 import { toast } from '@/hooks/use-toast';
 import { useUser } from '@/hooks/use-user';
 
-export const TeacherSuitabilityAndAvailabilityRoute = () => {
+export const TeacherSuitAvailRoute = () => {
   interface Availability {
     startTime: number; // em minutos
     endTime: number; // em minutos

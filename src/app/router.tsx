@@ -7,7 +7,6 @@ import {
 
 import { AppRoot } from './routes/app/root';
 
-
 export const createAppRouter = () =>
   createBrowserRouter([
     {
@@ -20,7 +19,6 @@ export const createAppRouter = () =>
         const { LoginRoute } = await import('./routes/auth/login');
         return { Component: LoginRoute };
       },
-
     },
     {
       path: '/app',
@@ -31,7 +29,7 @@ export const createAppRouter = () =>
           element: <Navigate to="dashboard" replace />,
         },
         {
-          path: 'time-registration',
+          path: 'time-register',
           lazy: async () => {
             const { TimeRegistrationRoute } = await import(
               './routes/app/time-registration'
@@ -47,21 +45,21 @@ export const createAppRouter = () =>
           },
         },
         {
-          path: 'teacher-suitability-availability',
+          path: 'teacher-suitavail',
           lazy: async () => {
-            const { TeacherSuitabilityAndAvailabilityRoute } = await import(
-              './routes/app/teacher-suitability-availability'
+            const { TeacherSuitAvailRoute } = await import(
+              './routes/app/teacher-suitavail'
             );
-            return { Component: TeacherSuitabilityAndAvailabilityRoute };
+            return { Component: TeacherSuitAvailRoute };
           },
         },
         {
-          path: 'coordinator-suitability-availability',
+          path: 'coord-suitavail',
           lazy: async () => {
-            const { CoordinatorSuitabilityAndAvailabilityRoute } = await import(
-              './routes/app/coordinator-suitability-availability'
+            const { CoordinatorSuitAvailRoute } = await import(
+              './routes/app/coordinator-suitavail'
             );
-            return { Component: CoordinatorSuitabilityAndAvailabilityRoute };
+            return { Component: CoordinatorSuitAvailRoute };
           },
         },
       ],
