@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { useEffect, useState } from 'react';
+import { set } from 'zod';
 
 import {
   Command,
@@ -19,11 +20,12 @@ export const TeacherSuitabilityAndAvailabilityRoute = () => {
     endTime: number; // em minutos
     weekDay: string;
   }
-  const [weekKey] = useState(0);
+  const [weekKey, setWeekKey] = useState(0);
   const [selectedSubjects, setSelectedSubjects] = useState<string[]>([]);
   const [subjects, setSubjects] = useState<Subject[]>([]);
   const [loading, setLoading] = useState(true);
   const [availability, setAvailability] = useState<Availability[]>([]);
+  const [isAvailLoaded, setIsAvailLoaded] = useState(false);
   const { userId } = useUser();
 
   interface Subject {
@@ -39,6 +41,38 @@ export const TeacherSuitabilityAndAvailabilityRoute = () => {
       );
       setSubjects(response.data.subjects);
       setLoading(false);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handlegetAvailability = async () => {
+    try {
+      const response = await axios.get(
+        `${import.meta.env.VITE_APP_API_URL}get_availabilities_by_professor?userId=${userId}`,
+      );
+      setAvailability(
+        response.data.availabilities.map((a: any) => ({
+          startTime: a.startTime,
+          endTime: a.endTime,
+          weekDay: a.weekDay,
+        })),
+      );
+      setIsAvailLoaded(true);
+      console.log(availability);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handlegetSelectedSubjects = async () => {
+    try {
+      const response = await axios.get(
+        `${import.meta.env.VITE_APP_API_URL}get_suitabilities_by_professor?userId=${userId}`,
+      );
+      setSelectedSubjects(
+        response.data.suitabilities.map((s: any) => s.codeSubject),
+      );
     } catch (error) {
       console.log(error);
     }
@@ -107,7 +141,10 @@ export const TeacherSuitabilityAndAvailabilityRoute = () => {
 
   useEffect(() => {
     handlegetSubjects();
+    handlegetSelectedSubjects();
+    handlegetAvailability();
     window.scrollTo(0, 0);
+    setWeekKey(weekKey + 1);
   }, []);
 
   return (
@@ -206,13 +243,20 @@ export const TeacherSuitabilityAndAvailabilityRoute = () => {
         <h3 className="mb-4 text-center text-xl font-bold">
           Set Your Availability
         </h3>
-        <WeekAvailability
-          startHour={'07:40'}
-          endHour={'22:20'}
-          key={weekKey}
-          initialAvailability={availability}
-          onAvailabilityChange={handleAvailabilityChange}
-        />
+        {isAvailLoaded ? (
+          <WeekAvailability
+            startHour={'07:40'}
+            endHour={'22:20'}
+            key={weekKey}
+            initialAvailability={availability}
+            onAvailabilityChange={handleAvailabilityChange}
+          />
+        ) : (
+          <div className="flex items-center justify-center">
+            <div className="size-32 animate-spin rounded-full border-y-2 border-gray-900"></div>
+          </div>
+        )}
+
         <div className="flex justify-center">
           <button
             className="mt-4 rounded bg-gray-200 px-4 py-2 transition duration-300 hover:bg-blue-400 hover:text-white"
