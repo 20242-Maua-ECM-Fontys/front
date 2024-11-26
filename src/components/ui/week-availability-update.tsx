@@ -188,9 +188,20 @@ const WeekAvailabilityTable: React.FC<WeekAvailabilityTableProps> = ({
                   ].map((day, index) => (
                     <td
                       key={day + interval}
-                      className={`cursor-pointer border p-2 text-sm transition md:text-base ${index !== visibleDayIndex ? 'hidden md:table-cell' : ''} ${availability.some((slot) => slot.startTime === convertTimeToMinutes(convertTimeStringToDecimal(interval.split('-')[0])) && slot.endTime === convertTimeToMinutes(convertTimeStringToDecimal(interval.split('-')[1])) && slot.weekDay === day.slice(0, 3).toUpperCase()) ? 'bg-blue-500 text-white' : 'hover:bg-blue-100'}`}
-                      onClick={() => toggleTimeSlot(day as WeekDays, interval)}
-                    ></td>
+                      className={`h-12 cursor-pointer border p-0 text-sm transition ${index !== visibleDayIndex ? 'hidden md:table-cell' : ''}`}
+                    >
+                      <button
+                        className={`size-full p-2 ${availability.some((slot) => slot.startTime === convertTimeToMinutes(convertTimeStringToDecimal(interval.split('-')[0])) && slot.endTime === convertTimeToMinutes(convertTimeStringToDecimal(interval.split('-')[1])) && slot.weekDay === day.slice(0, 3).toUpperCase()) ? 'bg-blue-500 text-white' : 'hover:bg-blue-100'}`}
+                        onClick={() =>
+                          toggleTimeSlot(day as WeekDays, interval)
+                        }
+                        onKeyPress={(e) => {
+                          if (e.key === 'Enter' || e.key === ' ') {
+                            toggleTimeSlot(day as WeekDays, interval);
+                          }
+                        }}
+                      ></button>
+                    </td>
                   ))}
                 </tr>
               ))}

@@ -5,6 +5,8 @@
 
 import { LogLevel } from '@azure/msal-browser';
 
+import { env } from '../../config/env';
+
 /**
  * Configuration object to be passed to MSAL instance on creation.
  * For a full list of MSAL.js configuration parameters, visit:
@@ -13,9 +15,9 @@ import { LogLevel } from '@azure/msal-browser';
 
 export const msalConfig = {
   auth: {
-    clientId: import.meta.env.VITE_APP_AZURE_CLIENT_ID || '',
+    clientId: env.AZURE_CLIENT_ID || '',
     authority: 'https://login.microsoftonline.com/common',
-    redirectUri: import.meta.env.VITE_APP_AZURE_REDIRECT_URI || '',
+    redirectUri: env.AZURE_REDIRECT_URL || '',
   },
   cache: {
     cacheLocation: 'sessionStorage', // This configures where your cache will be stored
