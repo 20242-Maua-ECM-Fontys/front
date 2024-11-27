@@ -1,4 +1,3 @@
-import axios from 'axios';
 import { useState } from 'react';
 
 import {
@@ -11,6 +10,7 @@ import {
 } from '@/components/ui/command';
 import WeekAvailability from '@/components/ui/week-availability-update';
 import { useSubjects } from '@/features/teacher/api/get-subjects';
+import { useUpdateSubjects } from '@/features/teacher/api/update-subjects';
 import type { Subject } from '@/features/teacher/types/subject';
 import { toast } from '@/hooks/use-toast';
 import { useUser } from '@/hooks/use-user';
@@ -41,29 +41,23 @@ export const TeacherSuitAvailRoute = () => {
     console.log(selectedSubjects);
   };
 
-  const handleUpdateSubjects = async (selectedSubjects: string[]) => {
-    try {
-      const response = await axios.post(
-        import.meta.env.VITE_APP_API_URL + 'update_suitabilities',
-        {
-          userId: userId,
-          suitabilities: selectedSubjects,
-        },
-      );
-      toast({
-        title: 'Success',
-        description: 'Subjects updated successfully',
-      });
-      console.log(response);
-    } catch (error) {
-      toast({
-        variant: 'destructive',
-        title: 'Error',
-        description: 'Error updating subjects',
-      });
-      console.log(error);
-    }
-  };
+  const updateSubjectsMutation = useUpdateSubjects({
+    mutationConfig: {
+      onSuccess: () => {
+        toast({
+          title: 'Success',
+          description: 'Subjects updated successfully',
+        });
+      },
+      onError: () => {
+        toast({
+          variant: 'destructive',
+          title: 'Error',
+          description: 'Error updating subjects',
+        });
+      },
+    },
+  });
 
   const updateAvailabilityMutation = useUpdateAvailability({
     mutationConfig: {
@@ -165,7 +159,10 @@ export const TeacherSuitAvailRoute = () => {
               document
                 .getElementById('table-possibilities')
                 ?.scrollIntoView({ behavior: 'smooth' });
-              handleUpdateSubjects(selectedSubjects);
+              updateSubjectsMutation.mutate({
+                userId: userId,
+                subjectCodes: selectedSubjects,
+              });
             }}
           >
             Save
