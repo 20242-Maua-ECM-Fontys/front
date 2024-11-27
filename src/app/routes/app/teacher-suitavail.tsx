@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 import {
   Command,
@@ -10,6 +10,8 @@ import {
   CommandList,
 } from '@/components/ui/command';
 import WeekAvailability from '@/components/ui/week-availability-update';
+import { useSubjects } from '@/features/teacher/api/get-subjects';
+import type { Subject } from '@/features/teacher/types/subject';
 import { toast } from '@/hooks/use-toast';
 import { useUser } from '@/hooks/use-user';
 
@@ -21,32 +23,12 @@ export const TeacherSuitAvailRoute = () => {
   }
   const [weekKey] = useState(0);
   const [selectedSubjects, setSelectedSubjects] = useState<string[]>([]);
-  const [subjects, setSubjects] = useState<Subject[]>([]);
-  const [loading, setLoading] = useState(true);
   const [availability, setAvailability] = useState<Availability[]>([]);
   const { userId } = useUser();
 
-  interface Subject {
-    codeSubject: string;
-    subjectName: string;
-    period: string;
-  }
+  const subjectsQuery = useSubjects({});
 
-  const handlegetSubjects = async () => {
-    try {
-      const response = await axios.get(
-        import.meta.env.VITE_APP_API_URL + 'get_all_subjects',
-      );
-      setSubjects(response.data.subjects);
-      setLoading(false);
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  const handleAvailabilityChange = (newAvailability: Availability[]) => {
-    setAvailability(newAvailability);
-  };
+  const subjects = subjectsQuery.data?.subjects;
 
   const handleSubjectAdd = (subject: string) => {
     if (selectedSubjects.includes(subject)) {
@@ -105,11 +87,6 @@ export const TeacherSuitAvailRoute = () => {
     }
   };
 
-  useEffect(() => {
-    handlegetSubjects();
-    window.scrollTo(0, 0);
-  }, []);
-
   return (
     <div>
       <div className="flex h-screen items-center">
@@ -162,7 +139,7 @@ export const TeacherSuitAvailRoute = () => {
           </div>
         </div>
 
-        {loading ? (
+        {subjectsQuery.isLoading ? (
           <div className="flex h-[49vh] items-center justify-center">
             <div className="size-32 animate-spin rounded-full border-y-2 border-gray-900"></div>
           </div>
@@ -172,14 +149,15 @@ export const TeacherSuitAvailRoute = () => {
             <CommandList>
               <CommandEmpty>No results found.</CommandEmpty>
               <CommandGroup heading="Subjects">
-                {subjects.map((subject: Subject) => (
-                  <CommandItem
-                    key={subject.codeSubject}
-                    onSelect={() => handleSubjectAdd(subject.codeSubject)}
-                  >
-                    {subject.subjectName}
-                  </CommandItem>
-                ))}
+                {subjects &&
+                  subjects.map((subject: Subject) => (
+                    <CommandItem
+                      key={subject.codeSubject}
+                      onSelect={() => handleSubjectAdd(subject.codeSubject)}
+                    >
+                      {subject.subjectName}
+                    </CommandItem>
+                  ))}
               </CommandGroup>
             </CommandList>
           </Command>
@@ -211,7 +189,7 @@ export const TeacherSuitAvailRoute = () => {
           endHour={'22:20'}
           key={weekKey}
           initialAvailability={availability}
-          onAvailabilityChange={handleAvailabilityChange}
+          onAvailabilityChange={(Availability) => setAvailability(Availability)}
         />
         <div className="flex justify-center">
           <button
