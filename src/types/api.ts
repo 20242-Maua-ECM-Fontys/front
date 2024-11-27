@@ -14,7 +14,8 @@ export type User = Entity<{
   role: 'STAFF' | 'COORDINATOR' | 'PROFESSOR';
 }>;
 
-export type AuthResponse = {
-  jwt: string;
-  user: User;
+export type Availability = {
+  startTime: number;
+  endTime: number;
+  weekDay: string;
 };

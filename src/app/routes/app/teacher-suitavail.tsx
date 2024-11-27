@@ -15,6 +15,8 @@ import type { Subject } from '@/features/teacher/types/subject';
 import { toast } from '@/hooks/use-toast';
 import { useUser } from '@/hooks/use-user';
 
+import { useUpdateAvailability } from '../../../features/teacher/api/update-availability';
+
 export const TeacherSuitAvailRoute = () => {
   interface Availability {
     startTime: number; // em minutos
@@ -23,7 +25,7 @@ export const TeacherSuitAvailRoute = () => {
   }
   const [weekKey] = useState(0);
   const [selectedSubjects, setSelectedSubjects] = useState<string[]>([]);
-  const [availability, setAvailability] = useState<Availability[]>([]);
+  const [availabilities, setAvailabilities] = useState<Availability[]>([]);
   const { userId } = useUser();
 
   const subjectsQuery = useSubjects({});
@@ -63,29 +65,23 @@ export const TeacherSuitAvailRoute = () => {
     }
   };
 
-  const handleUpdateAvailability = async (availability: Availability[]) => {
-    try {
-      const response = await axios.post(
-        import.meta.env.VITE_APP_API_URL + 'update_availabilities',
-        {
-          userId: userId,
-          availabilities: availability,
-        },
-      );
-      toast({
-        title: 'Success',
-        description: 'Availability updated successfully',
-      });
-      console.log(response);
-    } catch (error) {
-      toast({
-        variant: 'destructive',
-        title: 'Error',
-        description: 'Error updating availability',
-      });
-      console.log(error);
-    }
-  };
+  const updateAvailabilityMutation = useUpdateAvailability({
+    mutationConfig: {
+      onSuccess: () => {
+        toast({
+          title: 'Success',
+          description: 'Availability updated successfully',
+        });
+      },
+      onError: () => {
+        toast({
+          variant: 'destructive',
+          title: 'Error',
+          description: 'Error updating availability',
+        });
+      },
+    },
+  });
 
   return (
     <div>
@@ -188,14 +184,19 @@ export const TeacherSuitAvailRoute = () => {
           startHour={'07:40'}
           endHour={'22:20'}
           key={weekKey}
-          initialAvailability={availability}
-          onAvailabilityChange={(Availability) => setAvailability(Availability)}
+          initialAvailability={availabilities}
+          onAvailabilityChange={(Availabilities) =>
+            setAvailabilities(Availabilities)
+          }
         />
         <div className="flex justify-center">
           <button
             className="mt-4 rounded bg-gray-200 px-4 py-2 transition duration-300 hover:bg-blue-400 hover:text-white"
             onClick={() => {
-              handleUpdateAvailability(availability);
+              updateAvailabilityMutation.mutate({
+                userId: userId,
+                availabilities: availabilities,
+              });
             }}
           >
             Save

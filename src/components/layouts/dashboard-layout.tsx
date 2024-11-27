@@ -104,7 +104,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
     if (role === 'STAFF') {
       baseItems.push({
         name: 'Time Registration',
-        to: 'time-registration',
+        to: 'time-register',
         icon: Clock3,
       });
     } else if (role === 'PROFESSOR') {
@@ -119,8 +119,25 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
         to: 'coord-suitavail',
         icon: GraduationCap,
       });
+    } else if (role === 'ADMIN') {
+      baseItems.push(
+        {
+          name: 'Teachers',
+          to: 'coord-suitavail',
+          icon: GraduationCap,
+        },
+        {
+          name: 'Availability',
+          to: 'teacher-suitavail',
+          icon: CalendarClock,
+        },
+        {
+          name: 'Time Registration',
+          to: 'time-registration',
+          icon: Clock3,
+        },
+      );
     }
-
     return baseItems;
   };
 
