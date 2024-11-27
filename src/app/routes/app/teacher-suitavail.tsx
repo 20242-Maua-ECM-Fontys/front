@@ -1,3 +1,4 @@
+import { useMsal } from '@azure/msal-react';
 import { useState } from 'react';
 
 import {
@@ -9,24 +10,24 @@ import {
   CommandList,
 } from '@/components/ui/command';
 import WeekAvailability from '@/components/ui/week-availability-update';
+import { useRole } from '@/features/teacher/api/get-role-by-email';
 import { useSubjects } from '@/features/teacher/api/get-subjects';
+import { useUpdateAvailability } from '@/features/teacher/api/update-availability';
 import { useUpdateSubjects } from '@/features/teacher/api/update-subjects';
 import type { Subject } from '@/features/teacher/types/subject';
 import { toast } from '@/hooks/use-toast';
-import { useUser } from '@/hooks/use-user';
-
-import { useUpdateAvailability } from '../../../features/teacher/api/update-availability';
+import type { Availability } from '@/types/api';
 
 export const TeacherSuitAvailRoute = () => {
-  interface Availability {
-    startTime: number; // em minutos
-    endTime: number; // em minutos
-    weekDay: string;
-  }
   const [weekKey] = useState(0);
   const [selectedSubjects, setSelectedSubjects] = useState<string[]>([]);
   const [availabilities, setAvailabilities] = useState<Availability[]>([]);
-  const { userId } = useUser();
+  const { instance } = useMsal();
+  const currentAccount = instance.getActiveAccount();
+
+  const roleQuery = useRole({ email: currentAccount?.username ?? '' });
+
+  const userId = roleQuery.data?.userId;
 
   const subjectsQuery = useSubjects({});
 
@@ -159,10 +160,18 @@ export const TeacherSuitAvailRoute = () => {
               document
                 .getElementById('table-possibilities')
                 ?.scrollIntoView({ behavior: 'smooth' });
-              updateSubjectsMutation.mutate({
-                userId: userId,
-                subjectCodes: selectedSubjects,
-              });
+              if (userId !== undefined) {
+                updateSubjectsMutation.mutate({
+                  userId: userId,
+                  subjectCodes: selectedSubjects,
+                });
+              } else {
+                toast({
+                  variant: 'destructive',
+                  title: 'Error',
+                  description: 'User ID is null',
+                });
+              }
             }}
           >
             Save
@@ -179,7 +188,7 @@ export const TeacherSuitAvailRoute = () => {
         </h3>
         <WeekAvailability
           startHour={'07:40'}
-          endHour={'22:20'}
+          endHour={'22:10'}
           key={weekKey}
           initialAvailability={availabilities}
           onAvailabilityChange={(Availabilities) =>
@@ -190,10 +199,18 @@ export const TeacherSuitAvailRoute = () => {
           <button
             className="mt-4 rounded bg-gray-200 px-4 py-2 transition duration-300 hover:bg-blue-400 hover:text-white"
             onClick={() => {
-              updateAvailabilityMutation.mutate({
-                userId: userId,
-                availabilities: availabilities,
-              });
+              if (userId !== undefined) {
+                updateAvailabilityMutation.mutate({
+                  userId: userId,
+                  availabilities: availabilities,
+                });
+              } else {
+                toast({
+                  variant: 'destructive',
+                  title: 'Error',
+                  description: 'User ID is null',
+                });
+              }
             }}
           >
             Save

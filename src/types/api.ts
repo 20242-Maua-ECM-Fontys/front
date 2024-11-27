@@ -1,18 +1,8 @@
-export type BaseEntity = {
-  id: string;
-  createdAt: number;
-};
-
-export type Entity<T> = {
-  [K in keyof T]: T[K];
-} & BaseEntity;
-
-export type User = Entity<{
-  firstName: string;
-  lastName: string;
+export type User = {
+  userId: number;
   email: string;
-  role: 'STAFF' | 'COORDINATOR' | 'PROFESSOR';
-}>;
+  role: 'STAFF' | 'COORDINATOR' | 'PROFESSOR' | 'ADMIN';
+};
 
 export type Availability = {
   startTime: number;

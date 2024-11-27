@@ -58,7 +58,9 @@ const generateCustomTimeIntervals = (startHour: number, endHour: number) => {
 
 // Função para converter o tempo em minutos
 const convertTimeToMinutes = (time: number): number => {
-  return Math.floor(time * 60);
+  const hours = Math.floor(time);
+  const minutes = Math.round((time - hours) * 60);
+  return hours * 60 + minutes;
 };
 
 const WeekAvailabilityTable: React.FC<WeekAvailabilityTableProps> = ({
