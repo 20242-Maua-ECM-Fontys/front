@@ -10,28 +10,35 @@ import {
   CommandItem,
   CommandList,
 } from '@/components/ui/command';
+import { useUser } from '@/hooks/use-user';
 
 export const CoordinatorScheduleRoute = () => {
+  interface AvailabilityFullfilled {
+    userId: number;
+    classId: string;
+    possibilityId: string;
+  }
+  interface Class {
+    name: string;
+    subjectCode: string;
+    modality: string;
+    classType: string;
+    fullfilledData?: {
+      professorId: number;
+      possibilityId: string;
+    };
+  }
+  const { userId } = useUser();
   const [schedules, setSchedules] = useState<Record<string, any> | null>(null);
   const [selectedSchedule, setSelectedSchedule] = useState<string>('');
-  const [professors, setProfessors] = useState<any[]>([]);
+  const [availabilitiesFullfilled, setAvailabilitiesFullfilled] = useState<
+    AvailabilityFullfilled[]
+  >([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const scheduleTableRef = useRef<HTMLDivElement>(null);
   const calendarViewRef = useRef<HTMLDivElement>(null);
-
-  const handleGetProfessorsByClass = async (classId: string) => {
-    try {
-      const response = await axios.get(
-        `${import.meta.env.VITE_APP_API_URL}get_professors_by_class?classId=${classId}`,
-      );
-      return response.data.professors;
-    } catch (err) {
-      setError('Failed to fetch professors for class');
-      return {};
-    }
-  };
 
   const handleGetSchedules = async (coordId: number) => {
     try {
@@ -47,41 +54,32 @@ export const CoordinatorScheduleRoute = () => {
     }
   };
 
-  const handleSelectSchedule = async (schedule: string) => {
-    setSelectedSchedule(schedule);
+  const convertClassesToAvailabilities = (classes: Record<string, Class>) => {
+    const availabilitiesFullfilled: AvailabilityFullfilled[] = [];
 
-    const scheduleClasses = schedules?.[schedule]?.classes;
-
-    const professorsList: any[] = [];
-
-    for (const classId of Object.keys(scheduleClasses)) {
-      const professorsForClass = await handleGetProfessorsByClass(classId);
-
-      for (const professorId in professorsForClass) {
-        const professor = professorsForClass[professorId];
-        professorsList.push({
-          id: professorId,
-          name: professor.name,
-          email: professor.email,
-          RA: professor.RA,
-          availabilities: Object.values(professor.availabilities),
+    for (const [classId, classData] of Object.entries(classes)) {
+      if (classData.fullfilledData) {
+        availabilitiesFullfilled.push({
+          userId: classData.fullfilledData.professorId,
+          classId,
+          possibilityId: classData.fullfilledData.possibilityId,
         });
       }
     }
 
-    setProfessors(professorsList);
+    return availabilitiesFullfilled;
+  };
+
+  const handleSelectSchedule = async (schedule: string) => {
+    setSelectedSchedule(schedule);
+    setAvailabilitiesFullfilled(
+      convertClassesToAvailabilities(schedules?.[schedule]?.classes),
+    );
   };
 
   useEffect(() => {
     handleGetSchedules(2);
-    window.scrollTo(0, 0);
-  }, []);
-
-  useEffect(() => {
-    if (professors.length > 0) {
-      calendarViewRef.current?.scrollIntoView({ behavior: 'smooth' });
-    }
-  }, [professors]);
+  }, [availabilitiesFullfilled, userId]);
 
   return (
     <div>
@@ -136,7 +134,7 @@ export const CoordinatorScheduleRoute = () => {
           <p>No schedules available for this coordinator.</p>
         )}
       </div>
-      {professors.length > 0 && (
+      {selectedSchedule && (
         <div
           className="flex min-h-screen items-center justify-center"
           id="professor-table"
@@ -145,10 +143,11 @@ export const CoordinatorScheduleRoute = () => {
           <div className="mx-auto max-w-7xl px-4 py-12 text-center sm:px-6 lg:px-8 lg:py-16">
             <div className="mt-8 w-full max-w-5xl">
               <CalendarView
-                professors={professors}
                 possibilities={schedules?.[selectedSchedule]?.possibilities}
                 classes={schedules?.[selectedSchedule]?.classes}
                 scheduleId={selectedSchedule}
+                availabilitiesFullfilled={availabilitiesFullfilled}
+                setAvailabilitiesFullfilled={setAvailabilitiesFullfilled}
               />
             </div>
           </div>
