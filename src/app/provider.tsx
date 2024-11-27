@@ -8,8 +8,8 @@ import { HelmetProvider } from 'react-helmet-async';
 
 import { MainErrorFallback } from '@/components/errors/main';
 import { Spinner } from '@/components/ui/spinner';
+import { msalConfig } from '@/lib/auth';
 import { queryConfig } from '@/lib/react-query';
-import { msalConfig } from 'src/components/layouts/auth-config';
 
 import { Notifications } from '../components/ui/notifications';
 

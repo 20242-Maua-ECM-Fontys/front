@@ -1,74 +1,69 @@
-import { configureAuth } from 'react-query-auth';
-import { Navigate, useLocation } from 'react-router-dom';
-import { z } from 'zod';
+/*
+ * Copyright (c) Microsoft Corporation. All rights reserved.
+ * Licensed under the MIT License.
+ */
 
-import { AuthResponse, User } from '@/types/api';
+import { LogLevel } from '@azure/msal-browser';
 
-import { api } from './api-client';
+import { env } from '@/config/env';
 
-const getUser = async (): Promise<User> => {
-  const response = await api.get('/auth/me');
+/**
+ * Configuration object to be passed to MSAL instance on creation.
+ * For a full list of MSAL.js configuration parameters, visit:
+ * https://github.com/AzureAD/microsoft-authentication-library-for-js/blob/dev/lib/msal-browser/docs/configuration.md
+ */
 
-  return response.data;
-};
-
-const logout = (): Promise<void> => {
-  return api.post('/auth/logout');
-};
-
-export const loginInputSchema = z.object({
-  email: z.string().min(1, 'Required').email('Invalid email'),
-  password: z.string().min(5, 'Required'),
-});
-
-export type LoginInput = z.infer<typeof loginInputSchema>;
-const loginWithEmailAndPassword = (data: LoginInput): Promise<AuthResponse> => {
-  return api.post('/auth/login', data);
-};
-
-export const registerInputSchema = z.object({
-  email: z.string().min(1, 'Required'),
-  firstName: z.string().min(1, 'Required'),
-  lastName: z.string().min(1, 'Required'),
-  password: z.string().min(1, 'Required'),
-});
-
-export type RegisterInput = z.infer<typeof registerInputSchema>;
-
-const registerWithEmailAndPassword = (
-  data: RegisterInput,
-): Promise<AuthResponse> => {
-  return api.post('/auth/register', data);
-};
-
-const authConfig = {
-  userFn: getUser,
-  loginFn: async (data: LoginInput) => {
-    const response = await loginWithEmailAndPassword(data);
-    return response.user;
+export const msalConfig = {
+  auth: {
+    clientId: env.AZURE_CLIENT_ID || '',
+    authority: 'https://login.microsoftonline.com/common',
+    redirectUri: env.AZURE_REDIRECT_URL || '',
   },
-  registerFn: async (data: RegisterInput) => {
-    const response = await registerWithEmailAndPassword(data);
-    return response.user;
+  cache: {
+    cacheLocation: 'sessionStorage', // This configures where your cache will be stored
+    storeAuthStateInCookie: false, // Set this to "true" if you are having issues on IE11 or Edge
   },
-  logoutFn: logout,
+  system: {
+    loggerOptions: {
+      loggerCallback: (level: any, message: any, containsPii: any) => {
+        if (containsPii) {
+          return;
+        }
+        switch (level) {
+          case LogLevel.Error:
+            console.error(message);
+            return;
+          case LogLevel.Info:
+            console.info(message);
+            return;
+          case LogLevel.Verbose:
+            console.debug(message);
+            return;
+          case LogLevel.Warning:
+            console.warn(message);
+            return;
+          default:
+            return;
+        }
+      },
+    },
+  },
 };
 
-export const { useUser, useLogin, useLogout, useRegister, AuthLoader } =
-  configureAuth(authConfig);
+/**
+ * Scopes you add here will be prompted for user consent during sign-in.
+ * By default, MSAL.js will add OIDC scopes (openid, profile, email) to any login request.
+ * For more information about OIDC scopes, visit:
+ * https://docs.microsoft.com/en-us/azure/active-directory/develop/v2-permissions-and-consent#openid-connect-scopes
+ */
+export const loginRequest = {
+  scopes: ['User.Read'],
+};
 
-export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-  const user = useUser();
-  const location = useLocation();
-
-  if (!user.data) {
-    return (
-      <Navigate
-        to={`/auth/login?redirectTo=${encodeURIComponent(location.pathname)}`}
-        replace
-      />
-    );
-  }
-
-  return children;
+/**
+ * Add here the scopes to request when obtaining an access token for MS Graph API. For more information, see:
+ * https://github.com/AzureAD/microsoft-authentication-library-for-js/blob/dev/lib/msal-browser/docs/resources-and-scopes.md
+ */
+export const graphConfig = {
+  graphMeEndpoint: 'https://graph.microsoft.com/v1.0/me',
 };
