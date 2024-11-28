@@ -27,7 +27,7 @@ export const AuthLayout = ({ children, title }: LayoutProps) => {
     <>
       <Head title={title} />
       <div className="flex min-h-screen flex-col items-center justify-center sm:px-6 lg:px-8">
-        <div className=" w-[40rem] h-[25rem] rounded-2xl drop-shadow-[0px_0px_10px_rgba(0,0,0,0.25)] flex-col flex items-center justify-center">
+        <div className=" w-[40rem] h-[25rem] rounded-2xl   flex-col flex items-center justify-center">
           <div className="flex flex-col items-center sm:mx-auto sm:w-full sm:max-w-md">
             <Link className="flex items-center" to="/">
               <img className="h-24 w-auto" src={logo} alt="Workflow" />
