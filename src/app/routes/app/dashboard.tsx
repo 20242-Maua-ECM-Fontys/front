@@ -1,10 +1,18 @@
 import { useMsal } from '@azure/msal-react';
 
 import { ContentLayout } from '@/components/layouts';
-
+import { useOutletContext } from 'react-router-dom';
+import { useEffect } from 'react';
+type DashboardContext = {
+  setTitle: (title: string) => void;
+};
 export const DashboardRoute = () => {
   const { accounts } = useMsal();
+  const { setTitle } = useOutletContext<DashboardContext>();
 
+  useEffect(() => {
+    setTitle('Dashboard'); // Set the desired title
+  }, [setTitle]);
   return (
     <ContentLayout title="Dashboard">
       <h1 className="text-xl">

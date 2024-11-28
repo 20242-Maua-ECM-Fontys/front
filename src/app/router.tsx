@@ -6,6 +6,7 @@ import {
 } from 'react-router-dom';
 
 import { AppRoot } from './routes/app/root';
+import { NewTimeRegistrationRoute } from '@/app/routes/app/time-registration-new';
 
 export const createAppRouter = () =>
   createBrowserRouter([
@@ -38,10 +39,10 @@ export const createAppRouter = () =>
         {
           path: 'time-registration',
           lazy: async () => {
-            const { TimeRegistrationRoute } = await import(
-              './routes/app/time-registration'
+            const { NewTimeRegistrationRoute } = await import(
+              './routes/app/time-registration-new'
             );
-            return { Component: TimeRegistrationRoute };
+            return { Component: NewTimeRegistrationRoute };
           },
         },
         {
