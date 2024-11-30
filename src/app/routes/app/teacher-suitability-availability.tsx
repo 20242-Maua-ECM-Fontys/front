@@ -33,6 +33,7 @@ export const TeacherSuitabilityAndAvailabilityRoute = () => {
     period: string;
   }
 
+  window.scrollTo(0, 0);
   const handlegetSubjects = async () => {
     try {
       const response = await axios.get(
