@@ -39,27 +39,39 @@ const convertDecimalHourToTimeString = (hourDecimal: number): string => {
 const generateCustomTimeIntervals = (startHour: number, endHour: number) => {
   const timeIntervals: string[] = [];
   let currentHour = startHour;
-  const intervalDuration = 100 / 60;
+  const intervalDuration = 100 / 60; // 100 minutes in decimal hours
+  const skipStart1 = 16 + 50 / 60; // 16:50 in decimal hours
+  const skipEnd1 = 18 + 30 / 60; // 18:30 in decimal hours
+  const resumeStart1 = 19; // 19:00 in decimal hours
+  const skipStart2 = 20 + 50 / 60; // 20:50 in decimal hours
+  const skipEnd2 = 22 + 30 / 60; // 22:30 in decimal hours
 
   while (currentHour < endHour) {
-    const startTime = convertDecimalHourToTimeString(currentHour);
-    let endHourInterval = currentHour + intervalDuration;
-    if (endHourInterval > endHour) {
-      endHourInterval = endHour;
-    }
-    const endTime = convertDecimalHourToTimeString(endHourInterval);
+    if (currentHour >= skipStart1 && currentHour < skipEnd1) {
+      timeIntervals.push('16:50 - 18:30');
+      currentHour = resumeStart1;
+    } else if (currentHour >= skipStart2 && currentHour < skipEnd2) {
+      timeIntervals.push('20:50 - 22:30');
+      currentHour = skipEnd2;
+    } else {
+      const startTime = convertDecimalHourToTimeString(currentHour);
+      let endHourInterval = currentHour + intervalDuration;
+      if (endHourInterval > endHour) {
+        endHourInterval = endHour;
+      }
+      const endTime = convertDecimalHourToTimeString(endHourInterval);
 
-    timeIntervals.push(`${startTime} - ${endTime}`);
-    currentHour = endHourInterval + 10 / 60; // Adiciona um intervalo de 10 minutos
+      timeIntervals.push(`${startTime} - ${endTime}`);
+      currentHour = endHourInterval + 10 / 60; // Add a 10-minute interval
+    }
   }
 
   return timeIntervals;
 };
 
 // Função para converter o tempo em minutos
-const convertTimeToMinutes = (time: number): number => {
-  const hours = Math.floor(time);
-  const minutes = Math.round((time - hours) * 60);
+const convertTimeToMinutes = (time: string): number => {
+  const [hours, minutes] = time.split(':').map(Number);
   return hours * 60 + minutes;
 };
 
@@ -83,12 +95,10 @@ const WeekAvailabilityTable: React.FC<WeekAvailabilityTableProps> = ({
 
   const toggleTimeSlot = (day: WeekDays, interval: string) => {
     const [startTimeStr, endTimeStr] = interval.split(' - ');
-    const startTimeDecimal = convertTimeStringToDecimal(startTimeStr);
-    const endTimeDecimal = convertTimeStringToDecimal(endTimeStr);
     const weekDay = day.slice(0, 3).toUpperCase(); // Abreviação do dia (e.g., MON)
 
-    const startTime = convertTimeToMinutes(startTimeDecimal);
-    const endTime = convertTimeToMinutes(endTimeDecimal);
+    const startTime = convertTimeToMinutes(startTimeStr);
+    const endTime = convertTimeToMinutes(endTimeStr);
 
     setAvailability((prev) => {
       const existingSlotIndex = prev.findIndex(
@@ -193,15 +203,10 @@ const WeekAvailabilityTable: React.FC<WeekAvailabilityTableProps> = ({
                       className={`h-12 cursor-pointer border p-0 text-sm transition ${index !== visibleDayIndex ? 'hidden md:table-cell' : ''}`}
                     >
                       <button
-                        className={`size-full p-2 ${availability.some((slot) => slot.startTime === convertTimeToMinutes(convertTimeStringToDecimal(interval.split('-')[0])) && slot.endTime === convertTimeToMinutes(convertTimeStringToDecimal(interval.split('-')[1])) && slot.weekDay === day.slice(0, 3).toUpperCase()) ? 'bg-blue-500 text-white' : 'hover:bg-blue-100'}`}
+                        className={`size-full p-2 ${availability.some((slot) => slot.startTime === convertTimeToMinutes(convertDecimalHourToTimeString(convertTimeStringToDecimal(interval.split('-')[0]))) && slot.endTime === convertTimeToMinutes(convertDecimalHourToTimeString(convertTimeStringToDecimal(interval.split('-')[1]))) && slot.weekDay === day.slice(0, 3).toUpperCase()) ? 'bg-blue-500 text-white' : 'hover:bg-blue-100'}`}
                         onClick={() =>
                           toggleTimeSlot(day as WeekDays, interval)
                         }
-                        onKeyPress={(e) => {
-                          if (e.key === 'Enter' || e.key === ' ') {
-                            toggleTimeSlot(day as WeekDays, interval);
-                          }
-                        }}
                       ></button>
                     </td>
                   ))}
