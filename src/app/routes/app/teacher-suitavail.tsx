@@ -1,6 +1,7 @@
 import { useMsal } from '@azure/msal-react';
 import { useState } from 'react';
 
+import { useUpdateSubjects } from '@/api/update-subjects';
 import {
   Command,
   CommandEmpty,
@@ -10,11 +11,10 @@ import {
   CommandList,
 } from '@/components/ui/command';
 import WeekAvailability from '@/components/ui/week-availability-update';
-import { useRole } from '@/features/teacher/api/get-role-by-email';
-import { useSubjects } from '@/features/teacher/api/get-subjects';
-import { useUpdateAvailability } from '@/features/teacher/api/update-availability';
-import { useUpdateSubjects } from '@/features/teacher/api/update-subjects';
-import type { Subject } from '@/features/teacher/types/subject';
+import { useRole } from '@/features/teacher-avail/api/get-role-by-email';
+import { useSubjects } from '@/features/teacher-avail/api/get-subjects';
+import { useUpdateAvailability } from '@/features/teacher-avail/api/update-availability';
+import type { Subject } from '@/features/teacher-avail/types/subject';
 import { toast } from '@/hooks/use-toast';
 import type { Availability } from '@/types/api';
 

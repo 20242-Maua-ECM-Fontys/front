@@ -1,6 +1,8 @@
+import { useMsal } from '@azure/msal-react';
 import axios from 'axios';
 import { useEffect, useState } from 'react';
 
+import { useUpdateSubjects } from '@/api/update-subjects';
 import { Button } from '@/components/ui/button';
 import {
   Command,
@@ -11,6 +13,9 @@ import {
   CommandList,
 } from '@/components/ui/command';
 import WeekAvailability from '@/components/ui/week-availability-update';
+import { useRole } from '@/features/teacher-avail/api/get-role-by-email';
+
+import { toast } from '../../../hooks/use-toast';
 
 export const CoordinatorSuitAvailRoute = () => {
   interface Subject {
@@ -58,6 +63,31 @@ export const CoordinatorSuitAvailRoute = () => {
   const [professors, setProfessors] = useState<Professors | null>(null);
   const [, setLoading] = useState(true);
   const [subjects, setSubjects] = useState<Subject[]>([]);
+
+  const { instance } = useMsal();
+  const currentAccount = instance.getActiveAccount();
+
+  const roleQuery = useRole({ email: currentAccount?.username ?? '' });
+
+  const userId = roleQuery.data?.userId;
+
+  const updateSubjectsMutation = useUpdateSubjects({
+    mutationConfig: {
+      onSuccess: () => {
+        toast({
+          title: 'Success',
+          description: 'Subjects updated successfully',
+        });
+      },
+      onError: () => {
+        toast({
+          variant: 'destructive',
+          title: 'Error',
+          description: 'Error updating subjects',
+        });
+      },
+    },
+  });
 
   const handleGetProfessors = async () => {
     try {
@@ -197,7 +227,26 @@ export const CoordinatorSuitAvailRoute = () => {
         </Command>
         <div className="flex items-center justify-center gap-4">
           {selectedProfessor ? (
-            <Button className="mt-4 rounded bg-gray-400 px-4 py-2 transition duration-300 hover:bg-blue-400 hover:text-white">
+            <Button
+              onClick={() => {
+                document
+                  .getElementById('table-possibilities')
+                  ?.scrollIntoView({ behavior: 'smooth' });
+                if (userId !== undefined) {
+                  updateSubjectsMutation.mutate({
+                    userId: userId,
+                    subjectCodes: selectedSubjects,
+                  });
+                } else {
+                  toast({
+                    variant: 'destructive',
+                    title: 'Error',
+                    description: 'User ID is null',
+                  });
+                }
+              }}
+              className="mt-4 rounded bg-gray-400 px-4 py-2 transition duration-300 hover:bg-blue-400 hover:text-white"
+            >
               Save
             </Button>
           ) : (
