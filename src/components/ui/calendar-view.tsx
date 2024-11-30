@@ -75,9 +75,9 @@ export const CalendarView: React.FC<Props> = ({
     startTime: number;
     endTime: number;
     possibilityId?: string;
+    isFullfilled?: boolean;
+    classId?: string;
   }>(null);
-
-  // initiate professors with all professors
 
   const [selectedClass, setSelectedClass] = useState<string | null>(null);
   const [professors, setProfessors] = useState<Professor[]>([]);
@@ -216,7 +216,6 @@ export const CalendarView: React.FC<Props> = ({
         setSelectedSlot(null);
         setSelectedClass(null);
         setAvailabilitiesFullfilled(newFullfilled);
-        console.log('newFullfilled:', availabilitiesFullfilled);
       } catch (error) {
         toast({
           variant: 'destructive',
@@ -231,7 +230,7 @@ export const CalendarView: React.FC<Props> = ({
   const handleDeleteFullfilled = async () => {
     try {
       const updatedAvailabilities = availabilitiesFullfilled.filter(
-        (av) => av.possibilityId !== selectedSlot.possibilityId,
+        (av) => av.possibilityId !== selectedSlot!.possibilityId,
       );
 
       await axios.put(
@@ -248,7 +247,6 @@ export const CalendarView: React.FC<Props> = ({
       setSelectedSlot(null);
       setSelectedClass(null);
       setAvailabilitiesFullfilled(updatedAvailabilities);
-      console.log('updatedAvailabilities:', availabilitiesFullfilled);
     } catch (error) {
       toast({
         variant: 'destructive',
@@ -288,6 +286,7 @@ export const CalendarView: React.FC<Props> = ({
         startTime: slot.startTime,
         endTime: slot.endTime,
         possibilityId: slot.possibilityId,
+        isFullfilled: true,
       });
     } else {
       setSelectedSlot({
@@ -296,6 +295,7 @@ export const CalendarView: React.FC<Props> = ({
         startTime: slot.startTime,
         endTime: slot.endTime,
         possibilityId: slot.possibilityId,
+        isFullfilled: false,
       });
     }
   };
@@ -303,48 +303,128 @@ export const CalendarView: React.FC<Props> = ({
   return (
     <div className="relative p-4">
       <h2 className="p-4 text-2xl font-semibold">Classes of this schedule</h2>
+      <div className="flex items-center justify-center gap-4 p-4">
+        <button className="rounded bg-green-200 p-2">Theory</button>
+        <button className="rounded bg-blue-200 p-2">Practice</button>
+        <button className="rounded bg-orange-300 p-2">Laboratory</button>
+      </div>
       <div className="flex items-center justify-center gap-4">
         {Object.keys(classes).map((classId) => (
           <button
             key={classId}
-            className={`rounded bg-gray-200 p-4 transition duration-300 hover:bg-blue-400 hover:text-white focus:outline-none focus:ring ${
+            className={`rounded p-4 transition duration-300 hover:bg-blue-400 hover:text-white focus:outline-none focus:ring ${
               selectedClass === classId ? 'bg-blue-400 text-white' : ''
-            }`}
+            } ${Object.values(availabilitiesFullfilled).some((av) => av.classId === classId) ? 'opacity-50' : 'bg-gray-300'} ${classes[classId].classType === 'THEORY' ? 'bg-green-200' : classes[classId].classType === 'PRACTICE' ? 'bg-blue-200' : 'bg-orange-300'}`}
             onClick={() => handleSelectClass(classId)}
+            disabled={Object.values(availabilitiesFullfilled).some(
+              (av) => av.classId === classId,
+            )}
           >
-            {`${classes[classId].name} - ${classes[classId].modality}`}
+            {`${classes[classId].name} - ${classes[classId].subjectCode} ${classes[classId].modality}`}
           </button>
         ))}
       </div>
 
-      <div className="grid grid-cols-6 gap-4 p-4">
-        {weekDays.map((day) => (
-          <div key={day} className="rounded-lg border p-2">
-            <h2 className="mb-2 text-xl font-semibold">{day}</h2>
-            {calendarData[day].length > 0 ? (
-              calendarData[day].map((slot, index) => {
-                return (
-                  <div
-                    key={index}
-                    className={`relative mb-2 cursor-pointer rounded p-2 ${
-                      slot.isFullfilled
-                        ? 'bg-blue-300'
-                        : 'bg-gray-200 hover:bg-gray-300'
-                    }`}
-                    onClick={() => handleSlotClick(slot)}
-                  >
-                    <p>{slot.time}</p>
-                  </div>
-                );
-              })
-            ) : (
-              <p className="text-gray-500">No availability</p>
-            )}
-          </div>
-        ))}
+      <div className="mt-4 overflow-x-auto">
+        <table className="w-full table-auto border-collapse border border-gray-300">
+          <thead>
+            <tr>
+              <th className="w-24 border border-gray-300 bg-gray-100 p-2">
+                Times
+              </th>
+              {weekDays.map((day) => (
+                <th
+                  key={day}
+                  className="w-24 border border-gray-300 bg-gray-100 p-2"
+                >
+                  {day}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {[
+              ...new Set(
+                Object.keys(calendarData).flatMap((day) =>
+                  calendarData[day].map((slot) => slot.time),
+                ),
+              ),
+            ]
+              .sort()
+              .map((time, timeIndex) => (
+                <tr key={timeIndex}>
+                  <td className="w-24 border border-gray-300 bg-gray-200 p-2">
+                    {time}
+                  </td>
+                  {weekDays.map((day) => {
+                    const slot = calendarData[day]?.find(
+                      (s) => s.time === time,
+                    );
+                    return (
+                      <td
+                        key={`${day}-${time}`}
+                        className={`border border-gray-300 p-2 text-center ${
+                          slot?.isFullfilled
+                            ? Object.values(classes)
+                                .map((classItem) => {
+                                  if (
+                                    classItem.fullfilledData?.possibilityId ===
+                                    slot?.possibilityId
+                                  ) {
+                                    if (classItem.classType === 'THEORY') {
+                                      return 'bg-green-200';
+                                    }
+                                    if (classItem.classType === 'PRACTICE') {
+                                      return 'bg-blue-200';
+                                    }
+                                    if (classItem.classType === 'LAB') {
+                                      return 'bg-orange-300';
+                                    }
+                                  }
+                                  return '';
+                                })
+                                .join(' ')
+                            : 'cursor-pointer hover:bg-gray-300'
+                        } ${
+                          selectedSlot?.time === slot?.time &&
+                          selectedSlot?.weekDay === day &&
+                          'bg-gray-200 text-white'
+                        } w-24`}
+                        onClick={() => slot && handleSlotClick(slot)}
+                      >
+                        {slot ? (
+                          slot.isFullfilled ? (
+                            <div>
+                              {Object.values(classes).map((classItem) => {
+                                if (
+                                  classItem.fullfilledData?.possibilityId ===
+                                  slot.possibilityId
+                                ) {
+                                  return (
+                                    <span key={classItem.subjectCode}>
+                                      {classItem.subjectCode}
+                                    </span>
+                                  );
+                                }
+                                return null;
+                              })}
+                            </div>
+                          ) : (
+                            <span className="text-gray-500"></span>
+                          )
+                        ) : (
+                          <span className="text-gray-500">-</span>
+                        )}
+                      </td>
+                    );
+                  })}
+                </tr>
+              ))}
+          </tbody>
+        </table>
       </div>
 
-      {selectedSlot && selectedClass && (
+      {selectedSlot && selectedClass && !selectedSlot.isFullfilled && (
         <div className="absolute inset-0 z-10 flex items-center justify-center bg-gray-800/50">
           <div className="w-1/2 rounded bg-white p-4 shadow-lg">
             <h3 className="mb-4 text-lg font-semibold">
@@ -396,10 +476,26 @@ export const CalendarView: React.FC<Props> = ({
             <p>Time: {hoverInfo.time}</p>
             {hoverInfo.people.map((person, idx) => (
               <div key={idx} className="mt-2">
+                <p></p>
                 <p>Name: {person.name}</p>
                 <p>Email: {person.email}</p>
               </div>
             ))}
+            <div>
+              {Object.values(classes).map((classItem) => {
+                if (
+                  classItem.fullfilledData?.possibilityId ===
+                  selectedSlot!.possibilityId
+                ) {
+                  return (
+                    <span key={classItem.subjectCode}>
+                      {`Class: ${classItem.name} - ${classItem.subjectCode}`}
+                    </span>
+                  );
+                }
+                return null;
+              })}
+            </div>
             <button
               className="mt-4 w-full rounded bg-red-400 p-2 hover:bg-red-500 hover:text-white focus:outline-none focus:ring"
               onClick={() => {

@@ -78,7 +78,7 @@ export const CoordinatorScheduleRoute = () => {
   };
 
   useEffect(() => {
-    handleGetSchedules(2);
+    handleGetSchedules(userId);
   }, [availabilitiesFullfilled, userId]);
 
   return (
