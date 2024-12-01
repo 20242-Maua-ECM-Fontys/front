@@ -78,7 +78,6 @@ export const CoordinatorSuitAvailRoute = () => {
 
   useEffect(() => {
     handlegetSubjects();
-    window.scrollTo(0, 0);
   }, [selectedProfessor, queryClient]);
 
   return (
