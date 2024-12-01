@@ -36,18 +36,22 @@ export const TimeRegistrationRoute = () => {
       notLater: number;
     };
   }
-
-  type Period = 'morning' | 'afternoon' | 'night' | 'full';
   const [courses, setCourses] = useState<string[]>([]);
   const [coursesPeriods, setCoursesPeriods] = useState<any>({});
-  const [period, setPeriod] = useState<Period>('morning');
+  const [period, setPeriod] = useState('Morning');
 
   const [courseId, setCourseId] = useState('');
+  const [courseYears, setCourseYears] = useState<number | null>(null);
   const [courseType, setCourseType] = useState('');
   const [loading, setLoading] = useState(true);
   const [weekKey, setWeekKey] = useState(0);
   const [courseGrade, setCourseGrade] = useState(0);
   const [availability, setAvailability] = useState<Availability[]>([]);
+  const [timeSlot, setTimeSlot] = useState<{ start: string; end: string }>({
+    start: '07:40',
+    end: '13:00',
+  });
+
   const getCourseType = (course: string) => {
     // check in the "schedulePeriod" key of the course object
     // if the value is "ANNUAL" return "ANNUAL"
@@ -70,17 +74,31 @@ export const TimeRegistrationRoute = () => {
   };
 
   const handleTimeSlotChange = (slot: string) => {
-    setPeriod(slot as Period);
+    setPeriod(slot);
+    switch (slot) {
+      case 'Morning':
+        setTimeSlot({ start: '07:40', end: '13:00' });
+        break;
+      case 'Afternoon':
+        setTimeSlot({ start: '13:10', end: '18:30' });
+        break;
+      case 'Evening':
+        setTimeSlot({ start: '19:00', end: '22:20' });
+        break;
+      default:
+        break;
+    }
     setWeekKey((prevKey) => prevKey + 1);
   };
 
   const handleCourseChange = (course: string) => {
     setCourseId(courseToCourseId(course));
     setCourseType(getCourseType(course));
+    setCourseYears(coursesPeriods[course].courseGrade);
   };
 
   const handlePeriodChange = (period: string) => {
-    setPeriod(period as Period);
+    setPeriod(period);
     switch (period) {
       case '1st Year':
         setCourseGrade(1);
@@ -176,8 +194,7 @@ export const TimeRegistrationRoute = () => {
     });
 
     const request = {
-      //2S-4CM-D5@2024(SCS)
-      scheduleId: `${courseTypeRequest}-${courseGrade}${courseId}-D5@${current_year}(SCS)`,
+      scheduleId: `${courseTypeRequest}-${courseGrade}${courseId}-D${courseYears}@${current_year}(SCS)`,
       availability: weekDaysAvailability,
     };
 
@@ -335,58 +352,12 @@ export const TimeRegistrationRoute = () => {
         id="table-possibilities"
       >
         <h3 className="mb-4 text-center text-xl font-bold">
-          Set Your Availability
+          Set Your Possibilities
         </h3>
-        <div className="grid grid-cols-1 gap-5 p-6 sm:grid-cols-3">
-          <button
-            onClick={() => {
-              handleTimeSlotChange('morning');
-              document
-                .getElementById('table-possibilities')
-                ?.scrollIntoView({ behavior: 'smooth' });
-            }}
-            className={`mx-auto rounded px-4 py-2 transition duration-300 ${
-              period === 'morning'
-                ? 'bg-blue-500 text-white'
-                : 'bg-gray-200 text-black'
-            } hover:bg-blue-500 hover:text-white`}
-          >
-            Morning
-          </button>
 
-          <button
-            onClick={() => {
-              handleTimeSlotChange('afternoon');
-              document
-                .getElementById('table-possibilities')
-                ?.scrollIntoView({ behavior: 'smooth' });
-            }}
-            className={`mx-auto rounded px-4 py-2 transition duration-300 ${
-              period === 'afternoon'
-                ? 'bg-blue-500 text-white'
-                : 'bg-gray-200 text-black'
-            } hover:bg-blue-500 hover:text-white`}
-          >
-            <p>Afternoon</p>
-          </button>
-          <button
-            onClick={() => {
-              handleTimeSlotChange('night');
-              document
-                .getElementById('table-possibilities')
-                ?.scrollIntoView({ behavior: 'smooth' });
-            }}
-            className={`mx-auto rounded px-4 py-2 transition duration-300 ${
-              period === 'night'
-                ? 'bg-blue-500 text-white'
-                : 'bg-gray-200 text-black'
-            } hover:bg-blue-500 hover:text-white`}
-          >
-            <p>Evening</p>
-          </button>
-        </div>
         <WeekAvailability
-          period={period}
+          // converter Morning para morning
+          period="full"
           initialAvailability={availability}
           key={weekKey}
           onAvailabilityChange={handleAvailabilityChange}
