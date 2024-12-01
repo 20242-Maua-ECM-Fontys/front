@@ -1,5 +1,13 @@
+import { useMsal } from '@azure/msal-react';
 import { ArrowRight, ArrowLeft } from 'lucide-react';
 import React, { useState } from 'react';
+
+import { useUpdateAvailability } from '@/api/update-availability';
+import { toast } from '@/hooks/use-toast';
+
+import { useRole } from '../../api/get-role-by-email';
+
+import { Button } from './button';
 
 type WeekDays =
   | 'Monday'
@@ -75,7 +83,7 @@ const convertTimeToMinutes = (time: string): number => {
   return hours * 60 + minutes;
 };
 
-const WeekAvailabilityTable: React.FC<WeekAvailabilityTableProps> = ({
+export const WeekAvailabilityTable: React.FC<WeekAvailabilityTableProps> = ({
   startHour,
   endHour,
   initialAvailability, // Recebendo a lista de disponibilidade
@@ -92,6 +100,31 @@ const WeekAvailabilityTable: React.FC<WeekAvailabilityTableProps> = ({
     startHourDecimal,
     endHourDecimal,
   );
+
+  const { instance } = useMsal();
+  const currentAccount = instance.getActiveAccount();
+
+  const roleQuery = useRole({ email: currentAccount?.username ?? '' });
+
+  const userId = roleQuery.data?.userId;
+
+  const updateAvailabilityMutation = useUpdateAvailability({
+    mutationConfig: {
+      onSuccess: () => {
+        toast({
+          title: 'Success',
+          description: 'Availability updated successfully',
+        });
+      },
+      onError: () => {
+        toast({
+          variant: 'destructive',
+          title: 'Error',
+          description: 'Error updating availability',
+        });
+      },
+    },
+  });
 
   const toggleTimeSlot = (day: WeekDays, interval: string) => {
     const [startTimeStr, endTimeStr] = interval.split(' - ');
@@ -215,9 +248,29 @@ const WeekAvailabilityTable: React.FC<WeekAvailabilityTableProps> = ({
             </tbody>
           </table>
         </div>
+
+        <div className="flex w-full justify-end pt-4">
+          <Button
+            onClick={() => {
+              if (userId !== undefined) {
+                updateAvailabilityMutation.mutate({
+                  userId: userId,
+                  availabilities: initialAvailability,
+                });
+              } else {
+                toast({
+                  variant: 'destructive',
+                  title: 'Error',
+                  description: 'User ID is null',
+                });
+              }
+            }}
+            size="lg"
+          >
+            Submit
+          </Button>
+        </div>
       </div>
     </div>
   );
 };
-
-export default WeekAvailabilityTable;

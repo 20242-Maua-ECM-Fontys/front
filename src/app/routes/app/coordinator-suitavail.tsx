@@ -2,6 +2,7 @@ import { useMsal } from '@azure/msal-react';
 import axios from 'axios';
 import { useEffect, useState } from 'react';
 
+import { useRole } from '@/api/get-role-by-email';
 import { useUpdateSubjects } from '@/api/update-subjects';
 import { Button } from '@/components/ui/button';
 import {
@@ -12,8 +13,7 @@ import {
   CommandItem,
   CommandList,
 } from '@/components/ui/command';
-import WeekAvailability from '@/components/ui/week-availability-update';
-import { useRole } from '@/features/teacher-avail/api/get-role-by-email';
+import { WeekAvailabilityTable } from '@/components/ui/week-availability-update';
 
 import { toast } from '../../../hooks/use-toast';
 
@@ -267,9 +267,9 @@ export const CoordinatorSuitAvailRoute = () => {
         <h3 className="mb-4 text-center text-xl font-bold">
           Set Your Availability
         </h3>
-        <WeekAvailability
+        <WeekAvailabilityTable
           startHour={'07:40'}
-          endHour={'22:20'}
+          endHour={'22:30'}
           initialAvailability={selectedProfessor?.availabilities || []}
           onAvailabilityChange={handleAvailabilityChange}
           key={weekKey}

@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { useEffect, useState } from 'react';
 
-import WeekAvailability from '@/components/ui/week-availability-update';
+import { WeekAvailabilityTable } from '@/components/ui/week-availability-update';
 import { toast } from '@/hooks/use-toast';
 
 export const TimeRegistrationRoute = () => {
@@ -401,7 +401,7 @@ export const TimeRegistrationRoute = () => {
             <p>Evening</p>
           </button>
         </div>
-        <WeekAvailability
+        <WeekAvailabilityTable
           startHour={timeSlot.start}
           endHour={timeSlot.end}
           initialAvailability={availability}

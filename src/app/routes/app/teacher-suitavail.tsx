@@ -1,6 +1,7 @@
 import { useMsal } from '@azure/msal-react';
 import { useState } from 'react';
 
+import { useRole } from '@/api/get-role-by-email';
 import { useUpdateSubjects } from '@/api/update-subjects';
 import {
   Command,
@@ -10,10 +11,8 @@ import {
   CommandItem,
   CommandList,
 } from '@/components/ui/command';
-import WeekAvailability from '@/components/ui/week-availability-update';
-import { useRole } from '@/features/teacher-avail/api/get-role-by-email';
+import { WeekAvailabilityTable } from '@/components/ui/week-availability-update';
 import { useSubjects } from '@/features/teacher-avail/api/get-subjects';
-import { useUpdateAvailability } from '@/features/teacher-avail/api/update-availability';
 import type { Subject } from '@/features/teacher-avail/types/subject';
 import { toast } from '@/hooks/use-toast';
 import type { Availability } from '@/types/api';
@@ -55,24 +54,6 @@ export const TeacherSuitAvailRoute = () => {
           variant: 'destructive',
           title: 'Error',
           description: 'Error updating subjects',
-        });
-      },
-    },
-  });
-
-  const updateAvailabilityMutation = useUpdateAvailability({
-    mutationConfig: {
-      onSuccess: () => {
-        toast({
-          title: 'Success',
-          description: 'Availability updated successfully',
-        });
-      },
-      onError: () => {
-        toast({
-          variant: 'destructive',
-          title: 'Error',
-          description: 'Error updating availability',
         });
       },
     },
@@ -186,36 +167,15 @@ export const TeacherSuitAvailRoute = () => {
         <h3 className="mb-4 text-center text-xl font-bold">
           Set Your Availability
         </h3>
-        <WeekAvailability
+        <WeekAvailabilityTable
           startHour={'07:40'}
-          endHour={'22:10'}
+          endHour={'22:30'}
           key={weekKey}
           initialAvailability={availabilities}
           onAvailabilityChange={(Availabilities) =>
             setAvailabilities(Availabilities)
           }
         />
-        <div className="flex justify-center">
-          <button
-            className="mt-4 rounded bg-gray-200 px-4 py-2 transition duration-300 hover:bg-blue-400 hover:text-white"
-            onClick={() => {
-              if (userId !== undefined) {
-                updateAvailabilityMutation.mutate({
-                  userId: userId,
-                  availabilities: availabilities,
-                });
-              } else {
-                toast({
-                  variant: 'destructive',
-                  title: 'Error',
-                  description: 'User ID is null',
-                });
-              }
-            }}
-          >
-            Save
-          </button>
-        </div>
       </div>
     </div>
   );
