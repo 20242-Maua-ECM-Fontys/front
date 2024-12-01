@@ -280,8 +280,7 @@ export const CoordinatorSuitabilityAndAvailabilityRoute = () => {
           Set Your Availability
         </h3>
         <WeekAvailability
-          startHour={'07:40'}
-          endHour={'22:20'}
+          period="full"
           initialAvailability={selectedProfessor?.availabilities || []}
           onAvailabilityChange={handleAvailabilityChange}
           key={weekKey}

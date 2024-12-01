@@ -19,7 +19,7 @@ export const TeacherSuitabilityAndAvailabilityRoute = () => {
     endTime: number; // em minutos
     weekDay: string;
   }
-  const [weekKey, setWeekKey] = useState(0);
+  const [weekKey] = useState(0);
   const [selectedSubjects, setSelectedSubjects] = useState<string[]>([]);
   const [subjects, setSubjects] = useState<Subject[]>([]);
   const [loading, setLoading] = useState(true);
@@ -239,8 +239,7 @@ export const TeacherSuitabilityAndAvailabilityRoute = () => {
         </h3>
         {isAvailLoaded ? (
           <WeekAvailability
-            startHour={'07:40'}
-            endHour={'22:20'}
+            period="full"
             key={weekKey}
             initialAvailability={availability}
             onAvailabilityChange={handleAvailabilityChange}

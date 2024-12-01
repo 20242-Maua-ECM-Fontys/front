@@ -16,77 +16,76 @@ interface Availability {
 }
 
 interface WeekAvailabilityTableProps {
-  startHour: string;
-  endHour: string;
+  period: 'morning' | 'afternoon' | 'night' | 'full'; // Novo parâmetro
   initialAvailability: Availability[];
-  onAvailabilityChange: (newAvailability: Availability[]) => void; // Adicionei essa linha
+  onAvailabilityChange: (newAvailability: Availability[]) => void;
 }
 
-const convertTimeStringToDecimal = (timeString: string): number => {
-  const [hour, minute] = timeString.split(':').map(Number);
-  return hour + minute / 60;
+// Configurações de horários para os períodos
+const PERIOD_TIMES = {
+  morning: { start: 460, end: 780 }, // 7h40 - 13h00
+  afternoon: { start: 790, end: 1110 }, // 13h10 - 18h30
+  night: { start: 1140, end: 1350 }, // 19h00 - 22h20
+  full: [
+    { start: 460, end: 780 }, // 7h40 - 13h00
+    { start: 790, end: 1110 }, // 13h10 - 18h30
+    { start: 1140, end: 1350 }, // 19h00 - 22h20
+  ],
 };
 
-const convertDecimalHourToTimeString = (hourDecimal: number): string => {
-  const hour = Math.floor(hourDecimal);
-  const minute = Math.round((hourDecimal - hour) * 60);
-  if (minute === 60) {
-    return `${String(hour + 1).padStart(2, '0')}:00`;
-  }
-  return `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`;
-};
-
-const generateCustomTimeIntervals = (startHour: number, endHour: number) => {
+// Função para gerar os intervalos de tempo em minutos
+const generateCustomTimeIntervals = (
+  periods: { start: number; end: number }[],
+) => {
   const timeIntervals: string[] = [];
-  let currentHour = startHour;
-  const intervalDuration = 100 / 60;
 
-  while (currentHour < endHour) {
-    const startTime = convertDecimalHourToTimeString(currentHour);
-    let endHourInterval = currentHour + intervalDuration;
-    if (endHourInterval > endHour) {
-      endHourInterval = endHour;
+  periods.forEach(({ start, end }) => {
+    let currentTime = start;
+
+    while (currentTime + 100 <= end) {
+      const startTime = convertMinutesToTime(currentTime);
+      const endTime = convertMinutesToTime(currentTime + 100);
+      timeIntervals.push(`${startTime} - ${endTime}`);
+      currentTime += 110; // Adiciona 100 minutos de aula + 10 minutos de intervalo
     }
-    const endTime = convertDecimalHourToTimeString(endHourInterval);
-
-    timeIntervals.push(`${startTime} - ${endTime}`);
-    currentHour = endHourInterval + 10 / 60; // Adiciona um intervalo de 10 minutos
-  }
+  });
 
   return timeIntervals;
 };
 
-// Função para converter o tempo em minutos
-const convertTimeToMinutes = (time: number): number => {
-  return Math.floor(time * 60);
+// Converte minutos para uma string no formato "HH:MM"
+const convertMinutesToTime = (minutes: number): string => {
+  const hours = Math.floor(minutes / 60);
+  const mins = minutes % 60;
+  return `${String(hours).padStart(2, '0')}:${String(mins).padStart(2, '0')}`;
+};
+
+// Converte uma string no formato "HH:MM" para minutos
+const convertTimeToMinutes = (timeString: string): number => {
+  const [hours, minutes] = timeString.split(':').map(Number);
+  return hours * 60 + minutes;
 };
 
 const WeekAvailabilityTable: React.FC<WeekAvailabilityTableProps> = ({
-  startHour,
-  endHour,
-  initialAvailability, // Recebendo a lista de disponibilidade
-  onAvailabilityChange, // Adicionando a função de callback
+  period,
+  initialAvailability,
+  onAvailabilityChange,
 }) => {
   const [availability, setAvailability] =
     useState<Availability[]>(initialAvailability);
   const [visibleDayIndex, setVisibleDayIndex] = useState(0);
 
-  const startHourDecimal = convertTimeStringToDecimal(startHour);
-  const endHourDecimal = convertTimeStringToDecimal(endHour);
-
-  const timeIntervals = generateCustomTimeIntervals(
-    startHourDecimal,
-    endHourDecimal,
-  );
+  // Gera os intervalos de tempo com base no período
+  const timeIntervals =
+    period === 'full'
+      ? generateCustomTimeIntervals(PERIOD_TIMES.full)
+      : generateCustomTimeIntervals([PERIOD_TIMES[period]]);
 
   const toggleTimeSlot = (day: WeekDays, interval: string) => {
     const [startTimeStr, endTimeStr] = interval.split(' - ');
-    const startTimeDecimal = convertTimeStringToDecimal(startTimeStr);
-    const endTimeDecimal = convertTimeStringToDecimal(endTimeStr);
+    const startTime = convertTimeToMinutes(startTimeStr);
+    const endTime = convertTimeToMinutes(endTimeStr);
     const weekDay = day.slice(0, 3).toUpperCase(); // Abreviação do dia (e.g., MON)
-
-    const startTime = convertTimeToMinutes(startTimeDecimal);
-    const endTime = convertTimeToMinutes(endTimeDecimal);
 
     setAvailability((prev) => {
       const existingSlotIndex = prev.findIndex(
@@ -165,7 +164,9 @@ const WeekAvailabilityTable: React.FC<WeekAvailabilityTableProps> = ({
                 ].map((day, index) => (
                   <th
                     key={day}
-                    className={`border-b-2 p-2 text-center text-sm md:text-base ${index !== visibleDayIndex ? 'hidden md:table-cell' : ''}`}
+                    className={`border-b-2 p-2 text-center text-sm md:text-base ${
+                      index !== visibleDayIndex ? 'hidden md:table-cell' : ''
+                    }`}
                   >
                     {day}
                   </th>
@@ -188,7 +189,20 @@ const WeekAvailabilityTable: React.FC<WeekAvailabilityTableProps> = ({
                   ].map((day, index) => (
                     <td
                       key={day + interval}
-                      className={`cursor-pointer border p-2 text-sm transition md:text-base ${index !== visibleDayIndex ? 'hidden md:table-cell' : ''} ${availability.some((slot) => slot.startTime === convertTimeToMinutes(convertTimeStringToDecimal(interval.split('-')[0])) && slot.endTime === convertTimeToMinutes(convertTimeStringToDecimal(interval.split('-')[1])) && slot.weekDay === day.slice(0, 3).toUpperCase()) ? 'bg-blue-500 text-white' : 'hover:bg-blue-100'}`}
+                      className={`cursor-pointer border p-2 text-sm transition md:text-base ${
+                        index !== visibleDayIndex ? 'hidden md:table-cell' : ''
+                      } ${
+                        availability.some(
+                          (slot) =>
+                            slot.startTime ===
+                              convertTimeToMinutes(interval.split('-')[0]) &&
+                            slot.endTime ===
+                              convertTimeToMinutes(interval.split('-')[1]) &&
+                            slot.weekDay === day.slice(0, 3).toUpperCase(),
+                        )
+                          ? 'bg-blue-500 text-white'
+                          : 'hover:bg-blue-100'
+                      }`}
                       onClick={() => toggleTimeSlot(day as WeekDays, interval)}
                     ></td>
                   ))}

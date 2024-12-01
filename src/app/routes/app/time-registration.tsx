@@ -36,9 +36,11 @@ export const TimeRegistrationRoute = () => {
       notLater: number;
     };
   }
+
+  type Period = 'morning' | 'afternoon' | 'night' | 'full';
   const [courses, setCourses] = useState<string[]>([]);
   const [coursesPeriods, setCoursesPeriods] = useState<any>({});
-  const [period, setPeriod] = useState('Morning');
+  const [period, setPeriod] = useState<Period>('morning');
 
   const [courseId, setCourseId] = useState('');
   const [courseType, setCourseType] = useState('');
@@ -46,11 +48,6 @@ export const TimeRegistrationRoute = () => {
   const [weekKey, setWeekKey] = useState(0);
   const [courseGrade, setCourseGrade] = useState(0);
   const [availability, setAvailability] = useState<Availability[]>([]);
-  const [timeSlot, setTimeSlot] = useState<{ start: string; end: string }>({
-    start: '07:40',
-    end: '13:00',
-  });
-
   const getCourseType = (course: string) => {
     // check in the "schedulePeriod" key of the course object
     // if the value is "ANNUAL" return "ANNUAL"
@@ -73,20 +70,7 @@ export const TimeRegistrationRoute = () => {
   };
 
   const handleTimeSlotChange = (slot: string) => {
-    setPeriod(slot);
-    switch (slot) {
-      case 'Morning':
-        setTimeSlot({ start: '07:40', end: '13:00' });
-        break;
-      case 'Afternoon':
-        setTimeSlot({ start: '13:10', end: '18:30' });
-        break;
-      case 'Evening':
-        setTimeSlot({ start: '19:00', end: '22:20' });
-        break;
-      default:
-        break;
-    }
+    setPeriod(slot as Period);
     setWeekKey((prevKey) => prevKey + 1);
   };
 
@@ -96,7 +80,7 @@ export const TimeRegistrationRoute = () => {
   };
 
   const handlePeriodChange = (period: string) => {
-    setPeriod(period);
+    setPeriod(period as Period);
     switch (period) {
       case '1st Year':
         setCourseGrade(1);
@@ -356,13 +340,13 @@ export const TimeRegistrationRoute = () => {
         <div className="grid grid-cols-1 gap-5 p-6 sm:grid-cols-3">
           <button
             onClick={() => {
-              handleTimeSlotChange('Morning');
+              handleTimeSlotChange('morning');
               document
                 .getElementById('table-possibilities')
                 ?.scrollIntoView({ behavior: 'smooth' });
             }}
             className={`mx-auto rounded px-4 py-2 transition duration-300 ${
-              period === 'Morning'
+              period === 'morning'
                 ? 'bg-blue-500 text-white'
                 : 'bg-gray-200 text-black'
             } hover:bg-blue-500 hover:text-white`}
@@ -372,13 +356,13 @@ export const TimeRegistrationRoute = () => {
 
           <button
             onClick={() => {
-              handleTimeSlotChange('Afternoon');
+              handleTimeSlotChange('afternoon');
               document
                 .getElementById('table-possibilities')
                 ?.scrollIntoView({ behavior: 'smooth' });
             }}
             className={`mx-auto rounded px-4 py-2 transition duration-300 ${
-              period === 'Afternoon'
+              period === 'afternoon'
                 ? 'bg-blue-500 text-white'
                 : 'bg-gray-200 text-black'
             } hover:bg-blue-500 hover:text-white`}
@@ -387,13 +371,13 @@ export const TimeRegistrationRoute = () => {
           </button>
           <button
             onClick={() => {
-              handleTimeSlotChange('Evening');
+              handleTimeSlotChange('night');
               document
                 .getElementById('table-possibilities')
                 ?.scrollIntoView({ behavior: 'smooth' });
             }}
             className={`mx-auto rounded px-4 py-2 transition duration-300 ${
-              period === 'Evening'
+              period === 'night'
                 ? 'bg-blue-500 text-white'
                 : 'bg-gray-200 text-black'
             } hover:bg-blue-500 hover:text-white`}
@@ -402,8 +386,7 @@ export const TimeRegistrationRoute = () => {
           </button>
         </div>
         <WeekAvailability
-          startHour={timeSlot.start}
-          endHour={timeSlot.end}
+          period={period}
           initialAvailability={availability}
           key={weekKey}
           onAvailabilityChange={handleAvailabilityChange}
