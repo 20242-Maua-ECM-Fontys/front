@@ -1,6 +1,14 @@
 import { useMsal } from '@azure/msal-react';
-import { Home, PanelLeft, User2, Clock3, Upload } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import {
+  Home,
+  PanelLeft,
+  User2,
+  Clock3,
+  Upload,
+  CalendarClock,
+  GraduationCap,
+} from 'lucide-react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate, NavLink, useNavigation } from 'react-router-dom';
 
 import { Button } from '@/components/ui/button';
@@ -17,8 +25,17 @@ import {
 type SideNavigationItem = {
   name: string;
   to: string;
-  icon: (props: React.SVGProps<SVGSVGElement>) => JSX.Element;
+  icon: React.FC<React.SVGProps<SVGSVGElement>>;
 };
+
+// const Logo = () => {
+//   // return (
+//   //   <Link className="flex items-center text-white" to="/">
+//   //     <img className="h-8 w-auto" src={logo} alt="Workflow" />
+//   //     {/* <span className="text-sm font-semibold text-white">Maua Grid</span> */}
+//   //   </Link>
+//   // );
+// };
 
 const Progress = () => {
   const { state, location } = useNavigation();
@@ -63,13 +80,14 @@ const Progress = () => {
 export function DashboardLayout({ children }: { children: React.ReactNode }) {
   const navigate = useNavigate();
   const { instance, accounts } = useMsal();
+  const { role } = useUser();
 
   useEffect(() => {
     if (accounts.length === 0) {
       navigate('/auth/login');
     }
     /* forçar update pagina*/
-  }, [accounts, navigate]);
+  }, [navigate, accounts]);
 
   const handleLogout = (instance: any) => {
     instance.logoutPopup().catch((e: any) => {
@@ -78,16 +96,52 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
   };
 
   // const { checkAccess } = useAuthorization();
-  const navigation = [
-    { name: 'Dashboard', to: 'dashboard', icon: Home },
-    { name: 'Upload CSV', to: 'upload', icon: Upload },
-    { name: 'Time Registration', to: 'time-registration', icon: Clock3 },
-    // checkAccess({ allowedRoles: [ROLES.ADMIN] }) && {
-    //   name: 'Users',
-    //   to: './users',
-    //   icon: Users,
-    // },
-  ].filter(Boolean) as SideNavigationItem[];
+  const getNavigationItems = (role: string): SideNavigationItem[] => {
+    const baseItems: SideNavigationItem[] = [
+      { name: 'Dashboard', to: 'dashboard', icon: Home },
+    ];
+
+    if (role === 'STAFF') {
+      baseItems.push({
+        name: 'Time Registration',
+        to: 'time-register',
+        icon: Clock3,
+      });
+    } else if (role === 'PROFESSOR') {
+      baseItems.push({
+        name: 'Availability',
+        to: 'teacher-suitavail',
+        icon: CalendarClock,
+      });
+    } else if (role === 'COORDINATOR') {
+      baseItems.push({
+        name: 'Teachers',
+        to: 'coord-suitavail',
+        icon: GraduationCap,
+      });
+    } else if (role === 'ADMIN') {
+      baseItems.push(
+        {
+          name: 'Teachers',
+          to: 'coord-suitavail',
+          icon: GraduationCap,
+        },
+        {
+          name: 'Availability',
+          to: 'teacher-suitavail',
+          icon: CalendarClock,
+        },
+        {
+          name: 'Time Registration',
+          to: 'time-register',
+          icon: Clock3,
+        },
+      );
+    }
+    return baseItems;
+  };
+
+  const navigation = getNavigationItems(role);
 
   return (
     <div className="flex min-h-screen w-full flex-col bg-muted/40">
@@ -100,8 +154,8 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
               end={item.name !== 'Discussions'}
               className={({ isActive }) =>
                 cn(
-                  'text-gray-300 hover:bg-gray-700 hover:text-white',
-                  'group flex w-full flex-1 items-center rounded-md p-2 text-base font-medium',
+                  'duration-600 text-gray-300 transition hover:bg-gray-700 hover:text-white',
+                  'duration-600 group flex w-full flex-1 items-center rounded-xl p-2 text-base font-medium transition',
                   isActive && 'bg-gray-900 text-white',
                 )
               }
@@ -175,6 +229,16 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
                 className={cn('block w-full px-4 py-2 text-sm text-gray-700')}
               >
                 {accounts.length > 0 ? accounts[0].name : ''}
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                className={cn('block w-full px-4 py-2 text-sm text-gray-700')}
+              >
+                {accounts.length > 0 ? accounts[0].username : ''}
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                className={cn('block w-full px-4 py-2 text-sm text-gray-700')}
+              >
+                {accounts.length > 0 ? role : ''}
               </DropdownMenuItem>
               <DropdownMenuItem
                 className={cn('block w-full px-4 py-2 text-sm text-gray-700')}
