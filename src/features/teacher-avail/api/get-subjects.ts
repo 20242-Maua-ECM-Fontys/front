@@ -2,8 +2,7 @@ import { queryOptions, useQuery } from '@tanstack/react-query';
 
 import { api } from '@/lib/api-client';
 import { QueryConfig } from '@/lib/react-query';
-
-import type { Subject } from '../types/subject';
+import type { Subject } from '@/types/api';
 
 export const getSubjects = (): Promise<{
   message: string;

@@ -9,3 +9,23 @@ export type Availability = {
   endTime: number;
   weekDay: string;
 };
+
+export type Professor = {
+  name: string;
+  email: string;
+  availabilities: Availability[];
+  suitabilities: {
+    codeSubject: string;
+    subjectName: string;
+  }[];
+};
+
+export type Professors = {
+  [key: number]: Professor;
+};
+
+export type Subject = {
+  codeSubject: string;
+  subjectName: string;
+  period: string;
+};

@@ -1,4 +1,5 @@
 import { useMsal } from '@azure/msal-react';
+import { randUuid } from '@ngneat/falso';
 import axios from 'axios';
 import { useEffect, useState } from 'react';
 
@@ -14,53 +15,22 @@ import {
   CommandList,
 } from '@/components/ui/command';
 import { WeekAvailabilityTable } from '@/components/ui/week-availability-update';
+import type { Professor, Subject } from '@/types/api';
 
+import { ProfessorsList } from '../../../features/coord-avail/components/professors-list';
 import { toast } from '../../../hooks/use-toast';
 
 export const CoordinatorSuitAvailRoute = () => {
-  interface Subject {
-    codeSubject: string;
-    subjectName: string;
-    period: string;
-  }
   interface Availability {
     startTime: number; // em minutos
     endTime: number; // em minutos
     weekDay: string;
   }
 
-  type Professor = {
-    name: string;
-    email: string;
-    availabilities: Availability[];
-    suitabilities: {
-      codeSubject: string;
-      subjectName: string;
-    }[];
-  };
-
-  type Professors = {
-    [key: number]: {
-      name: string;
-      email: string;
-      availabilities: {
-        startTime: number;
-        endTime: number;
-        weekDay: string;
-      }[];
-      suitabilities: {
-        codeSubject: string;
-        subjectName: string;
-      }[];
-    };
-  };
-  const [weekKey, setWeekKey] = useState(0);
   const [selectedSubjects, setSelectedSubjects] = useState<string[]>([]);
-  const [selectedProfessor, setSelectedProfessor] = useState<Professor | null>(
-    null,
-  );
   const [, setAvailability] = useState<Availability[]>([]);
-  const [professors, setProfessors] = useState<Professors | null>(null);
+  const [selectedProfessor, setSelectedProfessor] =
+    useState<Professor | null>();
   const [, setLoading] = useState(true);
   const [subjects, setSubjects] = useState<Subject[]>([]);
 
@@ -89,23 +59,6 @@ export const CoordinatorSuitAvailRoute = () => {
     },
   });
 
-  const handleGetProfessors = async () => {
-    try {
-      const response = await axios.get(
-        import.meta.env.VITE_APP_API_URL + 'get_all_professors',
-      );
-      setProfessors(response.data.professors);
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  const handleProfessorSelect = (professor: Professor) => {
-    setSelectedProfessor(professor);
-    setSelectedSubjects(professor.suitabilities.map((s) => s.codeSubject));
-    setWeekKey((prevKey) => prevKey + 1);
-  };
-
   const handleSubjectAdd = (subject: string) => {
     if (selectedSubjects.includes(subject)) {
       setSelectedSubjects(selectedSubjects.filter((s) => s !== subject));
@@ -127,7 +80,6 @@ export const CoordinatorSuitAvailRoute = () => {
   };
 
   useEffect(() => {
-    handleGetProfessors();
     handlegetSubjects();
     window.scrollTo(0, 0);
   }, []);
@@ -161,31 +113,10 @@ export const CoordinatorSuitAvailRoute = () => {
         id="teachers-table"
         className="flex min-h-screen items-center justify-center"
       >
-        <div className="flex size-full p-4">
-          <Command className="min-h-[56vh]">
-            <h2 className="p-4 text-2xl font-semibold">Professors</h2>
-            <CommandInput placeholder="Type a professor name..." />
-            <CommandList>
-              <CommandEmpty>No results found.</CommandEmpty>
-              <CommandGroup heading="Professors">
-                {professors &&
-                  Object.keys(professors).map((professorId) => (
-                    <CommandItem
-                      key={professorId}
-                      onSelect={() => {
-                        handleProfessorSelect(professors[Number(professorId)]);
-                        document
-                          .getElementById('subject-possibilities')
-                          ?.scrollIntoView({ behavior: 'smooth' });
-                      }}
-                    >
-                      {professors[Number(professorId)].name}
-                    </CommandItem>
-                  ))}
-              </CommandGroup>
-            </CommandList>
-          </Command>
-        </div>
+        <ProfessorsList
+          setSelectedSubjects={setSelectedSubjects}
+          setSelectedProfessor={setSelectedProfessor}
+        />
       </div>
 
       <div id="subject-possibilities" className="min-h-screen">
@@ -272,7 +203,7 @@ export const CoordinatorSuitAvailRoute = () => {
           endHour={'22:30'}
           initialAvailability={selectedProfessor?.availabilities || []}
           onAvailabilityChange={handleAvailabilityChange}
-          key={weekKey}
+          key={randUuid() + Math.random()}
         />
       </div>
     </div>
