@@ -2,6 +2,7 @@ import { useMsal } from '@azure/msal-react';
 import { useState } from 'react';
 
 import { useRole } from '@/api/get-role-by-email';
+import { useSubjects } from '@/api/get-subjects';
 import { useUpdateSubjects } from '@/api/update-subjects';
 import {
   Command,
@@ -12,14 +13,13 @@ import {
   CommandList,
 } from '@/components/ui/command';
 import { WeekAvailabilityTable } from '@/components/ui/week-availability-update';
-import { useSubjects } from '@/features/teacher-avail/api/get-subjects';
 import { toast } from '@/hooks/use-toast';
 import type { Subject, Availability } from '@/types/api';
 
 export const TeacherSuitAvailRoute = () => {
   const [weekKey] = useState(0);
   const [selectedSubjects, setSelectedSubjects] = useState<string[]>([]);
-  const [availabilities, setAvailabilities] = useState<Availability[]>([]);
+  const [availabilities] = useState<Availability[]>([]);
   const { instance } = useMsal();
   const currentAccount = instance.getActiveAccount();
 
@@ -171,9 +171,7 @@ export const TeacherSuitAvailRoute = () => {
           endHour={'22:30'}
           key={weekKey}
           initialAvailability={availabilities}
-          onAvailabilityChange={(Availabilities) =>
-            setAvailabilities(Availabilities)
-          }
+          userId={userId ?? 0}
         />
       </div>
     </div>

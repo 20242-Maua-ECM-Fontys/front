@@ -406,7 +406,6 @@ export const TimeRegistrationRoute = () => {
           endHour={timeSlot.end}
           initialAvailability={availability}
           key={weekKey}
-          onAvailabilityChange={handleAvailabilityChange}
         />
         <button
           onClick={() => {

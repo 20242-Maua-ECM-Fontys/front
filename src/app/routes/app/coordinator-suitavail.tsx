@@ -1,9 +1,8 @@
 import { randUuid } from '@ngneat/falso';
-import { useQueryClient } from '@tanstack/react-query';
-import axios from 'axios';
 import { useEffect, useState } from 'react';
 
 import { useRole } from '@/api/get-role-by-email';
+import { useSubjects } from '@/api/get-subjects';
 import { useUpdateSubjects } from '@/api/update-subjects';
 import { Button } from '@/components/ui/button';
 import {
@@ -24,10 +23,6 @@ export const CoordinatorSuitAvailRoute = () => {
   const [selectedSubjects, setSelectedSubjects] = useState<string[]>([]);
   const [selectedProfessor, setSelectedProfessor] =
     useState<Professor | null>();
-  const [, setLoading] = useState(true);
-  const [subjects, setSubjects] = useState<Subject[]>([]);
-
-  const queryClient = useQueryClient();
 
   const professorRoleQuery = useRole({
     email: selectedProfessor?.email ?? '',
@@ -37,6 +32,10 @@ export const CoordinatorSuitAvailRoute = () => {
   });
 
   const professorUserId = professorRoleQuery.data?.userId;
+
+  const subjectsQuery = useSubjects({});
+
+  const subjectsData = subjectsQuery.data?.subjects;
 
   const updateSubjectsMutation = useUpdateSubjects({
     mutationConfig: {
@@ -64,21 +63,12 @@ export const CoordinatorSuitAvailRoute = () => {
     setSelectedSubjects([...selectedSubjects, subject]);
   };
 
-  const handlegetSubjects = async () => {
-    try {
-      const response = await axios.get(
-        import.meta.env.VITE_APP_API_URL + 'get_all_subjects',
-      );
-      setSubjects(response.data.subjects);
-      setLoading(false);
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
   useEffect(() => {
-    handlegetSubjects();
-  }, [selectedProfessor, queryClient]);
+    if (selectedProfessor) {
+      professorRoleQuery.refetch();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedProfessor]);
 
   return (
     <div>
@@ -138,7 +128,7 @@ export const CoordinatorSuitAvailRoute = () => {
           <CommandList>
             <CommandEmpty>No results found.</CommandEmpty>
             <CommandGroup heading="Subjects">
-              {subjects.map((subject: Subject) => (
+              {subjectsData?.map((subject: Subject) => (
                 <CommandItem
                   key={subject.codeSubject}
                   onSelect={() => handleSubjectAdd(subject.codeSubject)}

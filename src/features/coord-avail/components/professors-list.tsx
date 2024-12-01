@@ -6,9 +6,9 @@ import {
   CommandItem,
   CommandList,
 } from '@/components/ui/command';
+import type { Professor } from '@/types/api';
 
 import { useProfessors } from '../api/get-professors';
-import type { Professor } from '../types/professor';
 
 type ProfessorsListProps = {
   setSelectedSubjects: (subjects: string[]) => void;
