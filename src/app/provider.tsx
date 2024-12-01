@@ -1,3 +1,5 @@
+import { PublicClientApplication } from '@azure/msal-browser';
+import { MsalProvider } from '@azure/msal-react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import * as React from 'react';
@@ -6,7 +8,10 @@ import { HelmetProvider } from 'react-helmet-async';
 
 import { MainErrorFallback } from '@/components/errors/main';
 import { Spinner } from '@/components/ui/spinner';
+import { msalConfig } from '@/lib/auth';
 import { queryConfig } from '@/lib/react-query';
+
+import { Notifications } from '../components/ui/notifications';
 
 type AppProviderProps = {
   children: React.ReactNode;
@@ -20,6 +25,9 @@ export const AppProvider = ({ children }: AppProviderProps) => {
       }),
   );
 
+  const msalInstance = new PublicClientApplication(msalConfig);
+  msalInstance.initialize();
+
   return (
     <React.Suspense
       fallback={
@@ -31,8 +39,11 @@ export const AppProvider = ({ children }: AppProviderProps) => {
       <ErrorBoundary FallbackComponent={MainErrorFallback}>
         <HelmetProvider>
           <QueryClientProvider client={queryClient}>
-            {import.meta.env.DEV && <ReactQueryDevtools />}
-            {children}
+            <MsalProvider instance={msalInstance}>
+              {import.meta.env.DEV && <ReactQueryDevtools />}
+              <Notifications />
+              {children}
+            </MsalProvider>
           </QueryClientProvider>
         </HelmetProvider>
       </ErrorBoundary>

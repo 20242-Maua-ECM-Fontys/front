@@ -4,6 +4,7 @@ import {
   PanelLeft,
   User2,
   Clock3,
+  Upload,
   CalendarClock,
   GraduationCap,
 } from 'lucide-react';
@@ -12,7 +13,6 @@ import { useNavigate, NavLink, useNavigation } from 'react-router-dom';
 
 import { Button } from '@/components/ui/button';
 import { Drawer, DrawerContent, DrawerTrigger } from '@/components/ui/drawer';
-import { useUser } from '@/hooks/use-user';
 import { cn } from '@/utils/cn';
 
 import {

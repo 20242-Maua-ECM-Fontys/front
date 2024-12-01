@@ -1,76 +1,54 @@
 import axios from 'axios';
 import { useEffect, useState } from 'react';
 
-import { WeekAvailabilityTable } from '@/components/ui/week-availability-update';
-import { toast } from '@/hooks/use-toast';
+import { CreateStaffAvailability } from '@/features/time-registration/components/create-staff-availability';
+
+import { useSchedules } from '../../../features/time-registration/api/get-all-schedules';
+import type { Schedule } from '../../../types/api';
 
 export const TimeRegistrationRoute = () => {
-  interface Availability {
-    startTime: number; // em minutos
-    endTime: number; // em minutos
-    weekDay: string;
-  }
-  interface weekDayAvailability {
-    MON: {
-      notEarlier: number;
-      notLater: number;
-    };
-    TUE: {
-      notEarlier: number;
-      notLater: number;
-    };
-    WED: {
-      notEarlier: number;
-      notLater: number;
-    };
-    THU: {
-      notEarlier: number;
-      notLater: number;
-    };
-    FRI: {
-      notEarlier: number;
-      notLater: number;
-    };
-    SAT: {
-      notEarlier: number;
-      notLater: number;
-    };
-  }
-  const [courses, setCourses] = useState<string[]>([]);
-  const [coursesPeriods, setCoursesPeriods] = useState<any>({});
-  const [period, setPeriod] = useState('Morning');
+  const scheduleQuery = useSchedules({});
 
-  const [courseId, setCourseId] = useState('');
-  const [courseType, setCourseType] = useState('');
-  const [loading, setLoading] = useState(true);
-  const [weekKey, setWeekKey] = useState(0);
-  const [courseGrade, setCourseGrade] = useState(0);
-  const [availability, setAvailability] = useState<Availability[]>([]);
+  const schedules = scheduleQuery?.data?.courses;
+
+  const semesters = schedules
+    ? Object.values(schedules)
+        .flat()
+        .filter((schedule) => schedule.schedulePeriod !== 'ANNUAL')
+        .map((schedule) => {
+          const { courseGrade, schedulePeriod } = schedule;
+          const semester = `${courseGrade * 2 - (schedulePeriod === '1SEM' ? 1 : 0)}º Semester`;
+          return semester;
+        })
+    : [];
+
+  const uniqueSemesters = Array.from(new Set(semesters));
+
+  const courseGrades = scheduleQuery?.data?.courses
+    ? Object.values(scheduleQuery?.data?.courses)
+        .flat()
+        .map((schedule) => schedule.courseGrade)
+    : [];
+
+  const uniqueYears = [
+    '1st Year',
+    '2nd Year',
+    '3rd Year',
+    '4th Year',
+    '5th Year',
+  ].filter((_, index) => courseGrades.includes(index + 1));
+
   const [timeSlot, setTimeSlot] = useState<{ start: string; end: string }>({
     start: '07:40',
     end: '13:00',
   });
 
-  const getCourseType = (course: string) => {
-    // check in the "schedulePeriod" key of the course object
-    // if the value is "ANNUAL" return "ANNUAL"
-    const courseSchedules = coursesPeriods[course];
-    const courseType = courseSchedules[0].schedulePeriod;
-    return courseType;
-  };
-
-  const handlegetCourses = async () => {
-    try {
-      const response = await axios.get(
-        import.meta.env.VITE_APP_API_URL + 'get_all_schedules',
-      );
-      setCourses(Object.keys(response.data.courses));
-      setCoursesPeriods(response.data.courses);
-      setLoading(false);
-    } catch (error) {
-      console.log(error);
-    }
-  };
+  const [period, setPeriod] = useState('Morning');
+  const [year, setYear] = useState<number>();
+  const [semester, setSemester] = useState<string>();
+  const [course, setCourse] = useState('');
+  const [weekKey, setWeekKey] = useState(0);
+  const [isEngineering, setIsEngineering] = useState(false);
 
   const handleTimeSlotChange = (slot: string) => {
     setPeriod(slot);
@@ -124,104 +102,20 @@ export const TimeRegistrationRoute = () => {
     }
   };
 
-  const handleAvailabilityChange = (newAvailability: Availability[]) => {
-    setAvailability(newAvailability);
-  };
-
-  const courseToCourseId = (course: string) => {
-    switch (course) {
-      case 'Compute Engineering':
-        return 'CM';
-      case 'Cience Coputing':
-        return 'CIC';
-      default:
-        return '';
-    }
-  };
-
-  const registerPossibility = async () => {
-    const courseTypeRequest =
-      courseType === 'ANNUAL' ? '2S' : courseType === '1SEM' ? '1S' : '2S';
-    const current_year = new Date().getFullYear();
-    const weekDaysAvailability: weekDayAvailability = {
-      MON: {
-        notEarlier: 0,
-        notLater: 0,
-      },
-      TUE: {
-        notEarlier: 0,
-        notLater: 0,
-      },
-      WED: {
-        notEarlier: 0,
-        notLater: 0,
-      },
-      THU: {
-        notEarlier: 0,
-        notLater: 0,
-      },
-      FRI: {
-        notEarlier: 0,
-        notLater: 0,
-      },
-      SAT: {
-        notEarlier: 0,
-        notLater: 0,
-      },
-    };
-
-    //PEGAR OS VALORES MAXIMOS E MINIMOS DE CADA DIA DA SEMANA
-    availability.forEach((slot) => {
-      const weekDay = slot.weekDay as keyof weekDayAvailability;
-      const startTime = slot.startTime;
-      const endTime = slot.endTime;
-
-      if (weekDaysAvailability[weekDay].notEarlier === 0) {
-        weekDaysAvailability[weekDay].notEarlier = startTime;
-      } else {
-        weekDaysAvailability[weekDay].notEarlier = Math.min(
-          weekDaysAvailability[weekDay].notEarlier,
-          startTime,
+  const getScheduleId = () => {
+    if (schedules && course && year) {
+      const courseSchedules = schedules[course];
+      if (courseSchedules) {
+        const schedule = courseSchedules.find(
+          (schedule: Schedule) => schedule.courseGrade === year,
         );
+        return schedule?.scheduleId || '';
       }
-
-      weekDaysAvailability[weekDay].notLater = Math.max(
-        weekDaysAvailability[weekDay].notLater,
-        endTime,
-      );
-    });
-
-    const request = {
-      //2S-4CM-D5@2024(SCS)
-      scheduleId: `${courseTypeRequest}-${courseGrade}${courseId}-D5@${current_year}(SCS)`,
-      availability: weekDaysAvailability,
-    };
-
-    try {
-      await axios.post(
-        import.meta.env.VITE_APP_API_URL + 'create_possibility',
-        request,
-      );
-      toast({
-        title: 'Success',
-        description: 'Possibility registered successfully',
-      });
-      // console.log('success');
-    } catch (error) {
-      toast({
-        variant: 'destructive',
-        title: 'Error',
-        description:
-          'An error occurred while trying to register your possibility',
-      });
-      console.log(error);
     }
+    return '';
   };
 
-  useEffect(() => {
-    handlegetCourses();
-    window.scrollTo(0, 0);
-  }, []);
+  const scheduleId = getScheduleId();
 
   return (
     <div>
@@ -248,35 +142,29 @@ export const TimeRegistrationRoute = () => {
         className="mx-auto flex h-screen max-w-7xl items-center justify-center p-4 text-center sm:px-6 lg:px-8 lg:py-10"
         id="course-registration"
       >
-        {loading ? (
-          <div className="flex items-center">
-            <div className="size-12 animate-spin rounded-full border-t-4 border-solid border-blue-500"></div>
-            <p className="ml-4 text-lg font-bold">Loading...</p>
-          </div>
-        ) : (
-          <div className="flex flex-col items-center p-6">
-            <h3 className="text-2xl font-bold">
-              Which course are you registering for?
-            </h3>
-            <div className="grid grid-cols-2 gap-5 p-6 sm:grid-cols-3">
-              {courses.map((course) => {
-                const courseOption = course;
-                return (
-                  <button
-                    key={courseOption}
-                    onClick={() => {
-                      handleCourseChange(courseOption);
-                      document
-                        .getElementById('period-possibilities')
-                        ?.scrollIntoView({ behavior: 'smooth' });
-                    }}
-                    className={`rounded border bg-gray-200 p-4 transition duration-300 hover:bg-blue-400 hover:text-white`}
-                  >
-                    {courseOption}
-                  </button>
-                );
-              })}
-            </div>
+        <div className="flex flex-col items-center p-6">
+          <h3 className="text-2xl font-bold">
+            Which course are you registering for?
+          </h3>
+          <div className="grid grid-cols-2 gap-5 p-6 md:grid-cols-3">
+            {Object.keys(schedules || {}).map((courseOption) => (
+              <button
+                key={courseOption}
+                onClick={() => {
+                  handleCourseChange(courseOption);
+                  document
+                    .getElementById('period-possibilities')
+                    ?.scrollIntoView({ behavior: 'smooth' });
+                }}
+                className={`min-h-20 rounded border p-2 transition duration-300 ${
+                  course === courseOption
+                    ? 'bg-blue-500 text-white'
+                    : 'bg-gray-200'
+                } hover:bg-blue-400 hover:text-white`}
+              >
+                {courseOption}
+              </button>
+            ))}
           </div>
         )}
       </div>
@@ -288,47 +176,50 @@ export const TimeRegistrationRoute = () => {
         <h3 className="text-2xl font-bold">
           Which period are you registering for?
         </h3>
-        <div className="grid grid-cols-2 gap-5 p-6 sm:grid-cols-3">
-          {['1st Year', '2nd Year', '3rd Year', '4th Year', '5th Year'].map(
-            (year) => (
-              <button
-                key={year}
-                onClick={() => {
-                  handlePeriodChange(year);
-                  courseType === 'ANNUAL'
-                    ? document
+        <div className="grid grid-cols-2 gap-5 p-6 md:grid-cols-3">
+          {isEngineering ? (
+            <>
+              {uniqueYears.map((yearOption) => {
+                const yearMatch = yearOption.match(/\d+/);
+                const extractedYear = yearMatch
+                  ? parseInt(yearMatch[0], 10)
+                  : 1;
+                return (
+                  <button
+                    key={yearOption}
+                    onClick={() => {
+                      setYear(extractedYear);
+                      document
                         .getElementById('table-possibilities')
                         ?.scrollIntoView({ behavior: 'smooth' })
                     : document
                         .getElementById('semester-possibilities')
                         ?.scrollIntoView({ behavior: 'smooth' });
-                }}
-                className={`rounded border p-4 transition duration-300 ${
-                  period === year ? 'bg-blue-500 text-white' : 'bg-gray-200'
-                } hover:bg-blue-400 hover:text-white`}
-              >
-                {year}
-              </button>
-            ),
-          )}
-        </div>
-      </div>
-
-      {courseType === 'ANNUAL' ? null : (
-        <div
-          className="mx-auto flex h-screen max-w-7xl flex-col items-center justify-center p-4 text-center sm:px-6 lg:px-8 lg:py-10"
-          id="semester-possibilities"
-        >
-          <h3 className="text-2xl font-bold">
-            Which semester are you registering for?
-          </h3>
-          <div className="grid grid-cols-2 gap-5 p-6 sm:grid-cols-1 md:grid-cols-2">
+                    }}
+                    className={`rounded border p-4 transition duration-300 ${
+                      year === extractedYear
+                        ? 'bg-blue-500 text-white'
+                        : 'bg-gray-200'
+                    } hover:bg-blue-400 hover:text-white`}
+                  >
+                    {yearOption}
+                  </button>
+                );
+              })}
+            </>
+          ) : (
             <>
-              {['1st Semester', '2nd Semester'].map((semesterOption) => (
+              {uniqueSemesters.map((semesterOption) => (
                 <button
                   key={semesterOption}
                   onClick={() => {
-                    handlePeriodChange(semesterOption);
+                    const semesterMatch = semesterOption.match(/\d+/);
+                    const semesterNumber = semesterMatch
+                      ? parseInt(semesterMatch[0], 10)
+                      : 1;
+                    const calculatedYear = Math.ceil(semesterNumber / 2);
+                    setYear(calculatedYear);
+                    setSemester(semesterOption);
                     document
                       .getElementById('table-possibilities')
                       ?.scrollIntoView({ behavior: 'smooth' });
@@ -351,7 +242,7 @@ export const TimeRegistrationRoute = () => {
         id="table-possibilities"
       >
         <h3 className="mb-4 text-center text-xl font-bold">
-          Set Your Availability
+          What are your available time slots?
         </h3>
         <div className="grid grid-cols-1 gap-5 p-6 sm:grid-cols-3">
           <button
@@ -401,11 +292,12 @@ export const TimeRegistrationRoute = () => {
             <p>Evening</p>
           </button>
         </div>
-        <WeekAvailabilityTable
+        <CreateStaffAvailability
           startHour={timeSlot.start}
           endHour={timeSlot.end}
           initialAvailability={availability}
           key={weekKey}
+          scheduleId={scheduleId}
         />
         <button
           onClick={() => {

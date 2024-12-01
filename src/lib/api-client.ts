@@ -23,7 +23,7 @@ api.interceptors.response.use(
     return response.data;
   },
   (error) => {
-    const message = error.response?.data?.message || error.message;
+    const message = error.response?.data || error.message;
     useNotifications.getState().addNotification({
       type: 'error',
       title: 'Error',

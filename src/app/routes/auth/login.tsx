@@ -1,3 +1,4 @@
+import type { IPublicClientApplication } from '@azure/msal-browser';
 import { useMsal } from '@azure/msal-react';
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -6,7 +7,7 @@ export const LoginRoute = () => {
   const navigate = useNavigate();
   const { instance, accounts } = useMsal();
 
-  const handleLogin = (instance: any) => {
+  const handleLogin = (instance: IPublicClientApplication) => {
     instance.loginPopup().catch((e: any) => {
       console.error(e);
     });

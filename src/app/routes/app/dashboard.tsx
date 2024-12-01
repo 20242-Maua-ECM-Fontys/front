@@ -1,35 +1,34 @@
 import { useMsal } from '@azure/msal-react';
-import { useEffect } from 'react';
 
 import { ContentLayout } from '@/components/layouts';
-import { useUser } from '@/hooks/use-user';
 
 export const DashboardRoute = () => {
   const { accounts } = useMsal();
-  const { userId, role, getUser } = useUser();
-
-  useEffect(() => {
-    if (accounts[0]?.username && userId == 0) {
-      getUser(accounts[0]?.username);
-    }
-  }, [accounts, userId, getUser]);
 
   return (
-    <ContentLayout title="">
-      <div className="flex h-screen items-center">
-        <div className="mx-auto max-w-7xl px-4 py-12 text-center sm:px-6 lg:px-8 lg:py-16">
-          <h1 className="p-4 text-4xl font-extrabold tracking-tight text-gray-900 sm:text-5xl">
-            <span className="block">Welcome to</span>
-            <span className="block text-blue-600">Maua Grid</span>
-          </h1>
-          <p className="p-4 text-lg leading-6">
-            Hello {`${accounts[0]?.name}`} !
-          </p>
-          <h3 className="tracking-tight text-gray-900 sm:text-xl">
-            <span className="block">Your role is : {role}</span>
-          </h3>
-        </div>
-      </div>
+    <ContentLayout title="Dashboard">
+      <h1 className="text-xl">
+        Welcome <b>{`${accounts[0]?.name}`}</b>
+      </h1>
+
+      {/* <h4 className="my-3">
+        Your role is : <b>{user.data?.role}</b>
+      </h4>
+      <p className="font-medium">In this application you can:</p>
+      {user.data?.role === ROLES.STAFF && (
+        <ul className="my-4 list-inside list-disc">
+          <li>Upload professor, subject and course data</li>
+        </ul>
+      )} */}
+      {/* {user.data?.role === ROLES.PROFESSOR && (
+        <ul className="my-4 list-inside list-disc">
+          <li>Create discussions</li>
+          <li>Edit discussions</li>
+          <li>Delete discussions</li>
+          <li>Comment on discussions</li>
+          <li>Delete all comments</li>
+        </ul>
+      )} */}
     </ContentLayout>
   );
 };
