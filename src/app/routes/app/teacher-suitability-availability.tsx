@@ -33,7 +33,6 @@ export const TeacherSuitabilityAndAvailabilityRoute = () => {
     period: string;
   }
 
-  window.scrollTo(0, 0);
   const handlegetSubjects = async () => {
     try {
       const response = await axios.get(
@@ -46,7 +45,7 @@ export const TeacherSuitabilityAndAvailabilityRoute = () => {
     }
   };
 
-  const handlegetAvailability = async () => {
+  const handlegetAvailability = async (userId: number) => {
     try {
       const response = await axios.get(
         `${import.meta.env.VITE_APP_API_URL}get_availabilities_by_professor?userId=${userId}`,
@@ -59,13 +58,13 @@ export const TeacherSuitabilityAndAvailabilityRoute = () => {
         })),
       );
       setIsAvailLoaded(true);
-      console.log(availability);
+      window.scrollTo(0, 0);
     } catch (error) {
       console.log(error);
     }
   };
 
-  const handlegetSelectedSubjects = async () => {
+  const handlegetSelectedSubjects = async (userId: number) => {
     try {
       const response = await axios.get(
         `${import.meta.env.VITE_APP_API_URL}get_suitabilities_by_professor?userId=${userId}`,
@@ -140,12 +139,10 @@ export const TeacherSuitabilityAndAvailabilityRoute = () => {
   };
 
   useEffect(() => {
+    handlegetSelectedSubjects(userId);
     handlegetSubjects();
-    handlegetSelectedSubjects();
-    handlegetAvailability();
-    window.scrollTo(0, 0);
-    setWeekKey(weekKey + 1);
-  }, []);
+    handlegetAvailability(userId);
+  }, [userId, isAvailLoaded]);
 
   return (
     <div>
@@ -225,9 +222,6 @@ export const TeacherSuitabilityAndAvailabilityRoute = () => {
           <button
             className="mt-4 rounded bg-gray-200 px-4 py-2 transition duration-300 hover:bg-blue-400 hover:text-white"
             onClick={() => {
-              document
-                .getElementById('table-possibilities')
-                ?.scrollIntoView({ behavior: 'smooth' });
               handleUpdateSubjects(selectedSubjects);
             }}
           >

@@ -61,8 +61,6 @@ export const CoordinatorSuitabilityAndAvailabilityRoute = () => {
   const [subjects, setSubjects] = useState<Subject[]>([]);
   const [professorId, setProfessorId] = useState<number | null>(null);
 
-  window.scrollTo(0, 0);
-
   const handleGetProfessors = async () => {
     try {
       const response = await axios.get(
