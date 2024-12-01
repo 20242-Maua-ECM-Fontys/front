@@ -1,5 +1,5 @@
-import { useMsal } from '@azure/msal-react';
 import { randUuid } from '@ngneat/falso';
+import { useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
 import { useEffect, useState } from 'react';
 
@@ -21,25 +21,22 @@ import { ProfessorsList } from '../../../features/coord-avail/components/profess
 import { toast } from '../../../hooks/use-toast';
 
 export const CoordinatorSuitAvailRoute = () => {
-  interface Availability {
-    startTime: number; // em minutos
-    endTime: number; // em minutos
-    weekDay: string;
-  }
-
   const [selectedSubjects, setSelectedSubjects] = useState<string[]>([]);
-  const [, setAvailability] = useState<Availability[]>([]);
   const [selectedProfessor, setSelectedProfessor] =
     useState<Professor | null>();
   const [, setLoading] = useState(true);
   const [subjects, setSubjects] = useState<Subject[]>([]);
 
-  const { instance } = useMsal();
-  const currentAccount = instance.getActiveAccount();
+  const queryClient = useQueryClient();
 
-  const roleQuery = useRole({ email: currentAccount?.username ?? '' });
+  const professorRoleQuery = useRole({
+    email: selectedProfessor?.email ?? '',
+    queryConfig: {
+      enabled: !!selectedProfessor?.email,
+    },
+  });
 
-  const userId = roleQuery.data?.userId;
+  const professorUserId = professorRoleQuery.data?.userId;
 
   const updateSubjectsMutation = useUpdateSubjects({
     mutationConfig: {
@@ -82,11 +79,8 @@ export const CoordinatorSuitAvailRoute = () => {
   useEffect(() => {
     handlegetSubjects();
     window.scrollTo(0, 0);
-  }, []);
+  }, [selectedProfessor, queryClient]);
 
-  const handleAvailabilityChange = (newAvailability: Availability[]) => {
-    setAvailability(newAvailability);
-  };
   return (
     <div>
       <div className="flex h-screen items-center">
@@ -163,9 +157,9 @@ export const CoordinatorSuitAvailRoute = () => {
                 document
                   .getElementById('table-possibilities')
                   ?.scrollIntoView({ behavior: 'smooth' });
-                if (userId !== undefined) {
+                if (professorUserId !== undefined) {
                   updateSubjectsMutation.mutate({
-                    userId: userId,
+                    userId: professorUserId,
                     subjectCodes: selectedSubjects,
                   });
                 } else {
@@ -202,8 +196,8 @@ export const CoordinatorSuitAvailRoute = () => {
           startHour={'07:40'}
           endHour={'22:30'}
           initialAvailability={selectedProfessor?.availabilities || []}
-          onAvailabilityChange={handleAvailabilityChange}
           key={randUuid() + Math.random()}
+          userId={professorUserId ?? 0}
         />
       </div>
     </div>

@@ -25,6 +25,7 @@ export const ProfessorsList = ({
   const handleProfessorSelect = (professor: Professor) => {
     setSelectedProfessor(professor);
     setSelectedSubjects(professor.suitabilities.map((s) => s.codeSubject));
+    professorsQuery.refetch();
   };
   return (
     <div className="flex size-full p-4">

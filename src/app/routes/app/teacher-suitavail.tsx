@@ -13,9 +13,8 @@ import {
 } from '@/components/ui/command';
 import { WeekAvailabilityTable } from '@/components/ui/week-availability-update';
 import { useSubjects } from '@/features/teacher-avail/api/get-subjects';
-import type { Subject } from '@/features/teacher-avail/types/subject';
 import { toast } from '@/hooks/use-toast';
-import type { Availability } from '@/types/api';
+import type { Subject, Availability } from '@/types/api';
 
 export const TeacherSuitAvailRoute = () => {
   const [weekKey] = useState(0);

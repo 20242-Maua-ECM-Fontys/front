@@ -1,11 +1,9 @@
-import { useMsal } from '@azure/msal-react';
 import { ArrowRight, ArrowLeft } from 'lucide-react';
 import React, { useState } from 'react';
 
 import { useUpdateAvailability } from '@/api/update-availability';
 import { toast } from '@/hooks/use-toast';
-
-import { useRole } from '../../api/get-role-by-email';
+import type { Availability } from '@/types/api';
 
 import { Button } from './button';
 
@@ -17,17 +15,11 @@ type WeekDays =
   | 'Friday'
   | 'Saturday';
 
-interface Availability {
-  startTime: number; // em minutos
-  endTime: number; // em minutos
-  weekDay: string;
-}
-
 interface WeekAvailabilityTableProps {
   startHour: string;
   endHour: string;
   initialAvailability: Availability[];
-  onAvailabilityChange: (newAvailability: Availability[]) => void; // Adicionei essa linha
+  userId: number;
 }
 
 const convertTimeStringToDecimal = (timeString: string): number => {
@@ -87,7 +79,7 @@ export const WeekAvailabilityTable: React.FC<WeekAvailabilityTableProps> = ({
   startHour,
   endHour,
   initialAvailability, // Recebendo a lista de disponibilidade
-  onAvailabilityChange, // Adicionando a função de callback
+  userId,
 }) => {
   const [availability, setAvailability] =
     useState<Availability[]>(initialAvailability);
@@ -100,13 +92,6 @@ export const WeekAvailabilityTable: React.FC<WeekAvailabilityTableProps> = ({
     startHourDecimal,
     endHourDecimal,
   );
-
-  const { instance } = useMsal();
-  const currentAccount = instance.getActiveAccount();
-
-  const roleQuery = useRole({ email: currentAccount?.username ?? '' });
-
-  const userId = roleQuery.data?.userId;
 
   const updateAvailabilityMutation = useUpdateAvailability({
     mutationConfig: {
@@ -150,11 +135,6 @@ export const WeekAvailabilityTable: React.FC<WeekAvailabilityTableProps> = ({
       } else {
         // Adiciona o novo slot de tempo
         updatedAvailability = [...prev, { startTime, endTime, weekDay }];
-      }
-
-      // Chama a função de callback do componente pai
-      if (onAvailabilityChange) {
-        onAvailabilityChange(updatedAvailability);
       }
 
       return updatedAvailability;
@@ -255,7 +235,7 @@ export const WeekAvailabilityTable: React.FC<WeekAvailabilityTableProps> = ({
               if (userId !== undefined) {
                 updateAvailabilityMutation.mutate({
                   userId: userId,
-                  availabilities: initialAvailability,
+                  availabilities: availability,
                 });
               } else {
                 toast({
