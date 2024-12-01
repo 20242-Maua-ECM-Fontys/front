@@ -4,13 +4,14 @@ import {
   PanelLeft,
   User2,
   Clock3,
-  Upload,
   CalendarClock,
   GraduationCap,
+  Upload,
 } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { useNavigate, NavLink, useNavigation } from 'react-router-dom';
 
+import { useRole } from '@/api/get-role-by-email';
 import { Button } from '@/components/ui/button';
 import { Drawer, DrawerContent, DrawerTrigger } from '@/components/ui/drawer';
 import { cn } from '@/utils/cn';
@@ -80,7 +81,11 @@ const Progress = () => {
 export function DashboardLayout({ children }: { children: React.ReactNode }) {
   const navigate = useNavigate();
   const { instance, accounts } = useMsal();
-  const { role } = useUser();
+  const currentAccount = instance.getActiveAccount();
+
+  const roleQuery = useRole({ email: currentAccount?.username ?? '' });
+
+  const role = roleQuery.data?.role;
 
   useEffect(() => {
     if (accounts.length === 0) {
@@ -102,11 +107,18 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
     ];
 
     if (role === 'STAFF') {
-      baseItems.push({
-        name: 'Time Registration',
-        to: 'time-register',
-        icon: Clock3,
-      });
+      baseItems.push(
+        {
+          name: 'Upload',
+          to: 'upload',
+          icon: Upload,
+        },
+        {
+          name: 'Time Registration',
+          to: 'time-register',
+          icon: Clock3,
+        },
+      );
     } else if (role === 'PROFESSOR') {
       baseItems.push({
         name: 'Availability',
@@ -122,6 +134,16 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
     } else if (role === 'ADMIN') {
       baseItems.push(
         {
+          name: 'Upload',
+          to: 'upload',
+          icon: Upload,
+        },
+        {
+          name: 'Time Registration',
+          to: 'time-register',
+          icon: Clock3,
+        },
+        {
           name: 'Teachers',
           to: 'coord-suitavail',
           icon: GraduationCap,
@@ -131,17 +153,12 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
           to: 'teacher-suitavail',
           icon: CalendarClock,
         },
-        {
-          name: 'Time Registration',
-          to: 'time-register',
-          icon: Clock3,
-        },
       );
     }
     return baseItems;
   };
 
-  const navigation = getNavigationItems(role);
+  const navigation = getNavigationItems(role ?? '');
 
   return (
     <div className="flex min-h-screen w-full flex-col bg-muted/40">

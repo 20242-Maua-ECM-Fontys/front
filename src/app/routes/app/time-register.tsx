@@ -1,12 +1,11 @@
-import axios from 'axios';
-import { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 
 import { CreateStaffAvailability } from '@/features/time-registration/components/create-staff-availability';
 
 import { useSchedules } from '../../../features/time-registration/api/get-all-schedules';
 import type { Schedule } from '../../../types/api';
 
-export const TimeRegistrationRoute = () => {
+export const TimeRegisterRoute = () => {
   const scheduleQuery = useSchedules({});
 
   const schedules = scheduleQuery?.data?.courses;
@@ -69,37 +68,17 @@ export const TimeRegistrationRoute = () => {
   };
 
   const handleCourseChange = (course: string) => {
-    setCourseId(courseToCourseId(course));
-    setCourseType(getCourseType(course));
-  };
-
-  const handlePeriodChange = (period: string) => {
-    setPeriod(period);
-    switch (period) {
-      case '1st Year':
-        setCourseGrade(1);
-        break;
-      case '2nd Year':
-        setCourseGrade(2);
-        break;
-      case '3rd Year':
-        setCourseGrade(3);
-        break;
-      case '4th Year':
-        setCourseGrade(4);
-        break;
-      case '5th Year':
-        setCourseGrade(5);
-        break;
-      case '1st Semester':
-        setCourseGrade(1);
-        break;
-      case '2nd Semester':
-        setCourseGrade(2);
-        break;
-      default:
-        break;
-    }
+    setCourse(course);
+    const engineeringCourses = [
+      'Computer Engineering',
+      'Electrical Engineering',
+      'Mechanical Engineering',
+      'Civil Engineering',
+      'Chemical Engineering',
+      'Production Engineering',
+      'Control and Automation Engineering',
+    ];
+    setIsEngineering(engineeringCourses.includes(course));
   };
 
   const getScheduleId = () => {
@@ -166,7 +145,7 @@ export const TimeRegistrationRoute = () => {
               </button>
             ))}
           </div>
-        )}
+        </div>
       </div>
 
       <div
@@ -191,9 +170,6 @@ export const TimeRegistrationRoute = () => {
                       setYear(extractedYear);
                       document
                         .getElementById('table-possibilities')
-                        ?.scrollIntoView({ behavior: 'smooth' })
-                    : document
-                        .getElementById('semester-possibilities')
                         ?.scrollIntoView({ behavior: 'smooth' });
                     }}
                     className={`rounded border p-4 transition duration-300 ${
@@ -225,7 +201,7 @@ export const TimeRegistrationRoute = () => {
                       ?.scrollIntoView({ behavior: 'smooth' });
                   }}
                   className={`rounded border p-4 transition duration-300 ${
-                    period === semesterOption
+                    semester === semesterOption
                       ? 'bg-blue-500 text-white'
                       : 'bg-gray-200'
                   } hover:bg-blue-400 hover:text-white`}
@@ -234,9 +210,10 @@ export const TimeRegistrationRoute = () => {
                 </button>
               ))}
             </>
-          </div>
+          )}
         </div>
-      )}
+      </div>
+
       <div
         className="mx-auto flex h-screen max-w-7xl flex-col items-center justify-center p-4 text-center sm:px-6 lg:px-8 lg:py-10"
         id="table-possibilities"
@@ -295,18 +272,9 @@ export const TimeRegistrationRoute = () => {
         <CreateStaffAvailability
           startHour={timeSlot.start}
           endHour={timeSlot.end}
-          initialAvailability={availability}
           key={weekKey}
           scheduleId={scheduleId}
         />
-        <button
-          onClick={() => {
-            registerPossibility();
-          }}
-          className={`rounded border bg-gray-200 p-3 text-black transition duration-300 hover:bg-blue-400 hover:text-white`}
-        >
-          Register
-        </button>
       </div>
     </div>
   );

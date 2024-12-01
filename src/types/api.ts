@@ -29,3 +29,17 @@ export type Subject = {
   subjectName: string;
   period: string;
 };
+
+export type Courses = {
+  [courseName: string]: {
+    scheduleId: string;
+    courseGrade: number;
+    schedulePeriod: 'ANNUAL' | '1SEM' | '2SEM';
+  }[];
+};
+
+export type Schedule = {
+  scheduleId: string;
+  courseGrade: number;
+  schedulePeriod: 'ANNUAL' | '1SEM' | '2SEM';
+};

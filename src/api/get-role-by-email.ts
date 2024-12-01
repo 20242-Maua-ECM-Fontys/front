@@ -9,7 +9,7 @@ export const getRole = ({
   email: string;
 }): Promise<{
   userId: number;
-  role: 'ADMIN' | 'TEACHER' | 'STAFF' | 'COORINATOR';
+  role: 'ADMIN' | 'TEACHER' | 'STAFF' | 'COORDINATOR';
   message: string;
 }> => {
   return api.get('/get_role_by_email', { params: { email } });
