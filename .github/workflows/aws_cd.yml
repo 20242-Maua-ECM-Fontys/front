@@ -44,7 +44,6 @@ jobs:
           env: 
             VITE_STAGE: ${{ github.ref_name }}
             VITE_APP_API_URL: ${{ secrets.VITE_APP_API_URL }}
-            VITE_APP_ENABLE_API_MOCKING: true
             VITE_APP_AZURE_CLIENT_ID: ${{ secrets.VITE_APP_AZURE_CLIENT_ID }}
             VITE_APP_AZURE_REDIRECT_URL: ${{ vars.VITE_APP_AZURE_REDIRECT_URL }}
             # VITE_REFRESH_TOKEN_URL: ${{ vars.VITE_REFRESH_TOKEN_URL }}
