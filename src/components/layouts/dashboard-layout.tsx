@@ -11,9 +11,9 @@ import {
 import React, { useEffect, useState } from 'react';
 import { useNavigate, NavLink, useNavigation } from 'react-router-dom';
 
-import { useRole } from '@/api/get-role-by-email';
 import { Button } from '@/components/ui/button';
 import { Drawer, DrawerContent, DrawerTrigger } from '@/components/ui/drawer';
+import { useUser } from '@/hooks/use-user';
 import { cn } from '@/utils/cn';
 
 import {
@@ -80,12 +80,8 @@ const Progress = () => {
 
 export function DashboardLayout({ children }: { children: React.ReactNode }) {
   const navigate = useNavigate();
-  const { instance, accounts } = useMsal();
-  const currentAccount = instance.getActiveAccount();
-
-  const roleQuery = useRole({ email: currentAccount?.username ?? '' });
-
-  const role = roleQuery.data?.role;
+  const { accounts, instance } = useMsal();
+  const { role } = useUser();
 
   useEffect(() => {
     if (accounts.length === 0) {

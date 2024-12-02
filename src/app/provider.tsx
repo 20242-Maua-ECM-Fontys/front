@@ -1,4 +1,8 @@
-import { PublicClientApplication } from '@azure/msal-browser';
+import {
+  EventType,
+  PublicClientApplication,
+  type AuthenticationResult,
+} from '@azure/msal-browser';
 import { MsalProvider } from '@azure/msal-react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
@@ -27,6 +31,16 @@ export const AppProvider = ({ children }: AppProviderProps) => {
 
   const msalInstance = new PublicClientApplication(msalConfig);
   msalInstance.initialize();
+
+  msalInstance.addEventCallback((event) => {
+    console.log(event);
+    if (event.eventType === EventType.LOGIN_SUCCESS) {
+      const account = (event.payload as AuthenticationResult)?.account;
+      if (account) {
+        msalInstance.setActiveAccount(account);
+      }
+    }
+  });
 
   return (
     <React.Suspense
