@@ -34,7 +34,7 @@ export const NewTimeRegistrationRoute = () => {
         ? { start: '07:40', end: '13:00' }
         : slot === 'Afternoon'
           ? { start: '13:10', end: '18:30' }
-          : { start: '19:00', end: '22:20' },
+          : { start: '19:00', end: '22:20' }
     );
   };
 
@@ -49,7 +49,7 @@ export const NewTimeRegistrationRoute = () => {
         'Chemical Engineering',
         'Production Engineering',
         'Control and Automation Engineering',
-      ].includes(selectedCourse),
+      ].includes(selectedCourse)
     );
     setStep(2);
   };
@@ -78,75 +78,78 @@ export const NewTimeRegistrationRoute = () => {
   const semesters = isEngineering
     ? ['1st Year', '2nd Year', '3rd Year', '4th Year', '5th Year']
     : [
-        '1st Semester',
-        '2nd Semester',
-        '3rd Semester',
-        '4th Semester',
-        '5th Semester',
-        '6th Semester',
-        '7th Semester',
-        '8th Semester',
-        '9th Semester',
-        '10th Semester',
-      ];
+      '1st Semester',
+      '2nd Semester',
+      '3rd Semester',
+      '4th Semester',
+      '5th Semester',
+      '6th Semester',
+      '7th Semester',
+      '8th Semester',
+      '9th Semester',
+      '10th Semester',
+    ];
 
   const timeSlots = ['Morning', 'Afternoon', 'Evening'];
 
   return (
-    <div className="mx-auto h-[34rem] w-full max-w-7xl pt-6">
-      <div className="flex flex-row gap-6">
-        {/* First Panel - Big */}
-        <div
-          className={`h-[34rem] rounded-2xl border p-3 shadow-sm transition-all duration-300 ease-in-out ${
-            step === 1
-              ? 'w-full border-blue-400 bg-blue-100'
-              : 'w-1/5 border-gray-300 bg-gray-100 hover:bg-blue-50'
-          } cursor-pointer`}
-          onClick={() => setStep(1)}
-        >
-          <CourseSelectionPanel
-            courses={courses}
-            selectedCourse={course}
-            onCourseChange={handleCourseChange}
-          />
-        </div>
+    <div className="mx-auto max-w-7xl pt-6">
+      <div className="grid grid-cols-3 gap-6">
+        {step === 1 && (
+          <div className="col-span-3">
+            <CourseSelectionPanel
+              courses={courses}
+              selectedCourse={course}
+              onCourseChange={handleCourseChange}
+            />
+          </div>
+        )}
 
-        {/* Second Panel - Small */}
-        <div
-          className={`h-[34rem] rounded-2xl border p-3 shadow-sm transition-all duration-300 ease-in-out ${
-            step === 2
-              ? 'w-full border-blue-400 bg-blue-100'
-              : 'w-1/5 border-gray-300 bg-gray-100 hover:bg-blue-50'
-          } cursor-pointer`}
-          onClick={() => step >= 1 && setStep(2)}
-        >
-          <SemesterSelectionPanel
-            semesters={semesters}
-            selectedSemester={semester}
-            onSemesterChange={handleSemesterChange}
-          />
-        </div>
+        {step === 2 && (
+          <div className="col-span-3">
+            <SemesterSelectionPanel
+              semesters={semesters}
+              selectedSemester={semester}
+              onSemesterChange={handleSemesterChange}
+            />
+          </div>
+        )}
 
-        {/* Third Panel - Small */}
-        <div
-          className={`h-[34rem] rounded-2xl border p-3 shadow-sm transition-all duration-300 ease-in-out ${
-            step === 3
-              ? 'w-full border-blue-400 bg-blue-100'
-              : 'w-1/5 border-gray-300 bg-gray-100 hover:bg-blue-50'
-          } cursor-pointer`}
-          onClick={() => step >= 2 && setStep(3)}
-        >
-          <TimeSlotSelectionPanel
-            timeSlots={timeSlots}
-            selectedTimeSlot={period}
-            onTimeSlotChange={handleTimeSlotChange}
-          />
+        {step === 3 && (
+          <div className="col-span-3">
+            <TimeSlotSelectionPanel
+              timeSlots={timeSlots}
+              selectedTimeSlot={period}
+              onTimeSlotChange={handleTimeSlotChange}
+            />
+          </div>
+        )}
+      </div>
+
+      {/* Transition for selected course and semester */}
+      {step >= 2 && course && (
+        <div className="mt-4 p-4 rounded-md bg-gray-100 transition-all duration-300 ease-in-out opacity-100">
+          <h4 className="text-lg font-semibold">Selected Course</h4>
+          <p>{course}</p>
+        </div>
+      )}
+
+      {step >= 3 && semester && (
+        <div className="mt-4 p-4 rounded-md bg-gray-100 transition-all duration-300 ease-in-out opacity-100">
+          <h4 className="text-lg font-semibold">Selected Semester</h4>
+          <p>{semester}</p>
+        </div>
+      )}
+
+      {step === 3 && (
+        <div className="mt-6">
+          <h4 className="mb-4 text-2xl font-bold">Set Your Availability</h4>
           <WeekAvailabilityTable
             startHour={timeSlot.start}
             endHour={timeSlot.end}
           />
         </div>
-      </div>
+      )}
     </div>
   );
 };

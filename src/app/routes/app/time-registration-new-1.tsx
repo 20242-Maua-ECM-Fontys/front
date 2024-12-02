@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useOutletContext } from 'react-router';
-
 import { CourseSelectionPanel } from '@/components/time-registration/CourseSelectionPanel';
 import { SemesterSelectionPanel } from '@/components/time-registration/SemesterSelectionPanel';
 import { TimeSlotSelectionPanel } from '@/components/time-registration/TimeSlotSelectionPanel';
@@ -78,29 +77,29 @@ export const NewTimeRegistrationRoute = () => {
   const semesters = isEngineering
     ? ['1st Year', '2nd Year', '3rd Year', '4th Year', '5th Year']
     : [
-        '1st Semester',
-        '2nd Semester',
-        '3rd Semester',
-        '4th Semester',
-        '5th Semester',
-        '6th Semester',
-        '7th Semester',
-        '8th Semester',
-        '9th Semester',
-        '10th Semester',
-      ];
+      '1st Semester',
+      '2nd Semester',
+      '3rd Semester',
+      '4th Semester',
+      '5th Semester',
+      '6th Semester',
+      '7th Semester',
+      '8th Semester',
+      '9th Semester',
+      '10th Semester',
+    ];
 
   const timeSlots = ['Morning', 'Afternoon', 'Evening'];
 
   return (
-    <div className="mx-auto h-[34rem] w-full max-w-7xl pt-6">
-      <div className="flex flex-row gap-6">
+    <div className="mx-auto w-full max-w-7xl pt-6">
+      <div className="flex flex-wrap gap-6">
         {/* First Panel - Big */}
         <div
-          className={`h-[34rem] rounded-2xl border p-3 shadow-sm transition-all duration-300 ease-in-out ${
+          className={`rounded-2xl border p-3 shadow-sm overflow-clip ${
             step === 1
-              ? 'w-full border-blue-400 bg-blue-100'
-              : 'w-1/5 border-gray-300 bg-gray-100 hover:bg-blue-50'
+              ? 'h-[20rem] w-full border-blue-400 bg-blue-100'
+              : 'h-24 w-1/4 border-gray-300 bg-gray-100 hover:bg-blue-50'
           } cursor-pointer`}
           onClick={() => setStep(1)}
         >
@@ -113,10 +112,10 @@ export const NewTimeRegistrationRoute = () => {
 
         {/* Second Panel - Small */}
         <div
-          className={`h-[34rem] rounded-2xl border p-3 shadow-sm transition-all duration-300 ease-in-out ${
+          className={`rounded-2xl border p-3 shadow-sm overflow-clip ${
             step === 2
-              ? 'w-full border-blue-400 bg-blue-100'
-              : 'w-1/5 border-gray-300 bg-gray-100 hover:bg-blue-50'
+              ? 'h-[20rem] w-full border-blue-400 bg-blue-100'
+              : 'h-24 w-1/4 border-gray-300 bg-gray-100 hover:bg-blue-50'
           } cursor-pointer`}
           onClick={() => step >= 1 && setStep(2)}
         >
@@ -129,10 +128,10 @@ export const NewTimeRegistrationRoute = () => {
 
         {/* Third Panel - Small */}
         <div
-          className={`h-[34rem] rounded-2xl border p-3 shadow-sm transition-all duration-300 ease-in-out ${
+          className={`rounded-2xl border p-3 shadow-sm overflow-clip ${
             step === 3
-              ? 'w-full border-blue-400 bg-blue-100'
-              : 'w-1/5 border-gray-300 bg-gray-100 hover:bg-blue-50'
+              ? 'h-[28rem] w-full border-blue-400 bg-blue-100'
+              : 'h-24 w-1/4 border-gray-300 bg-gray-100 hover:bg-blue-50'
           } cursor-pointer`}
           onClick={() => step >= 2 && setStep(3)}
         >
@@ -141,10 +140,15 @@ export const NewTimeRegistrationRoute = () => {
             selectedTimeSlot={period}
             onTimeSlotChange={handleTimeSlotChange}
           />
-          <WeekAvailabilityTable
-            startHour={timeSlot.start}
-            endHour={timeSlot.end}
-          />
+          {step === 3 && (
+            <div className="mt-6">
+              <h4 className="mb-4 text-2xl font-bold">Set Your Availability</h4>
+              <WeekAvailabilityTable
+                startHour={timeSlot.start}
+                endHour={timeSlot.end}
+              />
+            </div>
+          )}
         </div>
       </div>
     </div>
