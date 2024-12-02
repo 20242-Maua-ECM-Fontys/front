@@ -1,53 +1,62 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useOutletContext } from 'react-router';
 
+import { CourseSelectionPanel } from '@/components/time-registration/CourseSelectionPanel';
+import { SemesterSelectionPanel } from '@/components/time-registration/SemesterSelectionPanel';
+import { TimeSlotSelectionPanel } from '@/components/time-registration/TimeSlotSelectionPanel';
 import { WeekAvailabilityTable } from '@/features/time-registration/components/week-availability';
 
-export const TimeRegistrationRoute = () => {
+type DashboardContext = {
+  setTitle: (title: string) => void;
+};
+
+export const NewTimeRegistrationRoute = () => {
   const [timeSlot, setTimeSlot] = useState<{ start: string; end: string }>({
     start: '07:40',
     end: '13:00',
   });
+  const { setTitle } = useOutletContext<DashboardContext>();
 
+  useEffect(() => {
+    setTitle('Time Registration');
+  }, [setTitle]);
+
+  const [step, setStep] = useState(1); // Active panel step
   const [period, setPeriod] = useState('Morning');
   const [semester, setSemester] = useState('');
   const [course, setCourse] = useState('');
-  const [weekKey, setWeekKey] = useState(0);
   const [isEngineering, setIsEngineering] = useState(false);
 
   const handleTimeSlotChange = (slot: string) => {
     setPeriod(slot);
-    switch (slot) {
-      case 'Morning':
-        setTimeSlot({ start: '07:40', end: '13:00' });
-        break;
-      case 'Afternoon':
-        setTimeSlot({ start: '13:10', end: '18:30' });
-        break;
-      case 'Evening':
-        setTimeSlot({ start: '19:00', end: '22:20' });
-        break;
-      default:
-        break;
-    }
-    setWeekKey((prevKey) => prevKey + 1);
+    setTimeSlot(
+      slot === 'Morning'
+        ? { start: '07:40', end: '13:00' }
+        : slot === 'Afternoon'
+          ? { start: '13:10', end: '18:30' }
+          : { start: '19:00', end: '22:20' }
+    );
   };
 
-  const handleCourseChange = (course: string) => {
-    setCourse(course);
-    const engineeringCourses = [
-      'Computer Engineering',
-      'Electrical Engineering',
-      'Mechanical Engineering',
-      'Civil Engineering',
-      'Chemical Engineering',
-      'Production Engineering',
-      'Control and Automation Engineering',
-    ];
-    setIsEngineering(engineeringCourses.includes(course));
+  const handleCourseChange = (selectedCourse: string) => {
+    setCourse(selectedCourse);
+    setIsEngineering(
+      [
+        'Computer Engineering',
+        'Electrical Engineering',
+        'Mechanical Engineering',
+        'Civil Engineering',
+        'Chemical Engineering',
+        'Production Engineering',
+        'Control and Automation Engineering',
+      ].includes(selectedCourse)
+    );
+    setStep(2);
   };
 
-  const handleSemesterChange = (semester: string) => {
-    setSemester(semester);
+  const handleSemesterChange = (selectedSemester: string) => {
+    setSemester(selectedSemester);
+    setStep(3);
   };
 
   const courses = [
@@ -66,186 +75,81 @@ export const TimeRegistrationRoute = () => {
     'Architecture and Urbanism',
   ];
 
+  const semesters = isEngineering
+    ? ['1st Year', '2nd Year', '3rd Year', '4th Year', '5th Year']
+    : [
+      '1st Semester',
+      '2nd Semester',
+      '3rd Semester',
+      '4th Semester',
+      '5th Semester',
+      '6th Semester',
+      '7th Semester',
+      '8th Semester',
+      '9th Semester',
+      '10th Semester',
+    ];
+
+  const timeSlots = ['Morning', 'Afternoon', 'Evening'];
+
   return (
-    <div>
-      <div className="flex h-screen items-center bg-white">
-        <div className="mx-auto max-w-7xl px-4 py-12 text-center sm:px-6 lg:px-8 lg:py-16">
-          <h2 className="p-4 text-3xl font-extrabold tracking-tight text-gray-900 sm:text-4xl">
-            <span className="block">Time Registration</span>
-          </h2>
-          <p>Building your Schedules in a straightforward manner</p>
-          <button
-            className="mt-4 rounded bg-gray-200 px-4 py-2 transition duration-300 hover:bg-blue-400 hover:text-white"
-            onClick={() =>
-              document
-                .getElementById('course-registration')
-                ?.scrollIntoView({ behavior: 'smooth' })
-            }
-          >
-            Register Now
-          </button>
-        </div>
-      </div>
-
-      <div
-        className="mx-auto flex h-screen max-w-7xl items-center justify-center p-4 text-center sm:px-6 lg:px-8 lg:py-10"
-        id="course-registration"
-      >
-        <div className="flex flex-col items-center bg-white p-6">
-          <h3 className="text-2xl font-bold">
-            Which course are you registering for?
-          </h3>
-          <div className="grid grid-cols-2 gap-5 p-6 sm:grid-cols-3">
-            {courses.map((courseOption) => (
-              <button
-                key={courseOption}
-                onClick={() => {
-                  handleCourseChange(courseOption);
-                  document
-                    .getElementById('period-possibilities')
-                    ?.scrollIntoView({ behavior: 'smooth' });
-                }}
-                className={`rounded border p-4 transition duration-300 ${
-                  course === courseOption
-                    ? 'bg-blue-500 text-white'
-                    : 'bg-gray-200'
-                } hover:bg-blue-400 hover:text-white`}
-              >
-                {courseOption}
-              </button>
-            ))}
+    <div className="mx-auto max-w-7xl pt-6">
+      <div className="grid grid-cols-3 gap-6">
+        {step === 1 && (
+          <div className="col-span-3">
+            <CourseSelectionPanel
+              courses={courses}
+              selectedCourse={course}
+              onCourseChange={handleCourseChange}
+            />
           </div>
-        </div>
+        )}
+
+        {step === 2 && (
+          <div className="col-span-3">
+            <SemesterSelectionPanel
+              semesters={semesters}
+              selectedSemester={semester}
+              onSemesterChange={handleSemesterChange}
+            />
+          </div>
+        )}
+
+        {step === 3 && (
+          <div className="col-span-3">
+            <TimeSlotSelectionPanel
+              timeSlots={timeSlots}
+              selectedTimeSlot={period}
+              onTimeSlotChange={handleTimeSlotChange}
+            />
+          </div>
+        )}
       </div>
 
-      <div
-        className="mx-auto flex h-screen max-w-7xl flex-col items-center justify-center p-4 text-center sm:px-6 lg:px-8 lg:py-10"
-        id="period-possibilities"
-      >
-        <h3 className="text-2xl font-bold">
-          Which period are you registering for?
-        </h3>
-        <div className="grid grid-cols-2 gap-5 p-6 sm:grid-cols-3">
-          {isEngineering ? (
-            <>
-              {['1st Year', '2nd Year', '3rd Year', '4th Year', '5th Year'].map(
-                (year) => (
-                  <button
-                    key={year}
-                    onClick={() => {
-                      handleSemesterChange(year);
-                      document
-                        .getElementById('table-possibilities')
-                        ?.scrollIntoView({ behavior: 'smooth' });
-                    }}
-                    className={`rounded border p-4 transition duration-300 ${
-                      semester === year
-                        ? 'bg-blue-500 text-white'
-                        : 'bg-gray-200'
-                    } hover:bg-blue-400 hover:text-white`}
-                  >
-                    {year}
-                  </button>
-                ),
-              )}
-            </>
-          ) : (
-            <>
-              {[
-                '1st Semester',
-                '2nd Semester',
-                '3rd Semester',
-                '4th Semester',
-                '5th Semester',
-                '6th Semester',
-                '7th Semester',
-                '8th Semester',
-                '9th Semester',
-                '10th Semester',
-              ].map((semesterOption) => (
-                <button
-                  key={semesterOption}
-                  onClick={() => {
-                    handleSemesterChange(semesterOption);
-                    document
-                      .getElementById('table-possibilities')
-                      ?.scrollIntoView({ behavior: 'smooth' });
-                  }}
-                  className={`rounded border p-4 transition duration-300 ${
-                    semester === semesterOption
-                      ? 'bg-blue-500 text-white'
-                      : 'bg-gray-200'
-                  } hover:bg-blue-400 hover:text-white`}
-                >
-                  {semesterOption}
-                </button>
-              ))}
-            </>
-          )}
+      {/* Transition for selected course and semester */}
+      {step >= 2 && course && (
+        <div className="mt-4 p-4 rounded-md bg-gray-100 transition-all duration-300 ease-in-out opacity-100">
+          <h4 className="text-lg font-semibold">Selected Course</h4>
+          <p>{course}</p>
         </div>
-      </div>
+      )}
 
-      <div
-        className="mx-auto flex h-screen max-w-7xl flex-col items-center justify-center p-4 text-center sm:px-6 lg:px-8 lg:py-10"
-        id="table-possibilities"
-      >
-        <h3 className="mb-4 text-center text-xl font-bold">
-          Set Your Availability
-        </h3>
-        <div className="grid grid-cols-1 gap-5 p-6 sm:grid-cols-3">
-          <button
-            onClick={() => {
-              handleTimeSlotChange('Morning');
-              document
-                .getElementById('table-possibilities')
-                ?.scrollIntoView({ behavior: 'smooth' });
-            }}
-            className={`mx-auto rounded px-4 py-2 transition duration-300 ${
-              period === 'Morning'
-                ? 'bg-blue-500 text-white'
-                : 'bg-gray-200 text-black'
-            } hover:bg-blue-500 hover:text-white`}
-          >
-            Morning
-          </button>
-
-          <button
-            onClick={() => {
-              handleTimeSlotChange('Afternoon');
-              document
-                .getElementById('table-possibilities')
-                ?.scrollIntoView({ behavior: 'smooth' });
-            }}
-            className={`mx-auto rounded px-4 py-2 transition duration-300 ${
-              period === 'Afternoon'
-                ? 'bg-blue-500 text-white'
-                : 'bg-gray-200 text-black'
-            } hover:bg-blue-500 hover:text-white`}
-          >
-            <p>Afternoon</p>
-          </button>
-          <button
-            onClick={() => {
-              handleTimeSlotChange('Evening');
-              document
-                .getElementById('table-possibilities')
-                ?.scrollIntoView({ behavior: 'smooth' });
-            }}
-            className={`mx-auto rounded px-4 py-2 transition duration-300 ${
-              period === 'Evening'
-                ? 'bg-blue-500 text-white'
-                : 'bg-gray-200 text-black'
-            } hover:bg-blue-500 hover:text-white`}
-          >
-            <p>Evening</p>
-          </button>
+      {step >= 3 && semester && (
+        <div className="mt-4 p-4 rounded-md bg-gray-100 transition-all duration-300 ease-in-out opacity-100">
+          <h4 className="text-lg font-semibold">Selected Semester</h4>
+          <p>{semester}</p>
         </div>
-        <WeekAvailabilityTable
-          startHour={timeSlot.start}
-          endHour={timeSlot.end}
-          key={weekKey}
-        />
-      </div>
+      )}
+
+      {step === 3 && (
+        <div className="mt-6">
+          <h4 className="mb-4 text-2xl font-bold">Set Your Availability</h4>
+          <WeekAvailabilityTable
+            startHour={timeSlot.start}
+            endHour={timeSlot.end}
+          />
+        </div>
+      )}
     </div>
   );
 };
