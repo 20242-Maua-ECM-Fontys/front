@@ -69,6 +69,15 @@ export const createAppRouter = () =>
             return { Component: CoordinatorSuitAvailRoute };
           },
         },
+        {
+          path: 'coord-schedule',
+          lazy: async () => {
+            const { CoordScheduleRoute } = await import(
+              './routes/app/coord-schedule'
+            );
+            return { Component: CoordScheduleRoute };
+          },
+        },
       ],
     },
     {
