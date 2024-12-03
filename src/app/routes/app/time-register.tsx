@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import { CreateStaffAvailability } from '@/features/time-registration/components/create-staff-availability';
 
@@ -20,16 +20,6 @@ export const TimeRegisterRoute = () => {
           return semester;
         })
     : [];
-
-  const annualCourses = Array.from(
-    new Set(
-      Object.entries(schedules || {})
-        .filter(([, schedules]) =>
-          schedules.some((schedule) => schedule.schedulePeriod === 'ANNUAL'),
-        )
-        .map(([course]) => course),
-    ),
-  );
 
   const uniqueSemesters = Array.from(new Set(semesters));
 
@@ -79,10 +69,13 @@ export const TimeRegisterRoute = () => {
 
   const handleCourseChange = (course: string) => {
     setCourse(course);
-    if (annualCourses.includes(course)) {
-      setIsEngineering(true);
-    }
   };
+
+  useEffect(() => {
+    if (course) {
+      setIsEngineering(course.includes('Engineering'));
+    }
+  }, [course]);
 
   const getScheduleId = () => {
     if (schedules && course && year) {
