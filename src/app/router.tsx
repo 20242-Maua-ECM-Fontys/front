@@ -36,12 +36,12 @@ export const createAppRouter = () =>
           },
         },
         {
-          path: 'time-registration',
+          path: 'time-register',
           lazy: async () => {
-            const { TimeRegistrationRoute } = await import(
-              './routes/app/time-registration'
+            const { TimeRegisterRoute } = await import(
+              './routes/app/time-register'
             );
-            return { Component: TimeRegistrationRoute };
+            return { Component: TimeRegisterRoute };
           },
         },
         {
@@ -49,6 +49,24 @@ export const createAppRouter = () =>
           lazy: async () => {
             const { DashboardRoute } = await import('./routes/app/dashboard');
             return { Component: DashboardRoute };
+          },
+        },
+        {
+          path: 'teacher-suitavail',
+          lazy: async () => {
+            const { TeacherSuitAvailRoute } = await import(
+              './routes/app/teacher-suitavail'
+            );
+            return { Component: TeacherSuitAvailRoute };
+          },
+        },
+        {
+          path: 'coord-suitavail',
+          lazy: async () => {
+            const { CoordinatorSuitAvailRoute } = await import(
+              './routes/app/coordinator-suitavail'
+            );
+            return { Component: CoordinatorSuitAvailRoute };
           },
         },
       ],

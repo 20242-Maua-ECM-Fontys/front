@@ -5,7 +5,7 @@
 
 import { LogLevel } from '@azure/msal-browser';
 
-import { env } from '@/config/env';
+import { env } from '../../config/env';
 
 /**
  * Configuration object to be passed to MSAL instance on creation.

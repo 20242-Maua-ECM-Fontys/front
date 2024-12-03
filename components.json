@@ -7,7 +7,11 @@
     "config": "tailwind.config.cjs",
     "css": "src/index.css",
     "baseColor": "neutral",
+<<<<<<< HEAD
     "cssVariables": false,
+=======
+    "cssVariables": true,
+>>>>>>> dev
     "prefix": ""
   },
   "aliases": {
@@ -16,6 +20,10 @@
     "ui": "@/components/ui",
     "lib": "@/lib",
     "hooks": "@/hooks"
+<<<<<<< HEAD
   },
   "iconLibrary": "lucide"
+=======
+  }
+>>>>>>> dev
 }

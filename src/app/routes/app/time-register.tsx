@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import { CreateStaffAvailability } from '@/features/time-registration/components/create-staff-availability';
 
 import { useSchedules } from '../../../features/time-registration/api/get-all-schedules';
 import type { Schedule } from '../../../types/api';
 
-export const TimeRegistrationRoute = () => {
+export const TimeRegisterRoute = () => {
   const scheduleQuery = useSchedules({});
 
   const schedules = scheduleQuery?.data?.courses;
@@ -69,17 +69,13 @@ export const TimeRegistrationRoute = () => {
 
   const handleCourseChange = (course: string) => {
     setCourse(course);
-    const engineeringCourses = [
-      'Computer Engineering',
-      'Electrical Engineering',
-      'Mechanical Engineering',
-      'Civil Engineering',
-      'Chemical Engineering',
-      'Production Engineering',
-      'Control and Automation Engineering',
-    ];
-    setIsEngineering(engineeringCourses.includes(course));
   };
+
+  useEffect(() => {
+    if (course) {
+      setIsEngineering(course.includes('Engineering'));
+    }
+  }, [course]);
 
   const getScheduleId = () => {
     if (schedules && course && year) {
