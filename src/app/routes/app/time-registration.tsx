@@ -22,7 +22,7 @@ export const NewTimeRegistrationRoute = () => {
   }, [setTitle]);
 
   const [step, setStep] = useState(1); // Active panel step
-  const [period, setPeriod] = useState('Morning');
+  const [period, setPeriod] = useState('');
   const [semester, setSemester] = useState('');
   const [course, setCourse] = useState('');
   const [isEngineering, setIsEngineering] = useState(false);
@@ -34,8 +34,9 @@ export const NewTimeRegistrationRoute = () => {
         ? { start: '07:40', end: '13:00' }
         : slot === 'Afternoon'
           ? { start: '13:10', end: '18:30' }
-          : { start: '19:00', end: '22:20' }
+          : { start: '19:00', end: '22:20' },
     );
+    setStep(3); // Ensure correct step alignment
   };
 
   const handleCourseChange = (selectedCourse: string) => {
@@ -49,7 +50,7 @@ export const NewTimeRegistrationRoute = () => {
         'Chemical Engineering',
         'Production Engineering',
         'Control and Automation Engineering',
-      ].includes(selectedCourse)
+      ].includes(selectedCourse),
     );
     setStep(2);
   };
@@ -78,23 +79,78 @@ export const NewTimeRegistrationRoute = () => {
   const semesters = isEngineering
     ? ['1st Year', '2nd Year', '3rd Year', '4th Year', '5th Year']
     : [
-      '1st Semester',
-      '2nd Semester',
-      '3rd Semester',
-      '4th Semester',
-      '5th Semester',
-      '6th Semester',
-      '7th Semester',
-      '8th Semester',
-      '9th Semester',
-      '10th Semester',
-    ];
+        '1st Semester',
+        '2nd Semester',
+        '3rd Semester',
+        '4th Semester',
+        '5th Semester',
+        '6th Semester',
+        '7th Semester',
+        '8th Semester',
+        '9th Semester',
+        '10th Semester',
+      ];
 
   const timeSlots = ['Morning', 'Afternoon', 'Evening'];
 
   return (
-    <div className="mx-auto max-w-7xl pt-6">
+    <div className="mx-auto w-full max-w-7xl pt-6">
+      {/* Top navigation bar */}
+      <div className="mb-6 flex items-center justify-center gap-4 sm:flex-wrap md:flex-nowrap md:justify-around">
+        <div
+          className={`mx-4 flex h-20 w-full flex-col items-center justify-center rounded-md border-2 p-6 text-center opacity-100 transition-all duration-300 ease-in-out hover:cursor-pointer ${
+            course
+              ? 'border-blue-500 bg-blue-100 hover:bg-blue-200'
+              : 'border-transparent bg-gray-200 hover:bg-gray-300'
+          }`}
+          onClick={() => setStep(1)}
+        >
+          <h4 className="text-lg font-semibold">Course</h4>
+          {course && <p>{course}</p>}
+        </div>
+
+        <div
+          className={`mx-4 flex h-20 w-full flex-col items-center justify-center rounded-md border-2 p-6 text-center opacity-100 transition-all duration-300 ease-in-out hover:cursor-pointer ${
+            semester
+              ? 'border-blue-500 bg-blue-100 hover:bg-blue-200'
+              : 'border-transparent bg-gray-200 hover:bg-gray-300'
+          }`}
+          onClick={() => setStep(2)}
+        >
+          <h4 className="text-lg font-semibold">Semester</h4>
+          {semester && <p>{semester}</p>}
+        </div>
+
+        <div
+          className={`mx-4 flex h-20 w-full flex-col items-center justify-center rounded-md border-2 p-6 text-center opacity-100 transition-all duration-300 ease-in-out hover:cursor-pointer ${
+            period
+              ? 'border-blue-500 bg-blue-100 hover:bg-blue-200'
+              : 'border-transparent bg-gray-200 hover:bg-gray-300'
+          }`}
+          onClick={() => setStep(3)}
+        >
+          <h4 className="text-lg font-semibold">Time Slot</h4>
+          {period && <p>{period}</p>}
+        </div>
+
+        {/* Submit button */}
+        <div className="text-center">
+          <button
+            disabled={!course || !semester || !period}
+            className={`rounded-md border-2 px-6 py-3 text-white transition-all duration-300 ${
+              course && semester && period
+                ? 'border-green-500 bg-green-200 hover:bg-green-300'
+                : 'cursor-not-allowed border-gray-300 bg-gray-200'
+            }`}
+            onClick={() => alert('Submission successful!')}
+          >
+            <p className="font-medium text-black">Submit</p>
+          </button>
+        </div>
+      </div>
+
       <div className="grid grid-cols-3 gap-6">
+        {/* Dynamic content */}
         {step === 1 && (
           <div className="col-span-3">
             <CourseSelectionPanel
@@ -125,21 +181,6 @@ export const NewTimeRegistrationRoute = () => {
           </div>
         )}
       </div>
-
-      {/* Transition for selected course and semester */}
-      {step >= 2 && course && (
-        <div className="mt-4 p-4 rounded-md bg-gray-100 transition-all duration-300 ease-in-out opacity-100">
-          <h4 className="text-lg font-semibold">Selected Course</h4>
-          <p>{course}</p>
-        </div>
-      )}
-
-      {step >= 3 && semester && (
-        <div className="mt-4 p-4 rounded-md bg-gray-100 transition-all duration-300 ease-in-out opacity-100">
-          <h4 className="text-lg font-semibold">Selected Semester</h4>
-          <p>{semester}</p>
-        </div>
-      )}
 
       {step === 3 && (
         <div className="mt-6">

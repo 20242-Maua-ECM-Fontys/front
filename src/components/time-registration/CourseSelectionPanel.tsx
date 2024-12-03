@@ -19,10 +19,10 @@ export const CourseSelectionPanel: React.FC<Props> = ({
           <button
             key={courseOption}
             onClick={() => onCourseChange(courseOption)}
-            className={`h-16 rounded border font-medium transition duration-300 ${
+            className={`rounded border p-2 transition duration-300 hover:cursor-pointer ${
               selectedCourse === courseOption
-                ? 'bg-blue-500 text-white'
-                : 'bg-gray-200'
+                ? 'bg-blue-500 text-white hover:bg-blue-400'
+                : 'bg-gray-200 hover:bg-gray-300'
             }`}
           >
             {courseOption}
