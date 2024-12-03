@@ -1,34 +1,22 @@
 import { useMsal } from '@azure/msal-react';
 
 import { ContentLayout } from '@/components/layouts';
+import AnimatedGridPattern from '@/components/ui/animated-grid-pattern';
 
 export const DashboardRoute = () => {
   const { accounts } = useMsal();
 
   return (
     <ContentLayout title="Dashboard">
-      <h1 className="text-xl">
-        Welcome <b>{`${accounts[0]?.name}`}</b>
-      </h1>
+      <AnimatedGridPattern className="fixed inset-0 inset-y-[-30%] z-0 h-[200%] w-full skew-y-12 opacity-30" />
 
-      {/* <h4 className="my-3">
-        Your role is : <b>{user.data?.role}</b>
-      </h4>
-      <p className="font-medium">In this application you can:</p>
-      {user.data?.role === ROLES.STAFF && (
-        <ul className="my-4 list-inside list-disc">
-          <li>Upload professor, subject and course data</li>
-        </ul>
-      )} */}
-      {/* {user.data?.role === ROLES.PROFESSOR && (
-        <ul className="my-4 list-inside list-disc">
-          <li>Create discussions</li>
-          <li>Edit discussions</li>
-          <li>Delete discussions</li>
-          <li>Comment on discussions</li>
-          <li>Delete all comments</li>
-        </ul>
-      )} */}
+      <div className="flex h-screen items-center justify-center">
+        <h1 className="p-4 text-center text-4xl font-extrabold tracking-tight text-gray-900 sm:text-5xl">
+          <span className="block">Welcome to</span>
+          <span className="block text-blue-600">Maua Grid</span>
+          <p className="p-4 text-3xl">Hello {`${accounts[0]?.name}`} !</p>
+        </h1>
+      </div>
     </ContentLayout>
   );
 };
