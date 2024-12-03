@@ -21,6 +21,16 @@ export const TimeRegisterRoute = () => {
         })
     : [];
 
+  const annualCourses = Array.from(
+    new Set(
+      Object.entries(schedules || {})
+        .filter(([, schedules]) =>
+          schedules.some((schedule) => schedule.schedulePeriod === 'ANNUAL'),
+        )
+        .map(([course]) => course),
+    ),
+  );
+
   const uniqueSemesters = Array.from(new Set(semesters));
 
   const courseGrades = scheduleQuery?.data?.courses
@@ -69,16 +79,9 @@ export const TimeRegisterRoute = () => {
 
   const handleCourseChange = (course: string) => {
     setCourse(course);
-    const engineeringCourses = [
-      'Computer Engineering',
-      'Electrical Engineering',
-      'Mechanical Engineering',
-      'Civil Engineering',
-      'Chemical Engineering',
-      'Production Engineering',
-      'Control and Automation Engineering',
-    ];
-    setIsEngineering(engineeringCourses.includes(course));
+    if (annualCourses.includes(course)) {
+      setIsEngineering(true);
+    }
   };
 
   const getScheduleId = () => {
