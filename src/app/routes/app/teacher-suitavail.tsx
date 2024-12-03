@@ -25,6 +25,7 @@ export const TeacherSuitAvailRoute = () => {
   const [isAvailLodaded, setIsAvailLoaded] = useState(false);
   const { instance } = useMsal();
   const currentAccount = instance.getActiveAccount();
+  console.log(currentAccount);
 
   const roleQuery = useRole({ email: currentAccount?.username ?? '' });
 
@@ -33,17 +34,23 @@ export const TeacherSuitAvailRoute = () => {
   const subjectsQuery = useSubjects({});
 
   const availabilitiesByProfessorQuery = useAvailByProfessor({
-    userId: userId!,
+    userId: userId ? userId : 0,
   });
 
   const subjectsByProfessorQuery = useSubjectsByProfessor({
-    userId: userId!,
+    userId: userId ? userId : 0,
   });
 
   useEffect(() => {
     if (userId) {
-      availabilitiesByProfessorQuery.refetch();
       subjectsByProfessorQuery.refetch();
+      availabilitiesByProfessorQuery.refetch();
+      if (
+        subjectsByProfessorQuery.isLoading ||
+        availabilitiesByProfessorQuery.isLoading
+      ) {
+        return;
+      }
       setSelectedSubjects(
         subjectsByProfessorQuery.data?.suitabilities.map(
           (s) => s.codeSubject,
@@ -53,6 +60,8 @@ export const TeacherSuitAvailRoute = () => {
         availabilitiesByProfessorQuery.data?.availabilities ?? [],
       );
       setIsAvailLoaded(true);
+    } else {
+      return;
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [

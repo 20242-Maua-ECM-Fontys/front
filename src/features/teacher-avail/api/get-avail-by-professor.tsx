@@ -34,5 +34,6 @@ export const useAvailByProfessor = ({
   return useQuery({
     ...getAvailByProfessorQueryOptions(userId),
     ...queryConfig,
+    enabled: !!userId,
   });
 };

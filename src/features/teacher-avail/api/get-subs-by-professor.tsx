@@ -38,5 +38,6 @@ export const useSubjectsByProfessor = ({
   return useQuery({
     ...getSubjectsByProfessorQueryOptions(userId),
     ...queryConfig,
+    enabled: !!userId,
   });
 };
