@@ -1,5 +1,5 @@
 import { useMsal } from '@azure/msal-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { useRole } from '@/api/get-role-by-email';
 import { useSubjects } from '@/api/get-subjects';
@@ -13,21 +13,62 @@ import {
   CommandList,
 } from '@/components/ui/command';
 import { WeekAvailabilityTable } from '@/components/ui/week-availability-update';
+import { useAvailByProfessor } from '@/features/teacher-avail/api/get-avail-by-professor';
+import { useSubjectsByProfessor } from '@/features/teacher-avail/api/get-subs-by-professor';
 import { toast } from '@/hooks/use-toast';
 import type { Subject, Availability } from '@/types/api';
 
 export const TeacherSuitAvailRoute = () => {
   const [weekKey] = useState(0);
   const [selectedSubjects, setSelectedSubjects] = useState<string[]>([]);
-  const [availabilities] = useState<Availability[]>([]);
+  const [availabilities, setAvailabilities] = useState<Availability[]>([]);
+  const [isAvailLodaded, setIsAvailLoaded] = useState(false);
   const { instance } = useMsal();
   const currentAccount = instance.getActiveAccount();
+  console.log(currentAccount);
 
   const roleQuery = useRole({ email: currentAccount?.username ?? '' });
 
   const userId = roleQuery.data?.userId;
 
   const subjectsQuery = useSubjects({});
+
+  const availabilitiesByProfessorQuery = useAvailByProfessor({
+    userId: userId ? userId : 0,
+  });
+
+  const subjectsByProfessorQuery = useSubjectsByProfessor({
+    userId: userId ? userId : 0,
+  });
+
+  useEffect(() => {
+    if (userId) {
+      subjectsByProfessorQuery.refetch();
+      availabilitiesByProfessorQuery.refetch();
+      if (
+        subjectsByProfessorQuery.isLoading ||
+        availabilitiesByProfessorQuery.isLoading
+      ) {
+        return;
+      }
+      setSelectedSubjects(
+        subjectsByProfessorQuery.data?.suitabilities.map(
+          (s) => s.codeSubject,
+        ) ?? [],
+      );
+      setAvailabilities(
+        availabilitiesByProfessorQuery.data?.availabilities ?? [],
+      );
+      setIsAvailLoaded(true);
+    } else {
+      return;
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    userId,
+    availabilitiesByProfessorQuery.data,
+    subjectsByProfessorQuery.data,
+  ]);
 
   const subjects = subjectsQuery.data?.subjects;
 
@@ -166,13 +207,19 @@ export const TeacherSuitAvailRoute = () => {
         <h3 className="mb-4 text-center text-xl font-bold">
           Set Your Availability
         </h3>
-        <WeekAvailabilityTable
-          startHour={'07:40'}
-          endHour={'22:30'}
-          key={weekKey}
-          initialAvailability={availabilities}
-          userId={userId ?? 0}
-        />
+        {isAvailLodaded ? (
+          <WeekAvailabilityTable
+            startHour={'07:40'}
+            endHour={'22:30'}
+            key={weekKey}
+            initialAvailability={availabilities}
+            userId={userId ?? 0}
+          />
+        ) : (
+          <div className="flex h-[49vh] items-center justify-center">
+            <div className="size-32 animate-spin rounded-full border-y-2 border-gray-900"></div>
+          </div>
+        )}
       </div>
     </div>
   );
