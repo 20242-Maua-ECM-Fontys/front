@@ -1,4 +1,5 @@
 import { useMsal } from '@azure/msal-react';
+
 import { ContentLayout } from '@/components/layouts';
 import AnimatedGridPattern from '@/components/ui/animated-grid-pattern';
 
@@ -7,11 +8,13 @@ export const DashboardRoute = () => {
 
   return (
     <ContentLayout title="Dashboard">
-      <AnimatedGridPattern className="fixed inset-0 z-0 w-full opacity-30 skew-y-12 inset-y-[-30%] h-[200%]" />
-      
-      <div className="z-10 flex items-center justify-center">
-        <h1 className="text-2xl font-bold text-center">
-          Welcome <b>{`${accounts[0]?.name}`}</b>
+      <AnimatedGridPattern className="fixed inset-0 inset-y-[-30%] z-0 h-[200%] w-full skew-y-12 opacity-30" />
+
+      <div className="flex h-screen items-center justify-center">
+        <h1 className="p-4 text-center text-4xl font-extrabold tracking-tight text-gray-900 sm:text-5xl">
+          <span className="block">Welcome to</span>
+          <span className="block text-blue-600">Maua Grid</span>
+          <p className="p-4 text-3xl">Hello {`${accounts[0]?.name}`} !</p>
         </h1>
       </div>
     </ContentLayout>
