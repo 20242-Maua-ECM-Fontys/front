@@ -2,8 +2,7 @@ import { queryOptions, useQuery } from '@tanstack/react-query';
 
 import { api } from '@/lib/api-client';
 import { QueryConfig } from '@/lib/react-query';
-
-import type { Courses } from '../../../types/api';
+import type { Courses } from '@/types/api';
 
 export const getSchedules = (): Promise<{
   message: string;

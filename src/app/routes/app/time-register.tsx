@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import { CreateStaffAvailability } from '@/features/time-registration/components/create-staff-availability';
 
 import { useSchedules } from '../../../features/time-registration/api/get-all-schedules';
 import type { Schedule } from '../../../types/api';
 
-export const TimeRegistrationRoute = () => {
+export const TimeRegisterRoute = () => {
   const scheduleQuery = useSchedules({});
 
   const schedules = scheduleQuery?.data?.courses;
@@ -21,21 +21,7 @@ export const TimeRegistrationRoute = () => {
         })
     : [];
 
-  const uniqueSemesters = Array.from(new Set(semesters));
-
-  const courseGrades = scheduleQuery?.data?.courses
-    ? Object.values(scheduleQuery?.data?.courses)
-        .flat()
-        .map((schedule) => schedule.courseGrade)
-    : [];
-
-  const uniqueYears = [
-    '1st Year',
-    '2nd Year',
-    '3rd Year',
-    '4th Year',
-    '5th Year',
-  ].filter((_, index) => courseGrades.includes(index + 1));
+  const uniqueSemesters = Array.from(new Set(semesters)).sort();
 
   const [timeSlot, setTimeSlot] = useState<{ start: string; end: string }>({
     start: '07:40',
@@ -48,6 +34,7 @@ export const TimeRegistrationRoute = () => {
   const [course, setCourse] = useState('');
   const [weekKey, setWeekKey] = useState(0);
   const [isEngineering, setIsEngineering] = useState(false);
+  const [uniqueYears, setUniqueYears] = useState<string[]>([]);
 
   const handleTimeSlotChange = (slot: string) => {
     setPeriod(slot);
@@ -69,17 +56,22 @@ export const TimeRegistrationRoute = () => {
 
   const handleCourseChange = (course: string) => {
     setCourse(course);
-    const engineeringCourses = [
-      'Computer Engineering',
-      'Electrical Engineering',
-      'Mechanical Engineering',
-      'Civil Engineering',
-      'Chemical Engineering',
-      'Production Engineering',
-      'Control and Automation Engineering',
-    ];
-    setIsEngineering(engineeringCourses.includes(course));
+    const courseGrades = scheduleQuery?.data?.courses
+      ? Object.values(scheduleQuery?.data?.courses[course])
+          .flat()
+          .map((schedule) => schedule.courseGrade)
+      : [];
+    const uniqueYears = Array.from(new Set(courseGrades))
+      .map((grade) => `${grade}th Year`)
+      .sort();
+    setUniqueYears(uniqueYears);
   };
+
+  useEffect(() => {
+    if (course) {
+      setIsEngineering(course.includes('Engineering'));
+    }
+  }, [course]);
 
   const getScheduleId = () => {
     if (schedules && course && year) {

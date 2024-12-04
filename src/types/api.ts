@@ -1,21 +1,45 @@
 export type User = {
-  firstName: string;
-  lastName: string;
+  userId: number;
   email: string;
-  role: 'STAFF' | 'COORDINATOR' | 'PROFESSOR';
+  role: 'STAFF' | 'COORDINATOR' | 'PROFESSOR' | 'ADMIN';
+};
+
+export type Availability = {
+  startTime: number;
+  endTime: number;
+  weekDay: string;
+};
+
+export type Professor = {
+  name: string;
+  email: string;
+  availabilities: Availability[];
+  suitabilities: {
+    codeSubject: string;
+    subjectName: string;
+  }[];
+};
+
+export type Professors = {
+  [key: number]: Professor;
+};
+
+export type Subject = {
+  codeSubject: string;
+  subjectName: string;
+  period: string;
+};
+
+export type Courses = {
+  [courseName: string]: {
+    scheduleId: string;
+    courseGrade: number;
+    schedulePeriod: 'ANNUAL' | '1SEM' | '2SEM';
+  }[];
 };
 
 export type Schedule = {
   scheduleId: string;
   courseGrade: number;
-  schedulePeriod: 'ANNUAL' | '1SEM';
-};
-
-export type Courses = {
-  [courseName: string]: Schedule[];
-};
-
-export type AuthResponse = {
-  token: string;
-  user: User;
+  schedulePeriod: 'ANNUAL' | '1SEM' | '2SEM';
 };
