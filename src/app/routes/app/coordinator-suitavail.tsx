@@ -1,7 +1,7 @@
 import { randUuid } from '@ngneat/falso';
 import { useEffect, useState } from 'react';
 
-import { useRole } from '@/api/get-role-by-email';
+import { useProfessorId } from '@/api/get-professor-id';
 import { useSubjects } from '@/api/get-subjects';
 import { useUpdateSubjects } from '@/api/update-subjects';
 import { Button } from '@/components/ui/button';
@@ -24,7 +24,7 @@ export const CoordinatorSuitAvailRoute = () => {
   const [selectedProfessor, setSelectedProfessor] =
     useState<Professor | null>();
 
-  const professorRoleQuery = useRole({
+  const professorRoleQuery = useProfessorId({
     email: selectedProfessor?.email ?? '',
     queryConfig: {
       enabled: !!selectedProfessor?.email,

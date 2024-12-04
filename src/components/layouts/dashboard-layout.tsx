@@ -7,6 +7,7 @@ import {
   CalendarClock,
   GraduationCap,
   Upload,
+  Calendar,
 } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { useNavigate, NavLink, useNavigation } from 'react-router-dom';
@@ -82,6 +83,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
   const navigate = useNavigate();
   const { accounts, instance } = useMsal();
   const { role } = useUser();
+  console.log(role);
 
   useEffect(() => {
     if (accounts.length === 0) {
@@ -148,6 +150,11 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
           name: 'Availability',
           to: 'teacher-suitavail',
           icon: CalendarClock,
+        },
+        {
+          name: 'Schedule Edit',
+          to: 'coord-schedule',
+          icon: Calendar,
         },
       );
     }
