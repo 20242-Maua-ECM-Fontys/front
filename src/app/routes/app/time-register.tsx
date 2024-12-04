@@ -21,21 +21,7 @@ export const TimeRegisterRoute = () => {
         })
     : [];
 
-  const uniqueSemesters = Array.from(new Set(semesters));
-
-  const courseGrades = scheduleQuery?.data?.courses
-    ? Object.values(scheduleQuery?.data?.courses)
-        .flat()
-        .map((schedule) => schedule.courseGrade)
-    : [];
-
-  const uniqueYears = [
-    '1st Year',
-    '2nd Year',
-    '3rd Year',
-    '4th Year',
-    '5th Year',
-  ].filter((_, index) => courseGrades.includes(index + 1));
+  const uniqueSemesters = Array.from(new Set(semesters)).sort();
 
   const [timeSlot, setTimeSlot] = useState<{ start: string; end: string }>({
     start: '07:40',
@@ -48,6 +34,7 @@ export const TimeRegisterRoute = () => {
   const [course, setCourse] = useState('');
   const [weekKey, setWeekKey] = useState(0);
   const [isEngineering, setIsEngineering] = useState(false);
+  const [uniqueYears, setUniqueYears] = useState<string[]>([]);
 
   const handleTimeSlotChange = (slot: string) => {
     setPeriod(slot);
@@ -69,6 +56,15 @@ export const TimeRegisterRoute = () => {
 
   const handleCourseChange = (course: string) => {
     setCourse(course);
+    const courseGrades = scheduleQuery?.data?.courses
+      ? Object.values(scheduleQuery?.data?.courses[course])
+          .flat()
+          .map((schedule) => schedule.courseGrade)
+      : [];
+    const uniqueYears = Array.from(new Set(courseGrades))
+      .map((grade) => `${grade}th Year`)
+      .sort();
+    setUniqueYears(uniqueYears);
   };
 
   useEffect(() => {
