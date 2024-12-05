@@ -38,10 +38,10 @@ export const createAppRouter = () =>
         {
           path: 'time-register',
           lazy: async () => {
-            const { NewTimeRegistrationRoute } = await import(
+            const { TimeRegistrationRoute } = await import(
               './routes/app/time-registration'
             );
-            return { Component: NewTimeRegistrationRoute };
+            return { Component: TimeRegistrationRoute };
           },
         },
         {
