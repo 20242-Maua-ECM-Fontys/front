@@ -5,7 +5,7 @@ import { CreateStaffAvailability } from '@/features/time-registration/components
 import { useSchedules } from '../../../features/time-registration/api/get-all-schedules';
 import type { Schedule } from '../../../types/api';
 
-export const TimeRegisterRoute = () => {
+export const TimeRegistrationRoute = () => {
   const scheduleQuery = useSchedules({});
 
   const schedules = scheduleQuery?.data?.courses;
