@@ -114,7 +114,7 @@ export function DashboardLayout({ children, title }: { children: React.ReactNode
         },
         {
           name: 'Time Registration',
-          to: 'time-register',
+          to: 'time-registration',
           icon: Clock3,
         },
       );

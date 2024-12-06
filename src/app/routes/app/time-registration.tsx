@@ -1,14 +1,74 @@
 import React, { useEffect, useState } from 'react';
 
+import { useNotifications } from '@/components/ui/notifications';
+import { useCreateStaffAvailability } from '@/features/time-registration/api/create-staff-availability';
+import { useSchedules } from '@/features/time-registration/api/get-all-schedules';
+import { CourseSelectionPanel } from '@/features/time-registration/components/CourseSelectionPanel';
 import { CreateStaffAvailability } from '@/features/time-registration/components/create-staff-availability';
+import { SemesterSelectionPanel } from '@/features/time-registration/components/SemesterSelectionPanel';
+import { TimeSlotSelectionPanel } from '@/features/time-registration/components/TimeSlotSelectionPanel';
+import type {
+  Availability,
+  TimeSlot,
+  WeekDays,
+} from '@/features/time-registration/types/availability';
+import {
+  convertTimeStringToDecimal,
+  generateCustomTimeIntervals,
+} from '@/features/time-registration/utils/create-staff-availability';
+import type { Schedule } from '@/types/api';
 
-import { useSchedules } from '../../../features/time-registration/api/get-all-schedules';
-import type { Schedule } from '../../../types/api';
+const initialAvailability: Availability = {
+  MON: [],
+  TUE: [],
+  WED: [],
+  THU: [],
+  FRI: [],
+  SAT: [],
+};
+
+// eg: { Monday: ['08:00 - 08:10', '08:20 - 08:30'], Tuesday: ['08:00 - 08:10'] }
+const formatAvailability = (
+  availability: Availability,
+): Partial<Record<WeekDays, { notEarlier: number; notLater: number }>> => {
+  const formattedAvailability: Partial<
+    Record<WeekDays, { notEarlier: number; notLater: number }>
+  > = {};
+
+  Object.keys(availability).forEach((day) => {
+    const dayAvailability = availability[day as WeekDays];
+    if (dayAvailability.length > 0) {
+      dayAvailability.sort((a, b) => {
+        const [hourA, minuteA] = a.split(' - ')[0].split(':').map(Number);
+        const [hourB, minuteB] = b.split(' - ')[0].split(':').map(Number);
+        return hourA - hourB || minuteA - minuteB;
+      });
+
+      const firstTime = dayAvailability[0].split(' - ')[0];
+      const lastTime =
+        dayAvailability[dayAvailability.length - 1].split(' - ')[1];
+
+      const [firstHour, firstMinute] = firstTime.split(':').map(Number);
+      const [lastHour, lastMinute] = lastTime.split(':').map(Number);
+
+      const notEarlier = firstHour * 60 + firstMinute;
+      const notLater = lastHour * 60 + lastMinute;
+
+      formattedAvailability[day as WeekDays] = {
+        notEarlier,
+        notLater,
+      };
+    }
+  });
+
+  return formattedAvailability;
+};
 
 export const TimeRegistrationRoute = () => {
   const scheduleQuery = useSchedules({});
 
   const schedules = scheduleQuery?.data?.courses;
+  const timeSlots = ['Morning', 'Afternoon', 'Evening'];
 
   const semesters = schedules
     ? Object.values(schedules)
@@ -28,13 +88,28 @@ export const TimeRegistrationRoute = () => {
     end: '13:00',
   });
 
-  const [period, setPeriod] = useState('Morning');
+  const [step, setStep] = useState(1); // Active panel step
+  const [period, setPeriod] = useState('');
   const [year, setYear] = useState<number>();
   const [semester, setSemester] = useState<string>();
   const [course, setCourse] = useState('');
   const [weekKey, setWeekKey] = useState(0);
   const [isEngineering, setIsEngineering] = useState(false);
   const [uniqueYears, setUniqueYears] = useState<string[]>([]);
+
+  const handleSemesterChange = (semesterOption: string) => {
+    setSemester(semesterOption);
+    const semesterMatch = semesterOption.match(/\d+/);
+    const semesterNumber = semesterMatch ? parseInt(semesterMatch[0], 10) : 1;
+    const calculatedYear = Math.ceil(semesterNumber / 2);
+    setYear(calculatedYear);
+    setStep(3);
+  };
+
+  const handleYearChange = (yearOption: number) => {
+    setYear(yearOption);
+    setStep(3);
+  };
 
   const handleTimeSlotChange = (slot: string) => {
     setPeriod(slot);
@@ -65,7 +140,10 @@ export const TimeRegistrationRoute = () => {
       .map((grade) => `${grade}th Year`)
       .sort();
     setUniqueYears(uniqueYears);
+    setStep(2);
   };
+
+  const courses = Object.keys(schedules || {});
 
   useEffect(() => {
     if (course) {
@@ -88,186 +166,153 @@ export const TimeRegistrationRoute = () => {
 
   const scheduleId = getScheduleId();
 
+  const { addNotification } = useNotifications();
+  const [availability, setAvailability] =
+    useState<Availability>(initialAvailability);
+  const [visibleDayIndex, setVisibleDayIndex] = useState<number>(0);
+
+  const startHourDecimal = convertTimeStringToDecimal(timeSlot.start);
+  const endHourDecimal = convertTimeStringToDecimal(timeSlot.end);
+
+  const timeIntervals = generateCustomTimeIntervals(
+    startHourDecimal,
+    endHourDecimal,
+  );
+
+  const createStaffAvailabilityMutation = useCreateStaffAvailability({
+    mutationConfig: {
+      onSuccess: () => {
+        addNotification({
+          type: 'success',
+          title: 'Availability registered with success',
+        });
+      },
+    },
+  });
+
+  const toggleTimeSlot = (day: WeekDays, timeSlot: TimeSlot) => {
+    setAvailability((prevAvailability) => {
+      const dayAvailability = prevAvailability[day];
+      const newDayAvailability = dayAvailability.includes(timeSlot)
+        ? dayAvailability.filter((slot) => slot !== timeSlot)
+        : [...dayAvailability, timeSlot];
+      return { ...prevAvailability, [day]: newDayAvailability };
+    });
+  };
+
   return (
     <div>
-      <div className="flex h-screen items-center">
-        <div className="mx-auto max-w-7xl px-4 py-12 text-center sm:px-6 lg:px-8 lg:py-16">
-          <h2 className="p-4 text-3xl font-extrabold tracking-tight text-gray-900 sm:text-4xl">
-            <span className="block">Time Registration</span>
-          </h2>
-          <p>Building your Schedules in a straightforward manner</p>
+      <div className="mb-6 flex items-center justify-center gap-4 sm:flex-wrap md:flex-nowrap md:justify-around">
+        {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/no-static-element-interactions */}
+        <div
+          className={`mx-4 flex h-20 w-full flex-col items-center justify-center rounded-md border-2 p-6 text-center opacity-100 transition-all duration-300 ease-in-out hover:cursor-pointer ${
+            course
+              ? 'border-blue-500 bg-blue-100 hover:bg-blue-200'
+              : 'border-transparent bg-gray-200 hover:bg-gray-300'
+          }`}
+          onClick={() => setStep(1)}
+        >
+          <h4 className="text-lg font-semibold">Course</h4>
+          {course && <p>{course}</p>}
+        </div>
+
+        {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/no-static-element-interactions */}
+        <div
+          className={`mx-4 flex h-20 w-full flex-col items-center justify-center rounded-md border-2 p-6 text-center opacity-100 transition-all duration-300 ease-in-out hover:cursor-pointer ${
+            semester || year
+              ? 'border-blue-500 bg-blue-100 hover:bg-blue-200'
+              : 'border-transparent bg-gray-200 hover:bg-gray-300'
+          }`}
+          onClick={() => setStep(2)}
+        >
+          <h4 className="text-lg font-semibold">Semester</h4>
+          {semester && <p>{semester}</p>}
+        </div>
+
+        {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/no-static-element-interactions */}
+        <div
+          className={`mx-4 flex h-20 w-full flex-col items-center justify-center rounded-md border-2 p-6 text-center opacity-100 transition-all duration-300 ease-in-out hover:cursor-pointer ${
+            period
+              ? 'border-blue-500 bg-blue-100 hover:bg-blue-200'
+              : 'border-transparent bg-gray-200 hover:bg-gray-300'
+          }`}
+          onClick={() => setStep(3)}
+        >
+          <h4 className="text-lg font-semibold">Time Slot</h4>
+          {period && <p>{period}</p>}
+        </div>
+
+        {/* Submit button */}
+        <div className="text-center">
           <button
-            className="mt-4 rounded bg-gray-200 px-4 py-2 transition duration-300 hover:bg-blue-400 hover:text-white"
-            onClick={() =>
-              document
-                .getElementById('course-registration')
-                ?.scrollIntoView({ behavior: 'smooth' })
-            }
+            disabled={!course || (!semester && !year) || !period}
+            className={`rounded-md border-2 px-6 py-3 text-white transition-all duration-300 ${
+              course && (semester || year) && period
+                ? 'border-green-500 bg-green-200 hover:bg-green-300'
+                : 'cursor-not-allowed border-gray-300 bg-gray-200'
+            }`}
+            onClick={() => {
+              createStaffAvailabilityMutation.mutate({
+                scheduleId: scheduleId,
+                data: formatAvailability(availability),
+              });
+            }}
           >
-            Register Now
+            <p className="font-medium text-black">Submit</p>
           </button>
         </div>
       </div>
 
-      <div
-        className="mx-auto flex h-screen max-w-7xl items-center justify-center p-4 text-center sm:px-6 lg:px-8 lg:py-10"
-        id="course-registration"
-      >
-        <div className="flex flex-col items-center p-6">
-          <h3 className="text-2xl font-bold">
-            Which course are you registering for?
-          </h3>
-          <div className="grid grid-cols-2 gap-5 p-6 md:grid-cols-3">
-            {Object.keys(schedules || {}).map((courseOption) => (
-              <button
-                key={courseOption}
-                onClick={() => {
-                  handleCourseChange(courseOption);
-                  document
-                    .getElementById('period-possibilities')
-                    ?.scrollIntoView({ behavior: 'smooth' });
-                }}
-                className={`min-h-20 rounded border p-2 transition duration-300 ${
-                  course === courseOption
-                    ? 'bg-blue-500 text-white'
-                    : 'bg-gray-200'
-                } hover:bg-blue-400 hover:text-white`}
-              >
-                {courseOption}
-              </button>
-            ))}
+      <div className="grid grid-cols-3 gap-6">
+        {/* Dynamic content */}
+        {step === 1 && (
+          <div className="col-span-3">
+            <CourseSelectionPanel
+              courses={courses}
+              selectedCourse={course}
+              onCourseChange={handleCourseChange}
+            />
           </div>
-        </div>
-      </div>
+        )}
 
-      <div
-        className="mx-auto flex h-screen max-w-7xl flex-col items-center justify-center p-4 text-center sm:px-6 lg:px-8 lg:py-10"
-        id="period-possibilities"
-      >
-        <h3 className="text-2xl font-bold">
-          Which period are you registering for?
-        </h3>
-        <div className="grid grid-cols-2 gap-5 p-6 md:grid-cols-3">
-          {isEngineering ? (
-            <>
-              {uniqueYears.map((yearOption) => {
-                const yearMatch = yearOption.match(/\d+/);
-                const extractedYear = yearMatch
-                  ? parseInt(yearMatch[0], 10)
-                  : 1;
-                return (
-                  <button
-                    key={yearOption}
-                    onClick={() => {
-                      setYear(extractedYear);
-                      document
-                        .getElementById('table-possibilities')
-                        ?.scrollIntoView({ behavior: 'smooth' });
-                    }}
-                    className={`rounded border p-4 transition duration-300 ${
-                      year === extractedYear
-                        ? 'bg-blue-500 text-white'
-                        : 'bg-gray-200'
-                    } hover:bg-blue-400 hover:text-white`}
-                  >
-                    {yearOption}
-                  </button>
-                );
-              })}
-            </>
-          ) : (
-            <>
-              {uniqueSemesters.map((semesterOption) => (
-                <button
-                  key={semesterOption}
-                  onClick={() => {
-                    const semesterMatch = semesterOption.match(/\d+/);
-                    const semesterNumber = semesterMatch
-                      ? parseInt(semesterMatch[0], 10)
-                      : 1;
-                    const calculatedYear = Math.ceil(semesterNumber / 2);
-                    setYear(calculatedYear);
-                    setSemester(semesterOption);
-                    document
-                      .getElementById('table-possibilities')
-                      ?.scrollIntoView({ behavior: 'smooth' });
-                  }}
-                  className={`rounded border p-4 transition duration-300 ${
-                    semester === semesterOption
-                      ? 'bg-blue-500 text-white'
-                      : 'bg-gray-200'
-                  } hover:bg-blue-400 hover:text-white`}
-                >
-                  {semesterOption}
-                </button>
-              ))}
-            </>
-          )}
-        </div>
-      </div>
+        {step === 2 && (
+          <div className="col-span-3">
+            <SemesterSelectionPanel
+              isEngineering={isEngineering}
+              uniqueSemesters={uniqueSemesters}
+              uniqueYears={uniqueYears}
+              selectedSemester={semester}
+              selectedYear={year}
+              onYearChange={handleYearChange}
+              onSemesterChange={handleSemesterChange}
+            />
+          </div>
+        )}
 
-      <div
-        className="mx-auto flex h-screen max-w-7xl flex-col items-center justify-center p-4 text-center sm:px-6 lg:px-8 lg:py-10"
-        id="table-possibilities"
-      >
-        <h3 className="mb-4 text-center text-xl font-bold">
-          What are your available time slots?
-        </h3>
-        <div className="grid grid-cols-1 gap-5 p-6 sm:grid-cols-3">
-          <button
-            onClick={() => {
-              handleTimeSlotChange('Morning');
-              document
-                .getElementById('table-possibilities')
-                ?.scrollIntoView({ behavior: 'smooth' });
-            }}
-            className={`mx-auto rounded px-4 py-2 transition duration-300 ${
-              period === 'Morning'
-                ? 'bg-blue-500 text-white'
-                : 'bg-gray-200 text-black'
-            } hover:bg-blue-500 hover:text-white`}
-          >
-            Morning
-          </button>
-
-          <button
-            onClick={() => {
-              handleTimeSlotChange('Afternoon');
-              document
-                .getElementById('table-possibilities')
-                ?.scrollIntoView({ behavior: 'smooth' });
-            }}
-            className={`mx-auto rounded px-4 py-2 transition duration-300 ${
-              period === 'Afternoon'
-                ? 'bg-blue-500 text-white'
-                : 'bg-gray-200 text-black'
-            } hover:bg-blue-500 hover:text-white`}
-          >
-            <p>Afternoon</p>
-          </button>
-          <button
-            onClick={() => {
-              handleTimeSlotChange('Evening');
-              document
-                .getElementById('table-possibilities')
-                ?.scrollIntoView({ behavior: 'smooth' });
-            }}
-            className={`mx-auto rounded px-4 py-2 transition duration-300 ${
-              period === 'Evening'
-                ? 'bg-blue-500 text-white'
-                : 'bg-gray-200 text-black'
-            } hover:bg-blue-500 hover:text-white`}
-          >
-            <p>Evening</p>
-          </button>
-        </div>
-        <CreateStaffAvailability
-          startHour={timeSlot.start}
-          endHour={timeSlot.end}
-          key={weekKey}
-          scheduleId={scheduleId}
-        />
+        {step === 3 && (
+          <div className="col-span-3">
+            <TimeSlotSelectionPanel
+              timeSlots={timeSlots}
+              selectedTimeSlot={period}
+              onTimeSlotChange={handleTimeSlotChange}
+            />
+          </div>
+        )}
       </div>
+      {step === 3 && (
+        <div className="mt-6">
+          <h4 className="mb-4 text-2xl font-bold">Set Your Availability</h4>
+          <CreateStaffAvailability
+            key={weekKey}
+            timeIntervals={timeIntervals}
+            availability={availability}
+            initialAvailability={initialAvailability}
+            setVisibleDayIndex={setVisibleDayIndex}
+            toggleTimeSlot={toggleTimeSlot}
+            visibleDayIndex={visibleDayIndex}
+          />
+        </div>
+      )}
     </div>
   );
 };
