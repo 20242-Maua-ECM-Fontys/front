@@ -1,14 +1,14 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useOutletContext } from 'react-router';
 
 import { ContentLayout } from '@/components/layouts';
 import { useNotifications } from '@/components/ui/notifications';
 import { useCreateStaffAvailability } from '@/features/time-registration/api/create-staff-availability';
 import { useSchedules } from '@/features/time-registration/api/get-all-schedules';
-import { Course_selection } from '@/features/time-registration/components/course_selection';
+import { CourseSelection } from '@/features/time-registration/components/course-selection';
 import { CreateStaffAvailability } from '@/features/time-registration/components/create-staff-availability';
-import { Semester_selection } from '@/features/time-registration/components/semester_selection';
-import { Timeslot_selection } from '@/features/time-registration/components/timeslot_selection';
+import { SemesterSelection } from '@/features/time-registration/components/semester-selection';
+import { TimeslotSelection } from '@/features/time-registration/components/timeslot-selection';
 import type {
   Availability,
   TimeSlot,
@@ -275,7 +275,7 @@ export const TimeRegistrationRoute = () => {
           {/* Dynamic content */}
           {step === 1 && (
             <div className="col-span-3">
-              <Course_selection
+              <CourseSelection
                 courses={courses}
                 selectedCourse={course}
                 onCourseChange={handleCourseChange}
@@ -285,7 +285,7 @@ export const TimeRegistrationRoute = () => {
 
           {step === 2 && (
             <div className="col-span-3">
-              <Semester_selection
+              <SemesterSelection
                 isEngineering={isEngineering}
                 uniqueSemesters={uniqueSemesters}
                 uniqueYears={uniqueYears}
@@ -299,7 +299,7 @@ export const TimeRegistrationRoute = () => {
 
           {step === 3 && (
             <div className="col-span-3">
-              <Timeslot_selection
+              <TimeslotSelection
                 timeSlots={timeSlots}
                 selectedTimeSlot={period}
                 onTimeSlotChange={handleTimeSlotChange}
