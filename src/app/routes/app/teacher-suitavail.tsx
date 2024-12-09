@@ -12,7 +12,7 @@ import {
   CommandItem,
   CommandList,
 } from '@/components/ui/command';
-import { WeekAvailabilityTable } from '@/components/ui/week-availability-update';
+import { WeekAvailabilityTable } from '@/features/coord-avail/components/week-availability-update';
 import { useAvailByProfessor } from '@/features/teacher-avail/api/get-avail-by-professor';
 import { useSubjectsByProfessor } from '@/features/teacher-avail/api/get-subs-by-professor';
 import { toast } from '@/hooks/use-toast';
@@ -111,7 +111,7 @@ export const TeacherSuitAvailRoute = () => {
               className="mt-4 rounded bg-gray-200 px-4 py-2 transition duration-300 hover:bg-blue-400 hover:text-white"
               onClick={() =>
                 document
-                  .getElementById('subject-possibilities')
+                  .getElementById('subject-possibilities.tsx')
                   ?.scrollIntoView({ behavior: 'smooth' })
               }
             >

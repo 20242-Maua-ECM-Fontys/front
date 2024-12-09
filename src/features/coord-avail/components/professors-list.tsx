@@ -28,7 +28,7 @@ export const ProfessorsList = ({
     professorsQuery.refetch();
   };
   return (
-    <div className="flex size-full p-4">
+    <div className="flex w-full p-4">
       <Command className="min-h-[56vh]">
         <h2 className="p-4 text-2xl font-semibold">Professors</h2>
         <CommandInput placeholder="Type a professor name..." />
@@ -42,7 +42,7 @@ export const ProfessorsList = ({
                   onSelect={() => {
                     handleProfessorSelect(professors[Number(professorId)]);
                     document
-                      .getElementById('subject-possibilities')
+                      .getElementById('subject-possibilities.tsx')
                       ?.scrollIntoView({ behavior: 'smooth' });
                   }}
                 >

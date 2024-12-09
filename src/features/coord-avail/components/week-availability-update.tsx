@@ -5,7 +5,7 @@ import { useUpdateAvailability } from '@/api/update-availability';
 import { toast } from '@/hooks/use-toast';
 import type { Availability } from '@/types/api';
 
-import { Button } from './button';
+import { Button } from '../../../components/ui/button';
 
 type WeekDays =
   | 'Monday'
@@ -19,7 +19,9 @@ interface WeekAvailabilityTableProps {
   startHour: string;
   endHour: string;
   initialAvailability: Availability[];
-  userId: number;
+  userId: number | string | undefined;
+  availabilities: Availability[];
+  setAvailabilities: React.Dispatch<React.SetStateAction<Availability[]>>;
 }
 
 const convertTimeStringToDecimal = (timeString: string): number => {
@@ -80,6 +82,7 @@ export const WeekAvailabilityTable: React.FC<WeekAvailabilityTableProps> = ({
   endHour,
   initialAvailability, // Recebendo a lista de disponibilidade
   userId,
+  setAvailabilities,
 }) => {
   const [availability, setAvailability] =
     useState<Availability[]>(initialAvailability);
@@ -136,7 +139,7 @@ export const WeekAvailabilityTable: React.FC<WeekAvailabilityTableProps> = ({
         // Adiciona o novo slot de tempo
         updatedAvailability = [...prev, { startTime, endTime, weekDay }];
       }
-
+      setAvailabilities(updatedAvailability);
       return updatedAvailability;
     });
   };
