@@ -2,21 +2,24 @@ import React, { useEffect, useState } from 'react';
 
 import { useProfessorId } from '@/api/get-professor-id';
 import { useSubjects } from '@/api/get-subjects';
-import { useUpdateAvailability } from '@/api/update-availability';
 import { useUpdateSubjects } from '@/api/update-subjects';
 import { ContentLayout } from '@/components/layouts';
 import { ProfessorsList } from '@/features/coord-avail/components/professors-list';
 import { SubjectPossibilities } from '@/features/coord-avail/components/subject-possibilities';
 import { TablePossibilities } from '@/features/coord-avail/components/table-possibilities';
 import { toast } from '@/hooks/use-toast';
-import { Availability,Professor } from '@/types/api';
-let availabilities: Availability[];
+import { Availability, Professor } from '@/types/api';
+import { useOutletContext } from 'react-router';
+type DashboardContext = {
+  setTitle: (title: string) => void;
+};
 export const CoordinatorSuitAvailRoute = () => {
   const [step, setStep] = useState(1); // Active panel step
   const [selectedSubjects, setSelectedSubjects] = useState<string[]>([]);
   const [selectedProfessor, setSelectedProfessor] =
     useState<Professor | null>();
   const [availabilities, setAvailabilities] = useState<Availability[]>([]); // Track availability
+  const { setTitle } = useOutletContext<DashboardContext>();
 
   const professorRoleQuery = useProfessorId({
     email: selectedProfessor?.email ?? '',
@@ -49,6 +52,7 @@ export const CoordinatorSuitAvailRoute = () => {
   });
 
   useEffect(() => {
+    setTitle('Teachers'); // Set the desired title
     if (selectedProfessor) {
       professorRoleQuery.refetch();
     }

@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useOutletContext } from 'react-router';
 
 import { ContentLayout } from '@/components/layouts';
 import { useNotifications } from '@/components/ui/notifications';
@@ -18,7 +19,7 @@ import {
   generateCustomTimeIntervals,
 } from '@/features/time-registration/utils/create-staff-availability';
 import type { Schedule } from '@/types/api';
-import { useOutletContext } from 'react-router';
+
 type DashboardContext = {
   setTitle: (title: string) => void;
 };

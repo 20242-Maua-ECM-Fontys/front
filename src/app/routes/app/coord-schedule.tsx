@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { useEffect, useRef, useState } from 'react';
+import { useOutletContext } from 'react-router';
 
 import { CalendarView } from '@/components/ui/calendar/calendar-view';
 import {
@@ -11,6 +12,9 @@ import {
   CommandList,
 } from '@/components/ui/command';
 
+type DashboardContext = {
+  setTitle: (title: string) => void;
+};
 export const CoordScheduleRoute = () => {
   interface AvailabilityFullfilled {
     userId: number;
@@ -27,7 +31,9 @@ export const CoordScheduleRoute = () => {
       possibilityId: string;
     };
   }
-
+  useEffect(() => {
+    setTitle('Schedule Editor'); // Set the desired title
+  });
   // const { instance } = useMsal();
   // const currentAccount = instance.getActiveAccount();
 
@@ -43,6 +49,7 @@ export const CoordScheduleRoute = () => {
   >([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { setTitle } = useOutletContext<DashboardContext>();
 
   const scheduleTableRef = useRef<HTMLDivElement>(null);
   const calendarViewRef = useRef<HTMLDivElement>(null);

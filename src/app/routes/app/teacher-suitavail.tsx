@@ -1,11 +1,14 @@
 import { useMsal } from '@azure/msal-react';
-import React from 'react';
+import React, { useEffect } from 'react';
 
 import { useRole } from '@/api/get-role-by-email';
 import { ContentLayout } from '@/components/layouts';
 import { SubjectPossibilities } from '@/features/teacher-avail/components/subject-possibilities';
 import { TablePossibilities } from '@/features/teacher-avail/components/table-possibilities';
-
+import { useOutletContext } from 'react-router-dom';
+type DashboardContext = {
+  setTitle: (title: string) => void;
+};
 export const TeacherSuitAvailRoute = () => {
   const { instance } = useMsal();
   const currentAccount = instance.getActiveAccount();
@@ -13,7 +16,11 @@ export const TeacherSuitAvailRoute = () => {
   const [step, setStep] = React.useState(1);
   const userId = roleQuery.data?.userId;
   const [selectedSubjects, setSelectedSubjects] = React.useState<string[]>([]);
+  const { setTitle } = useOutletContext<DashboardContext>();
 
+  useEffect(() => {
+    setTitle('Availability'); // Set the desired title
+  });
   return (
     <ContentLayout title="Time Registration">
       <div>
