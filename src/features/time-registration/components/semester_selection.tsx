@@ -10,7 +10,7 @@ type SemesterSelectionProps = {
   isEngineering: boolean;
 };
 
-export const SemesterSelectionPanel: React.FC<SemesterSelectionProps> = ({
+export const Semester_selection: React.FC<SemesterSelectionProps> = ({
   uniqueYears,
   uniqueSemesters,
   selectedSemester,

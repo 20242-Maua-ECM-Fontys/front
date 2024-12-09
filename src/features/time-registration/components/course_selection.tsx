@@ -6,7 +6,7 @@ type Props = {
   onCourseChange: (course: string) => void;
 };
 
-export const CourseSelectionPanel: React.FC<Props> = ({
+export const Course_selection: React.FC<Props> = ({
   courses,
   selectedCourse,
   onCourseChange,

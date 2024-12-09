@@ -6,7 +6,7 @@ type TimeSlotSelectionProps = {
   onTimeSlotChange: (timeSlot: string) => void;
 };
 
-export const TimeSlotSelectionPanel: React.FC<TimeSlotSelectionProps> = ({
+export const Timeslot_selection: React.FC<TimeSlotSelectionProps> = ({
   timeSlots,
   selectedTimeSlot,
   onTimeSlotChange,

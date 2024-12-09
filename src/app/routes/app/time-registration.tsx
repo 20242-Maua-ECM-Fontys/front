@@ -3,10 +3,10 @@ import React, { useEffect, useState } from 'react';
 import { useNotifications } from '@/components/ui/notifications';
 import { useCreateStaffAvailability } from '@/features/time-registration/api/create-staff-availability';
 import { useSchedules } from '@/features/time-registration/api/get-all-schedules';
-import { CourseSelectionPanel } from '@/features/time-registration/components/CourseSelectionPanel';
+import { Course_selection } from '@/features/time-registration/components/course_selection';
 import { CreateStaffAvailability } from '@/features/time-registration/components/create-staff-availability';
-import { SemesterSelectionPanel } from '@/features/time-registration/components/SemesterSelectionPanel';
-import { TimeSlotSelectionPanel } from '@/features/time-registration/components/TimeSlotSelectionPanel';
+import { Semester_selection } from '@/features/time-registration/components/semester_selection';
+import { Timeslot_selection } from '@/features/time-registration/components/timeslot_selection';
 import type {
   Availability,
   TimeSlot,
@@ -245,9 +245,9 @@ export const TimeRegistrationRoute = () => {
         {/* Submit button */}
         <div className="text-center">
           <button
-            disabled={!course || (!semester && !year) || !period}
+            disabled={!course || (!semester && !year)}
             className={`rounded-md border-2 px-6 py-3 text-white transition-all duration-300 ${
-              course && (semester || year) && period
+              course && (semester || year)
                 ? 'border-green-500 bg-green-200 hover:bg-green-300'
                 : 'cursor-not-allowed border-gray-300 bg-gray-200'
             }`}
@@ -267,7 +267,7 @@ export const TimeRegistrationRoute = () => {
         {/* Dynamic content */}
         {step === 1 && (
           <div className="col-span-3">
-            <CourseSelectionPanel
+            <Course_selection
               courses={courses}
               selectedCourse={course}
               onCourseChange={handleCourseChange}
@@ -277,7 +277,7 @@ export const TimeRegistrationRoute = () => {
 
         {step === 2 && (
           <div className="col-span-3">
-            <SemesterSelectionPanel
+            <Semester_selection
               isEngineering={isEngineering}
               uniqueSemesters={uniqueSemesters}
               uniqueYears={uniqueYears}
@@ -291,7 +291,7 @@ export const TimeRegistrationRoute = () => {
 
         {step === 3 && (
           <div className="col-span-3">
-            <TimeSlotSelectionPanel
+            <Timeslot_selection
               timeSlots={timeSlots}
               selectedTimeSlot={period}
               onTimeSlotChange={handleTimeSlotChange}
