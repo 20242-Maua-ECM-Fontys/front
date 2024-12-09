@@ -4,7 +4,9 @@ import { ContentLayout } from '@/components/layouts';
 import { useOutletContext } from 'react-router-dom';
 import { useEffect } from 'react';
 type DashboardContext = {
+  // set title to empty string
   setTitle: (title: string) => void;
+
 };
 import AnimatedGridPattern from '@/components/ui/animated-grid-pattern';
 

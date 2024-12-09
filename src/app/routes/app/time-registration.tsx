@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 
+import { ContentLayout } from '@/components/layouts';
 import { useNotifications } from '@/components/ui/notifications';
 import { useCreateStaffAvailability } from '@/features/time-registration/api/create-staff-availability';
 import { useSchedules } from '@/features/time-registration/api/get-all-schedules';
@@ -17,7 +18,10 @@ import {
   generateCustomTimeIntervals,
 } from '@/features/time-registration/utils/create-staff-availability';
 import type { Schedule } from '@/types/api';
-
+import { useOutletContext } from 'react-router';
+type DashboardContext = {
+  setTitle: (title: string) => void;
+};
 const initialAvailability: Availability = {
   MON: [],
   TUE: [],
@@ -96,6 +100,7 @@ export const TimeRegistrationRoute = () => {
   const [weekKey, setWeekKey] = useState(0);
   const [isEngineering, setIsEngineering] = useState(false);
   const [uniqueYears, setUniqueYears] = useState<string[]>([]);
+  const { setTitle } = useOutletContext<DashboardContext>();
 
   const handleSemesterChange = (semesterOption: string) => {
     setSemester(semesterOption);
@@ -146,6 +151,7 @@ export const TimeRegistrationRoute = () => {
   const courses = Object.keys(schedules || {});
 
   useEffect(() => {
+    setTitle('Register your time here'); // Set the desired title
     if (course) {
       setIsEngineering(course.includes('Engineering'));
     }
@@ -201,118 +207,120 @@ export const TimeRegistrationRoute = () => {
   };
 
   return (
-    <div>
-      <div className="mb-6 flex items-center justify-center gap-4 sm:flex-wrap md:flex-nowrap md:justify-around">
-        {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/no-static-element-interactions */}
-        <div
-          className={`mx-4 flex h-20 w-full flex-col items-center justify-center rounded-md border-2 p-6 text-center opacity-100 transition-all duration-300 ease-in-out hover:cursor-pointer ${
-            course
-              ? 'border-blue-500 bg-blue-100 hover:bg-blue-200'
-              : 'border-transparent bg-gray-200 hover:bg-gray-300'
-          }`}
-          onClick={() => setStep(1)}
-        >
-          <h4 className="text-lg font-semibold">Course</h4>
-          {course && <p>{course}</p>}
-        </div>
-
-        {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/no-static-element-interactions */}
-        <div
-          className={`mx-4 flex h-20 w-full flex-col items-center justify-center rounded-md border-2 p-6 text-center opacity-100 transition-all duration-300 ease-in-out hover:cursor-pointer ${
-            semester || year
-              ? 'border-blue-500 bg-blue-100 hover:bg-blue-200'
-              : 'border-transparent bg-gray-200 hover:bg-gray-300'
-          }`}
-          onClick={() => setStep(2)}
-        >
-          <h4 className="text-lg font-semibold">Semester</h4>
-          {semester && <p>{semester}</p>}
-        </div>
-
-        {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/no-static-element-interactions */}
-        <div
-          className={`mx-4 flex h-20 w-full flex-col items-center justify-center rounded-md border-2 p-6 text-center opacity-100 transition-all duration-300 ease-in-out hover:cursor-pointer ${
-            period
-              ? 'border-blue-500 bg-blue-100 hover:bg-blue-200'
-              : 'border-transparent bg-gray-200 hover:bg-gray-300'
-          }`}
-          onClick={() => setStep(3)}
-        >
-          <h4 className="text-lg font-semibold">Time Slot</h4>
-          {period && <p>{period}</p>}
-        </div>
-
-        {/* Submit button */}
-        <div className="text-center">
-          <button
-            disabled={!course || (!semester && !year)}
-            className={`rounded-md border-2 px-6 py-3 text-white transition-all duration-300 ${
-              course && (semester || year)
-                ? 'border-green-500 bg-green-200 hover:bg-green-300'
-                : 'cursor-not-allowed border-gray-300 bg-gray-200'
+    <ContentLayout title="Time Registration">
+      <div>
+        <div className="mb-6 flex items-center justify-center gap-4 sm:flex-wrap md:flex-nowrap md:justify-around">
+          {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/no-static-element-interactions */}
+          <div
+            className={`mx-4 flex h-20 w-full flex-col items-center justify-center rounded-md border-2 p-6 text-center opacity-100 transition-all duration-300 ease-in-out hover:cursor-pointer ${
+              course
+                ? 'border-blue-500 bg-blue-100 hover:bg-blue-200'
+                : 'border-transparent bg-gray-200 hover:bg-gray-300'
             }`}
-            onClick={() => {
-              createStaffAvailabilityMutation.mutate({
-                scheduleId: scheduleId,
-                data: formatAvailability(availability),
-              });
-            }}
+            onClick={() => setStep(1)}
           >
-            <p className="font-medium text-black">Submit</p>
-          </button>
+            <h4 className="text-lg font-semibold">Course</h4>
+            {course && <p>{course}</p>}
+          </div>
+
+          {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/no-static-element-interactions */}
+          <div
+            className={`mx-4 flex h-20 w-full flex-col items-center justify-center rounded-md border-2 p-6 text-center opacity-100 transition-all duration-300 ease-in-out hover:cursor-pointer ${
+              semester || year
+                ? 'border-blue-500 bg-blue-100 hover:bg-blue-200'
+                : 'border-transparent bg-gray-200 hover:bg-gray-300'
+            }`}
+            onClick={() => setStep(2)}
+          >
+            <h4 className="text-lg font-semibold">Semester</h4>
+            {semester && <p>{semester}</p>}
+          </div>
+
+          {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/no-static-element-interactions */}
+          <div
+            className={`mx-4 flex h-20 w-full flex-col items-center justify-center rounded-md border-2 p-6 text-center opacity-100 transition-all duration-300 ease-in-out hover:cursor-pointer ${
+              period
+                ? 'border-blue-500 bg-blue-100 hover:bg-blue-200'
+                : 'border-transparent bg-gray-200 hover:bg-gray-300'
+            }`}
+            onClick={() => setStep(3)}
+          >
+            <h4 className="text-lg font-semibold">Time Slot</h4>
+            {period && <p>{period}</p>}
+          </div>
+
+          {/* Submit button */}
+          <div className="text-center">
+            <button
+              disabled={!course || (!semester && !year)}
+              className={`rounded-md border-2 px-6 py-3 text-white transition-all duration-300 ${
+                course && (semester || year)
+                  ? 'border-green-500 bg-green-200 hover:bg-green-300'
+                  : 'cursor-not-allowed border-gray-300 bg-gray-200'
+              }`}
+              onClick={() => {
+                createStaffAvailabilityMutation.mutate({
+                  scheduleId: scheduleId,
+                  data: formatAvailability(availability),
+                });
+              }}
+            >
+              <p className="font-medium text-black">Submit</p>
+            </button>
+          </div>
         </div>
-      </div>
 
-      <div className="grid grid-cols-3 gap-6">
-        {/* Dynamic content */}
-        {step === 1 && (
-          <div className="col-span-3">
-            <Course_selection
-              courses={courses}
-              selectedCourse={course}
-              onCourseChange={handleCourseChange}
-            />
-          </div>
-        )}
+        <div className="grid grid-cols-3 gap-6">
+          {/* Dynamic content */}
+          {step === 1 && (
+            <div className="col-span-3">
+              <Course_selection
+                courses={courses}
+                selectedCourse={course}
+                onCourseChange={handleCourseChange}
+              />
+            </div>
+          )}
 
-        {step === 2 && (
-          <div className="col-span-3">
-            <Semester_selection
-              isEngineering={isEngineering}
-              uniqueSemesters={uniqueSemesters}
-              uniqueYears={uniqueYears}
-              selectedSemester={semester}
-              selectedYear={year}
-              onYearChange={handleYearChange}
-              onSemesterChange={handleSemesterChange}
-            />
-          </div>
-        )}
+          {step === 2 && (
+            <div className="col-span-3">
+              <Semester_selection
+                isEngineering={isEngineering}
+                uniqueSemesters={uniqueSemesters}
+                uniqueYears={uniqueYears}
+                selectedSemester={semester}
+                selectedYear={year}
+                onYearChange={handleYearChange}
+                onSemesterChange={handleSemesterChange}
+              />
+            </div>
+          )}
 
+          {step === 3 && (
+            <div className="col-span-3">
+              <Timeslot_selection
+                timeSlots={timeSlots}
+                selectedTimeSlot={period}
+                onTimeSlotChange={handleTimeSlotChange}
+              />
+            </div>
+          )}
+        </div>
         {step === 3 && (
-          <div className="col-span-3">
-            <Timeslot_selection
-              timeSlots={timeSlots}
-              selectedTimeSlot={period}
-              onTimeSlotChange={handleTimeSlotChange}
+          <div className="mt-6">
+            <h4 className="mb-4 text-2xl font-bold">Set Your Availability</h4>
+            <CreateStaffAvailability
+              key={weekKey}
+              timeIntervals={timeIntervals}
+              availability={availability}
+              initialAvailability={initialAvailability}
+              setVisibleDayIndex={setVisibleDayIndex}
+              toggleTimeSlot={toggleTimeSlot}
+              visibleDayIndex={visibleDayIndex}
             />
           </div>
         )}
       </div>
-      {step === 3 && (
-        <div className="mt-6">
-          <h4 className="mb-4 text-2xl font-bold">Set Your Availability</h4>
-          <CreateStaffAvailability
-            key={weekKey}
-            timeIntervals={timeIntervals}
-            availability={availability}
-            initialAvailability={initialAvailability}
-            setVisibleDayIndex={setVisibleDayIndex}
-            toggleTimeSlot={toggleTimeSlot}
-            visibleDayIndex={visibleDayIndex}
-          />
-        </div>
-      )}
-    </div>
+    </ContentLayout>
   );
 };
