@@ -62,7 +62,7 @@ export const SubjectPossibilities = ({
           <Button
             onClick={() => {
               document
-                .getElementById('table-possibilities')
+                .getElementById('table-possibilities.tsx')
                 ?.scrollIntoView({ behavior: 'smooth' });
               if (professorUserId !== undefined) {
                 updateSubjectsMutation.mutate({
