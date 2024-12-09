@@ -46,7 +46,9 @@ export const SubjectPossibilities = ({
             {subjectsData?.map((subject) => (
               <CommandItem
                 key={subject.codeSubject}
-                onSelect={() => handleSubjectAdd(subject.codeSubject)}
+                onSelect={() => {
+                  handleSubjectAdd(subject.codeSubject)
+                }}
               >
                 {subject.subjectName}
               </CommandItem>

@@ -28,27 +28,11 @@ export const CoordinatorSuitAvailRoute = () => {
 
   const subjectsQuery = useSubjects({});
   const subjectsData = subjectsQuery.data?.subjects;
-  const updateAvailabilityMutation = useUpdateAvailability({
-    mutationConfig: {
-      onSuccess: () => {
-        toast({
-          title: 'Success',
-          description: 'Availability updated successfully',
-        });
-      },
-      onError: () => {
-        toast({
-          variant: 'destructive',
-          title: 'Error',
-          description: 'Error updating availability',
-        });
-      },
-    },
-  });
 
   const updateSubjectsMutation = useUpdateSubjects({
     mutationConfig: {
       onSuccess: () => {
+        setStep(3);
         toast({
           title: 'Success',
           description: 'Subjects updated successfully',
@@ -112,34 +96,6 @@ export const CoordinatorSuitAvailRoute = () => {
           >
             <h4 className="text-lg font-semibold">Time Slot</h4>
           </div>
-
-          {/* Submit button */}
-          <div className="text-center">
-            <button
-              disabled={!selectedProfessor || !(selectedSubjects.length > 0)}
-              className={`rounded-md border-2 px-6 py-3 text-white transition-all duration-300 ${
-                selectedProfessor && selectedSubjects
-                  ? 'border-green-500 bg-green-200 hover:bg-green-300'
-                  : 'cursor-not-allowed border-gray-300 bg-gray-200'
-              }`}
-              onClick={() => {
-                if (professorUserId !== undefined) {
-                  updateAvailabilityMutation.mutate({
-                    userId: professorUserId,
-                    availabilities: availabilities,
-                  });
-                } else {
-                  toast({
-                    variant: 'destructive',
-                    title: 'Error',
-                    description: 'User ID is null',
-                  });
-                }
-              }}
-            >
-              <p className="font-medium text-black">Submit</p>
-            </button>
-          </div>
         </div>
 
         <div className="grid grid-cols-3 gap-6">
@@ -153,6 +109,7 @@ export const CoordinatorSuitAvailRoute = () => {
                 <ProfessorsList
                   setSelectedSubjects={setSelectedSubjects}
                   setSelectedProfessor={setSelectedProfessor}
+                  setStep={setStep}
                 />
               </div>
             </div>

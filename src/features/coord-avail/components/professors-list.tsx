@@ -13,11 +13,13 @@ import { useProfessors } from '../api/get-professors';
 type ProfessorsListProps = {
   setSelectedSubjects: (subjects: string[]) => void;
   setSelectedProfessor: (professor: Professor) => void;
+  setStep:  React.Dispatch<React.SetStateAction<number>>;
 };
 
 export const ProfessorsList = ({
   setSelectedSubjects,
   setSelectedProfessor,
+  setStep,
 }: ProfessorsListProps) => {
   const professorsQuery = useProfessors({});
   const professors = professorsQuery.data?.professors;
@@ -41,9 +43,7 @@ export const ProfessorsList = ({
                   key={professorId}
                   onSelect={() => {
                     handleProfessorSelect(professors[Number(professorId)]);
-                    document
-                      .getElementById('subject-possibilities.tsx')
-                      ?.scrollIntoView({ behavior: 'smooth' });
+                    setStep(2);
                   }}
                 >
                   {professors[Number(professorId)].name}
