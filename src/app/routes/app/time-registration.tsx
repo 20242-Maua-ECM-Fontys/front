@@ -156,7 +156,7 @@ export const TimeRegistrationRoute = () => {
     if (course) {
       setIsEngineering(course.includes('Engineering'));
     }
-  }, [course]);
+  }, [course, setTitle]);
 
   const getScheduleId = () => {
     if (schedules && course && year) {

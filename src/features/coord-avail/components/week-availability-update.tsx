@@ -2,10 +2,9 @@ import { ArrowRight, ArrowLeft } from 'lucide-react';
 import React, { useState } from 'react';
 
 import { useUpdateAvailability } from '@/api/update-availability';
+import { Button } from '@/components/ui/button';
 import { toast } from '@/hooks/use-toast';
 import type { Availability } from '@/types/api';
-
-import { Button } from '@/components/ui/button';
 
 type WeekDays =
   | 'Monday'

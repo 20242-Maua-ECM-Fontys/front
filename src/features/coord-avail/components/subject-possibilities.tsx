@@ -1,4 +1,6 @@
 import React from 'react';
+
+import { Button } from '@/components/ui/button';
 import {
   Command,
   CommandEmpty,
@@ -7,7 +9,6 @@ import {
   CommandItem,
   CommandList,
 } from '@/components/ui/command';
-import { Button } from '@/components/ui/button';
 import { toast } from '@/hooks/use-toast';
 import type { Subject, Professor } from '@/types/api';
 
@@ -47,7 +48,7 @@ export const SubjectPossibilities = ({
               <CommandItem
                 key={subject.codeSubject}
                 onSelect={() => {
-                  handleSubjectAdd(subject.codeSubject)
+                  handleSubjectAdd(subject.codeSubject);
                 }}
               >
                 {subject.subjectName}

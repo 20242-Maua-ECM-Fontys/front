@@ -1,14 +1,14 @@
 import { useMsal } from '@azure/msal-react';
+import { useEffect } from 'react';
+import { useOutletContext } from 'react-router-dom';
 
 import { ContentLayout } from '@/components/layouts';
-import { useOutletContext } from 'react-router-dom';
-import { useEffect } from 'react';
+import AnimatedGridPattern from '@/components/ui/animated-grid-pattern';
+
 type DashboardContext = {
   // set title to empty string
   setTitle: (title: string) => void;
-
 };
-import AnimatedGridPattern from '@/components/ui/animated-grid-pattern';
 
 export const DashboardRoute = () => {
   const { accounts } = useMsal();

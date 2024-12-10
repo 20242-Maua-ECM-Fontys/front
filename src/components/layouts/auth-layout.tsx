@@ -2,8 +2,8 @@ import { useMsal } from '@azure/msal-react';
 import * as React from 'react';
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Circles from '@/assets/images/Circles.svg';
 
+import Circles from '@/assets/images/Circles.svg';
 import logo from '@/assets/images/MauaGrid-logo.svg';
 import { Head } from '@/components/seo';
 import { Link } from '@/components/ui/link';
@@ -27,13 +27,12 @@ export const AuthLayout = ({ children, title }: LayoutProps) => {
     <>
       <Head title={title} />
       <div className="flex min-h-screen flex-col items-center justify-center sm:px-6 lg:px-8">
-        <div className=" w-[40rem] h-[25rem] rounded-2xl   flex-col flex items-center justify-center">
+        <div className="flex h-[25rem] w-[40rem] flex-col items-center justify-center rounded-2xl">
           <div className="flex flex-col items-center sm:mx-auto sm:w-full sm:max-w-md">
             <Link className="flex items-center" to="/">
               <img className="h-24 w-auto" src={logo} alt="Workflow" />
             </Link>
-            <h2
-              className="w-80 text-center text-xl font-extrabold leading-relaxed text-gray-500 sm:w-[50rem] sm:leading-normal">
+            <h2 className="w-80 text-center text-xl font-extrabold leading-relaxed text-gray-500 sm:w-[50rem] sm:leading-normal">
               Building your Schedules in a straightforward manner
             </h2>
           </div>

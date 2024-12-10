@@ -13,7 +13,7 @@ import { useProfessors } from '../api/get-professors';
 type ProfessorsListProps = {
   setSelectedSubjects: (subjects: string[]) => void;
   setSelectedProfessor: (professor: Professor) => void;
-  setStep:  React.Dispatch<React.SetStateAction<number>>;
+  setStep: React.Dispatch<React.SetStateAction<number>>;
 };
 
 export const ProfessorsList = ({

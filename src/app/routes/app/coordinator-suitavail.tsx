@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useOutletContext } from 'react-router';
 
 import { useProfessorId } from '@/api/get-professor-id';
 import { useSubjects } from '@/api/get-subjects';
@@ -9,7 +10,6 @@ import { SubjectPossibilities } from '@/features/coord-avail/components/subject-
 import { TablePossibilities } from '@/features/coord-avail/components/table-possibilities';
 import { toast } from '@/hooks/use-toast';
 import { Availability, Professor } from '@/types/api';
-import { useOutletContext } from 'react-router';
 type DashboardContext = {
   setTitle: (title: string) => void;
 };
@@ -56,7 +56,7 @@ export const CoordinatorSuitAvailRoute = () => {
     if (selectedProfessor) {
       professorRoleQuery.refetch();
     }
-  }, [selectedProfessor]);
+  }, [professorRoleQuery, selectedProfessor, setTitle]);
 
   return (
     <ContentLayout title="Time Registration">

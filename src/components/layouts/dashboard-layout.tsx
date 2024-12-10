@@ -11,7 +11,6 @@ import {
 } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { useNavigate, NavLink, useNavigation } from 'react-router-dom';
-import { Outlet } from 'react-router-dom';
 
 import { Button } from '@/components/ui/button';
 import { Drawer, DrawerContent, DrawerTrigger } from '@/components/ui/drawer';
@@ -80,7 +79,13 @@ const Progress = () => {
   );
 };
 
-export function DashboardLayout({ children, title }: { children: React.ReactNode; title?: string }) {
+export function DashboardLayout({
+  children,
+  title,
+}: {
+  children: React.ReactNode;
+  title?: string;
+}) {
   const navigate = useNavigate();
   const { accounts, instance } = useMsal();
   const { role } = useUser();
@@ -194,8 +199,7 @@ export function DashboardLayout({ children, title }: { children: React.ReactNode
         </nav>
       </aside>
       <div className="flex flex-col sm:gap-4 sm:py-4 sm:pl-60">
-        <header
-          className="sticky top-0 z-30 flex h-14 items-center justify-between gap-4 border-b bg-background px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6">
+        <header className="sticky top-0 z-30 flex h-14 items-center justify-between gap-4 border-b bg-background px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6">
           <Drawer>
             <DrawerTrigger asChild>
               <Button size="icon" variant="outline" className="sm:hidden">

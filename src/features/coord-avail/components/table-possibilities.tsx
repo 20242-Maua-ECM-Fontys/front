@@ -1,4 +1,5 @@
 import React from 'react';
+
 import { WeekAvailabilityTable } from '@/features/coord-avail/components/week-availability-update';
 import { Availability } from '@/types/api';
 

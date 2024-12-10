@@ -64,7 +64,7 @@ export const SubjectPossibilities = ({
 
   return (
     <div className="w-full">
-      <div className="mx-auto max-w-7xl p-4 px-4 text-center sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-7xl p-4 text-center sm:px-6 lg:px-8">
         <h2 className="text-2xl font-semibold">Selected Subjects:</h2>
         <div className="flex flex-wrap justify-center gap-2 text-center">
           {selectedSubjects.length === 0 ? (

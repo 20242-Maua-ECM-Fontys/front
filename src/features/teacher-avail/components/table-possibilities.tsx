@@ -1,5 +1,6 @@
-import { WeekAvailabilityTable } from '@/features/coord-avail/components/week-availability-update';
 import { useEffect, useState } from 'react';
+
+import { WeekAvailabilityTable } from '@/features/coord-avail/components/week-availability-update';
 import { useAvailByProfessor } from '@/features/teacher-avail/api/get-avail-by-professor';
 import type { Availability } from '@/types/api';
 

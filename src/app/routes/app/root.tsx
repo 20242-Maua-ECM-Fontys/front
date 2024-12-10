@@ -1,8 +1,9 @@
-import { Suspense, useState, useEffect } from 'react';
+import { Suspense, useState } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
-import { Outlet, useLocation, useOutletContext } from 'react-router-dom';
+import { Outlet, useLocation } from 'react-router-dom';
 
 import { Spinner } from '@/components/ui/spinner';
+
 import { DashboardLayout } from '../../../components/layouts/dashboard-layout';
 
 export const AppRoot = () => {
