@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { useEffect, useRef, useState } from 'react';
 
+import { useRole } from '@/api/get-role-by-email';
 import { CalendarView } from '@/components/ui/calendar/calendar-view';
 import {
   Command,
@@ -10,6 +11,7 @@ import {
   CommandItem,
   CommandList,
 } from '@/components/ui/command';
+import { useMsal } from '@azure/msal-react';
 
 export const CoordScheduleRoute = () => {
   interface AvailabilityFullfilled {
@@ -28,13 +30,13 @@ export const CoordScheduleRoute = () => {
     };
   }
 
-  // const { instance } = useMsal();
-  // const currentAccount = instance.getActiveAccount();
+  const { instance } = useMsal();
+  const currentAccount = instance.getActiveAccount();
 
-  // const roleQuery = useRole({ email: currentAccount?.username ?? '' });
+  const roleQuery = useRole({ email: currentAccount?.username ?? '' });
 
-  // const userId = roleQuery.data?.userId;
-  const userId = 2;
+  const userId = roleQuery.data?.userId;
+  // const userId = 2;
 
   const [schedules, setSchedules] = useState<Record<string, any> | null>(null);
   const [selectedSchedule, setSelectedSchedule] = useState<string>('');
