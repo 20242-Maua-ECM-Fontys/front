@@ -1,3 +1,4 @@
+import { useMsal } from '@azure/msal-react';
 import axios from 'axios';
 import { useEffect, useRef, useState } from 'react';
 import { useOutletContext } from 'react-router';
@@ -12,7 +13,6 @@ import {
   CommandItem,
   CommandList,
 } from '@/components/ui/command';
-import { useMsal } from '@azure/msal-react';
 
 type DashboardContext = {
   setTitle: (title: string) => void;
@@ -38,10 +38,8 @@ export const CoordScheduleRoute = () => {
     setTitle('Schedule Editor'); // Set the desired title
   });
 
-
   const { instance } = useMsal();
   const currentAccount = instance.getActiveAccount();
-
 
   const roleQuery = useRole({ email: currentAccount?.username ?? '' });
 

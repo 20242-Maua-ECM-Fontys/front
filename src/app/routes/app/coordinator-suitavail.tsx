@@ -9,7 +9,7 @@ import { ProfessorsList } from '@/features/coord-avail/components/professors-lis
 import { SubjectPossibilities } from '@/features/coord-avail/components/subject-possibilities';
 import { TablePossibilities } from '@/features/coord-avail/components/table-possibilities';
 import { toast } from '@/hooks/use-toast';
-import { Availability, Professor } from '@/types/api';
+import { Professor } from '@/types/api';
 type DashboardContext = {
   setTitle: (title: string) => void;
 };
@@ -18,7 +18,6 @@ export const CoordinatorSuitAvailRoute = () => {
   const [selectedSubjects, setSelectedSubjects] = useState<string[]>([]);
   const [selectedProfessor, setSelectedProfessor] =
     useState<Professor | null>();
-  const [availabilities, setAvailabilities] = useState<Availability[]>([]); // Track availability
   const { setTitle } = useOutletContext<DashboardContext>();
 
   const professorRoleQuery = useProfessorId({
@@ -136,8 +135,6 @@ export const CoordinatorSuitAvailRoute = () => {
               <TablePossibilities
                 professorUserId={professorUserId}
                 selectedProfessor={selectedProfessor}
-                availabilities={availabilities}
-                setAvailabilities={setAvailabilities}
               />
             </div>
           )}
