@@ -84,8 +84,7 @@ export const CoordinatorSuitAvailRoute = () => {
             }`}
             onClick={() => setStep(2)}
           >
-            <h4 className="text-lg font-semibold">Select Subjects</h4>
-            {selectedSubjects && <p>{selectedSubjects.length}</p>}
+            <h4 className="text-lg font-semibold">Select Suitabilities</h4>
           </div>
 
           {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/no-static-element-interactions */}
@@ -98,7 +97,7 @@ export const CoordinatorSuitAvailRoute = () => {
             }`}
             onClick={() => setStep(3)}
           >
-            <h4 className="text-lg font-semibold">Time Slot</h4>
+            <h4 className="text-lg font-semibold">Select Availabilities</h4>
           </div>
         </div>
 

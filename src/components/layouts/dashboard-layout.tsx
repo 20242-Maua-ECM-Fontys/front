@@ -89,7 +89,6 @@ export function DashboardLayout({
   const navigate = useNavigate();
   const { accounts, instance } = useMsal();
   const { role } = useUser();
-  console.log(role);
 
   useEffect(() => {
     if (accounts.length === 0) {
@@ -130,11 +129,23 @@ export function DashboardLayout({
         icon: CalendarClock,
       });
     } else if (role === 'COORDINATOR') {
-      baseItems.push({
-        name: 'Teachers',
-        to: 'coord-suitavail',
-        icon: GraduationCap,
-      });
+      baseItems.push(
+        {
+          name: 'Teachers',
+          to: 'coord-suitavail',
+          icon: GraduationCap,
+        },
+        {
+          name: 'Availability',
+          to: 'teacher-suitavail',
+          icon: CalendarClock,
+        },
+        {
+          name: 'Schedule Edit',
+          to: 'coord-schedule',
+          icon: Calendar,
+        },
+      );
     } else if (role === 'ADMIN') {
       baseItems.push(
         {

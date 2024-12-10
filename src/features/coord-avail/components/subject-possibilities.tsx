@@ -39,6 +39,25 @@ export const SubjectPossibilities = ({
 
   return (
     <div id="subject-possibilities" className="">
+      <div className="mx-auto max-w-7xl p-4 text-center sm:px-6 lg:px-8">
+        <h2 className="text-2xl font-semibold">Selected Subjects:</h2>
+        <div className="flex flex-wrap justify-center gap-2 text-center">
+          {selectedSubjects.length === 0 ? (
+            <span className="rounded bg-gray-200 px-3 py-1 text-gray-800">
+              No subjects selected
+            </span>
+          ) : (
+            selectedSubjects.map((subject) => (
+              <span
+                key={subject}
+                className="flex items-center gap-2 rounded bg-green-400 px-3 py-1"
+              >
+                {subject}
+              </span>
+            ))
+          )}
+        </div>
+      </div>
       <Command className="min-h-[49vh]">
         <CommandInput placeholder="Type a subject name..." />
         <CommandList>
