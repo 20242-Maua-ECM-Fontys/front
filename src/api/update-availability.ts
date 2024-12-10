@@ -9,7 +9,7 @@ export const updateAvailability = ({
   userId,
 }: {
   availabilities: Availability[];
-  userId: number;
+  userId: number | string;
 }): Promise<string> => {
   return api.put('/update_availabilities', {
     userId,

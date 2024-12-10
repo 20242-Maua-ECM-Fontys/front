@@ -1,28 +1,25 @@
-import { randUuid } from '@ngneat/falso';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useOutletContext } from 'react-router';
 
 import { useProfessorId } from '@/api/get-professor-id';
 import { useSubjects } from '@/api/get-subjects';
 import { useUpdateSubjects } from '@/api/update-subjects';
-import { Button } from '@/components/ui/button';
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from '@/components/ui/command';
-import { WeekAvailabilityTable } from '@/components/ui/week-availability-update';
-import type { Professor, Subject } from '@/types/api';
-
-import { ProfessorsList } from '../../../features/coord-avail/components/professors-list';
-import { toast } from '../../../hooks/use-toast';
-
+import { ContentLayout } from '@/components/layouts';
+import { ProfessorsList } from '@/features/coord-avail/components/professors-list';
+import { SubjectPossibilities } from '@/features/coord-avail/components/subject-possibilities';
+import { TablePossibilities } from '@/features/coord-avail/components/table-possibilities';
+import { toast } from '@/hooks/use-toast';
+import { Availability, Professor } from '@/types/api';
+type DashboardContext = {
+  setTitle: (title: string) => void;
+};
 export const CoordinatorSuitAvailRoute = () => {
+  const [step, setStep] = useState(1); // Active panel step
   const [selectedSubjects, setSelectedSubjects] = useState<string[]>([]);
   const [selectedProfessor, setSelectedProfessor] =
     useState<Professor | null>();
+  const [availabilities, setAvailabilities] = useState<Availability[]>([]); // Track availability
+  const { setTitle } = useOutletContext<DashboardContext>();
 
   const professorRoleQuery = useProfessorId({
     email: selectedProfessor?.email ?? '',
@@ -30,16 +27,15 @@ export const CoordinatorSuitAvailRoute = () => {
       enabled: !!selectedProfessor?.email,
     },
   });
-
   const professorUserId = professorRoleQuery.data?.userId;
 
   const subjectsQuery = useSubjects({});
-
   const subjectsData = subjectsQuery.data?.subjects;
 
   const updateSubjectsMutation = useUpdateSubjects({
     mutationConfig: {
       onSuccess: () => {
+        setStep(3);
         toast({
           title: 'Success',
           description: 'Subjects updated successfully',
@@ -55,140 +51,98 @@ export const CoordinatorSuitAvailRoute = () => {
     },
   });
 
-  const handleSubjectAdd = (subject: string) => {
-    if (selectedSubjects.includes(subject)) {
-      setSelectedSubjects(selectedSubjects.filter((s) => s !== subject));
-      return;
-    }
-    setSelectedSubjects([...selectedSubjects, subject]);
-  };
-
   useEffect(() => {
+    setTitle('Teachers'); // Set the desired title
     if (selectedProfessor) {
       professorRoleQuery.refetch();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedProfessor]);
+  }, [professorRoleQuery, selectedProfessor, setTitle]);
 
   return (
-    <div>
-      <div className="flex h-screen items-center">
-        <div className="mx-auto max-w-7xl px-4 py-12 text-center sm:px-6 lg:px-8 lg:py-16">
-          <h2 className="p-4 text-3xl font-extrabold tracking-tight text-gray-900 sm:text-4xl">
-            <span className="block">Teachers Availability and Suitability</span>
-          </h2>
-          <p>View and manage teachers availability and suitability</p>
-          <div className="flex items-center justify-center gap-4">
-            <button
-              className="mt-4 rounded bg-gray-200 px-4 py-2 transition duration-300 hover:bg-blue-400 hover:text-white"
-              onClick={() =>
-                document
-                  .getElementById('teachers-table')
-                  ?.scrollIntoView({ behavior: 'smooth' })
-              }
-            >
-              Search a teacher
-            </button>
+    <ContentLayout title="Time Registration">
+      <div>
+        <div className="mb-6 flex items-center justify-center gap-4 sm:flex-wrap md:flex-nowrap md:justify-around">
+          {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/no-static-element-interactions */}
+          <div
+            className={`mx-4 flex h-20 w-full flex-col items-center justify-center rounded-md border-2 p-6 text-center opacity-100 transition-all duration-300 ease-in-out hover:cursor-pointer ${
+              selectedProfessor
+                ? 'border-blue-500 bg-blue-100 hover:bg-blue-200'
+                : 'border-transparent bg-gray-200 hover:bg-gray-300'
+            }`}
+            onClick={() => setStep(1)}
+          >
+            <h4 className="text-lg font-semibold">Select Professor</h4>
+            {selectedProfessor && <p>{selectedProfessor.name}</p>}
           </div>
-        </div>
-      </div>
-      <div
-        id="teachers-table"
-        className="flex min-h-screen items-center justify-center"
-      >
-        <ProfessorsList
-          setSelectedSubjects={setSelectedSubjects}
-          setSelectedProfessor={setSelectedProfessor}
-        />
-      </div>
 
-      <div id="subject-possibilities" className="min-h-screen">
-        <div className="mx-auto max-w-7xl px-4 py-12 text-center sm:px-6 lg:px-8 lg:py-16">
-          <h2 className="p-4 text-2xl font-semibold">Selected Subjects:</h2>
-          <div className="flex flex-wrap justify-center gap-2 text-center">
-            {selectedSubjects.length === 0 ? (
-              <span className="rounded bg-gray-200 px-3 py-1 text-gray-800">
-                No subjects selected
-              </span>
-            ) : (
-              selectedSubjects.map((subject) => (
-                <span
-                  key={subject}
-                  className="flex items-center gap-2 rounded bg-green-400 px-3 py-1"
-                >
-                  {subject}
-                </span>
-              ))
-            )}
+          {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/no-static-element-interactions */}
+          <div
+            className={`mx-4 flex h-20 w-full flex-col items-center justify-center rounded-md border-2 p-6 text-center opacity-100 transition-all duration-300 ease-in-out hover:cursor-pointer ${
+              selectedSubjects.length > 0
+                ? 'border-blue-500 bg-blue-100 hover:bg-blue-200'
+                : 'border-transparent bg-gray-200 hover:bg-gray-300'
+            }`}
+            onClick={() => setStep(2)}
+          >
+            <h4 className="text-lg font-semibold">Select Suitabilities</h4>
+          </div>
+
+          {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/no-static-element-interactions */}
+          <div
+            className={`mx-4 flex h-20 w-full flex-col items-center justify-center rounded-md border-2 p-6 text-center opacity-100 transition-all duration-300 ease-in-out hover:cursor-pointer ${
+              selectedProfessor?.availabilities.length != undefined &&
+              selectedProfessor?.availabilities.length > 0
+                ? 'border-blue-500 bg-blue-100 hover:bg-blue-200'
+                : 'border-transparent bg-gray-200 hover:bg-gray-300'
+            }`}
+            onClick={() => setStep(3)}
+          >
+            <h4 className="text-lg font-semibold">Select Availabilities</h4>
           </div>
         </div>
 
-        <Command className="min-h-[49vh]">
-          <CommandInput placeholder="Type a subject name..." />
-          <CommandList>
-            <CommandEmpty>No results found.</CommandEmpty>
-            <CommandGroup heading="Subjects">
-              {subjectsData?.map((subject: Subject) => (
-                <CommandItem
-                  key={subject.codeSubject}
-                  onSelect={() => handleSubjectAdd(subject.codeSubject)}
-                >
-                  {subject.subjectName}
-                </CommandItem>
-              ))}
-            </CommandGroup>
-          </CommandList>
-        </Command>
-        <div className="flex items-center justify-center gap-4">
-          {selectedProfessor ? (
-            <Button
-              onClick={() => {
-                document
-                  .getElementById('table-possibilities')
-                  ?.scrollIntoView({ behavior: 'smooth' });
-                if (professorUserId !== undefined) {
-                  updateSubjectsMutation.mutate({
-                    userId: professorUserId,
-                    subjectCodes: selectedSubjects,
-                  });
-                } else {
-                  toast({
-                    variant: 'destructive',
-                    title: 'Error',
-                    description: 'User ID is null',
-                  });
-                }
-              }}
-              className="mt-4 rounded bg-gray-400 px-4 py-2 transition duration-300 hover:bg-blue-400 hover:text-white"
-            >
-              Save
-            </Button>
-          ) : (
-            <Button
-              disabled
-              className="mt-4 rounded bg-gray-200 px-4 py-2 text-black transition duration-300"
-            >
-              Save
-            </Button>
+        <div className="grid grid-cols-3 gap-6">
+          {/* Dynamic content */}
+          {step === 1 && (
+            <div className="col-span-3">
+              <div
+                id="teachers-table"
+                className="flex items-center justify-center"
+              >
+                <ProfessorsList
+                  setSelectedSubjects={setSelectedSubjects}
+                  setSelectedProfessor={setSelectedProfessor}
+                  setStep={setStep}
+                />
+              </div>
+            </div>
+          )}
+
+          {step === 2 && (
+            <div className="col-span-3">
+              <SubjectPossibilities
+                subjectsData={subjectsData}
+                selectedSubjects={selectedSubjects}
+                setSelectedSubjects={setSelectedSubjects}
+                selectedProfessor={selectedProfessor}
+                professorUserId={professorUserId}
+                updateSubjectsMutation={updateSubjectsMutation}
+              />
+            </div>
+          )}
+
+          {step === 3 && (
+            <div className="col-span-3">
+              <TablePossibilities
+                professorUserId={professorUserId}
+                selectedProfessor={selectedProfessor}
+                availabilities={availabilities}
+                setAvailabilities={setAvailabilities}
+              />
+            </div>
           )}
         </div>
       </div>
-
-      <div
-        className="mx-auto mt-10 flex min-h-screen max-w-7xl flex-col items-center justify-center p-4 text-center sm:px-6 md:mt-0 lg:px-8 lg:py-10"
-        id="table-possibilities"
-      >
-        <h3 className="mb-4 text-center text-xl font-bold">
-          Set Your Availability
-        </h3>
-        <WeekAvailabilityTable
-          startHour={'07:40'}
-          endHour={'22:30'}
-          initialAvailability={selectedProfessor?.availabilities || []}
-          key={randUuid() + Math.random()}
-          userId={professorUserId ?? 0}
-        />
-      </div>
-    </div>
+    </ContentLayout>
   );
 };

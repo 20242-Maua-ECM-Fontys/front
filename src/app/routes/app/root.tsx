@@ -1,4 +1,4 @@
-import { Suspense } from 'react';
+import { Suspense, useState } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { Outlet, useLocation } from 'react-router-dom';
 
@@ -7,9 +7,11 @@ import { Spinner } from '@/components/ui/spinner';
 import { DashboardLayout } from '../../../components/layouts/dashboard-layout';
 
 export const AppRoot = () => {
+  const [title, setTitle] = useState('Default Dashboard Title');
   const location = useLocation();
+
   return (
-    <DashboardLayout>
+    <DashboardLayout title={title}>
       <Suspense
         fallback={
           <div className="flex size-full items-center justify-center">
@@ -21,7 +23,7 @@ export const AppRoot = () => {
           key={location.pathname}
           fallback={<div>Something went wrong!</div>}
         >
-          <Outlet />
+          <Outlet context={{ setTitle }} />
         </ErrorBoundary>
       </Suspense>
     </DashboardLayout>

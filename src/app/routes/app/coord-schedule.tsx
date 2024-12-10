@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { useEffect, useRef, useState } from 'react';
+import { useOutletContext } from 'react-router';
 
 import { useRole } from '@/api/get-role-by-email';
 import { CalendarView } from '@/components/ui/calendar/calendar-view';
@@ -13,6 +14,9 @@ import {
 } from '@/components/ui/command';
 import { useMsal } from '@azure/msal-react';
 
+type DashboardContext = {
+  setTitle: (title: string) => void;
+};
 export const CoordScheduleRoute = () => {
   interface AvailabilityFullfilled {
     userId: number;
@@ -30,8 +34,14 @@ export const CoordScheduleRoute = () => {
     };
   }
 
+  useEffect(() => {
+    setTitle('Schedule Editor'); // Set the desired title
+  });
+
+
   const { instance } = useMsal();
   const currentAccount = instance.getActiveAccount();
+
 
   const roleQuery = useRole({ email: currentAccount?.username ?? '' });
 
@@ -45,6 +55,7 @@ export const CoordScheduleRoute = () => {
   >([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { setTitle } = useOutletContext<DashboardContext>();
 
   const scheduleTableRef = useRef<HTMLDivElement>(null);
   const calendarViewRef = useRef<HTMLDivElement>(null);

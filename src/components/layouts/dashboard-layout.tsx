@@ -79,11 +79,16 @@ const Progress = () => {
   );
 };
 
-export function DashboardLayout({ children }: { children: React.ReactNode }) {
+export function DashboardLayout({
+  children,
+  title,
+}: {
+  children: React.ReactNode;
+  title?: string;
+}) {
   const navigate = useNavigate();
   const { accounts, instance } = useMsal();
   const { role } = useUser();
-  console.log(role);
 
   useEffect(() => {
     if (accounts.length === 0) {
@@ -113,7 +118,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
         },
         {
           name: 'Time Registration',
-          to: 'time-register',
+          to: 'time-registration',
           icon: Clock3,
         },
       );
@@ -150,7 +155,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
         },
         {
           name: 'Time Registration',
-          to: 'time-register',
+          to: 'time-registration',
           icon: Clock3,
         },
         {
@@ -205,8 +210,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
         </nav>
       </aside>
       <div className="flex flex-col sm:gap-4 sm:py-4 sm:pl-60">
-        <header className="sticky top-0 z-30 flex h-14 items-center justify-between gap-4 border-b bg-background px-4 sm:static sm:h-auto sm:justify-end sm:border-0 sm:bg-transparent sm:px-6">
-          <Progress />
+        <header className="sticky top-0 z-30 flex h-14 items-center justify-between gap-4 border-b bg-background px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6">
           <Drawer>
             <DrawerTrigger asChild>
               <Button size="icon" variant="outline" className="sm:hidden">
@@ -245,6 +249,12 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
               </nav>
             </DrawerContent>
           </Drawer>
+          <h1 className="text-lg font-bold text-gray-800 sm:text-2xl">
+            {title || 'Default Title'} {/* Default fallback */}
+          </h1>
+          <Progress />
+          <Progress />
+
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
