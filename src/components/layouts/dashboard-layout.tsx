@@ -1,16 +1,16 @@
 import { useMsal } from '@azure/msal-react';
 import {
+  Calendar,
+  CalendarClock,
+  Clock3,
+  GraduationCap,
   Home,
   PanelLeft,
-  User2,
-  Clock3,
-  CalendarClock,
-  GraduationCap,
   Upload,
-  Calendar,
+  User2,
 } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
-import { useNavigate, NavLink, useNavigation } from 'react-router-dom';
+import { NavLink, useNavigate, useNavigation } from 'react-router-dom';
 
 import { Button } from '@/components/ui/button';
 import { Drawer, DrawerContent, DrawerTrigger } from '@/components/ui/drawer';
@@ -124,11 +124,23 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
         icon: CalendarClock,
       });
     } else if (role === 'COORDINATOR') {
-      baseItems.push({
-        name: 'Teachers',
-        to: 'coord-suitavail',
-        icon: GraduationCap,
-      });
+      baseItems.push(
+        {
+          name: 'Availability',
+          to: 'teacher-suitavail',
+          icon: CalendarClock,
+        },
+        {
+          name: 'Teachers',
+          to: 'coord-suitavail',
+          icon: GraduationCap,
+        },
+        {
+          name: 'Schedule Edit',
+          to: 'coord-schedule',
+          icon: Calendar,
+        },
+      );
     } else if (role === 'ADMIN') {
       baseItems.push(
         {
