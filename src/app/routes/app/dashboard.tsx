@@ -1,11 +1,22 @@
 import { useMsal } from '@azure/msal-react';
+import { useEffect } from 'react';
+import { useOutletContext } from 'react-router-dom';
 
 import { ContentLayout } from '@/components/layouts';
 import AnimatedGridPattern from '@/components/ui/animated-grid-pattern';
 
+type DashboardContext = {
+  // set title to empty string
+  setTitle: (title: string) => void;
+};
+
 export const DashboardRoute = () => {
   const { accounts } = useMsal();
+  const { setTitle } = useOutletContext<DashboardContext>();
 
+  useEffect(() => {
+    setTitle('Dashboard'); // Set the desired title
+  }, [setTitle]);
   return (
     <ContentLayout title="Dashboard">
       <AnimatedGridPattern className="fixed inset-0 inset-y-[-30%] z-0 h-[200%] w-full skew-y-12 opacity-30" />

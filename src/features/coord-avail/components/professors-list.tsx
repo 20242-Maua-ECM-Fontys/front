@@ -13,11 +13,13 @@ import { useProfessors } from '../api/get-professors';
 type ProfessorsListProps = {
   setSelectedSubjects: (subjects: string[]) => void;
   setSelectedProfessor: (professor: Professor) => void;
+  setStep: React.Dispatch<React.SetStateAction<number>>;
 };
 
 export const ProfessorsList = ({
   setSelectedSubjects,
   setSelectedProfessor,
+  setStep,
 }: ProfessorsListProps) => {
   const professorsQuery = useProfessors({});
   const professors = professorsQuery.data?.professors;
@@ -28,7 +30,7 @@ export const ProfessorsList = ({
     professorsQuery.refetch();
   };
   return (
-    <div className="flex size-full p-4">
+    <div className="flex w-full p-4">
       <Command className="min-h-[56vh]">
         <h2 className="p-4 text-2xl font-semibold">Professors</h2>
         <CommandInput placeholder="Type a professor name..." />
@@ -41,9 +43,7 @@ export const ProfessorsList = ({
                   key={professorId}
                   onSelect={() => {
                     handleProfessorSelect(professors[Number(professorId)]);
-                    document
-                      .getElementById('subject-possibilities')
-                      ?.scrollIntoView({ behavior: 'smooth' });
+                    setStep(2);
                   }}
                 >
                   {professors[Number(professorId)].name}

@@ -1,108 +1,24 @@
 import { ArrowLeft, ArrowRight } from 'lucide-react';
-import { useState } from 'react';
 
-import { Button } from '@/components/ui/button';
-
-import { useNotifications } from '../../../components/ui/notifications';
-import { useCreateStaffAvailability } from '../api/create-staff-availability';
-import type { Availability, TimeSlot, WeekDays } from '../types/availability';
-import {
-  convertTimeStringToDecimal,
-  generateCustomTimeIntervals,
-} from '../utils/create-staff-availability';
+import { WeekDays } from '@/features/time-registration/types/availability';
 
 export type CreateStaffAvailabilityProps = {
-  startHour: string;
-  endHour: string;
-  resetAvailability?: boolean;
-  scheduleId: string;
-};
-
-const initialAvailability: Availability = {
-  MON: [],
-  TUE: [],
-  WED: [],
-  THU: [],
-  FRI: [],
-  SAT: [],
-};
-
-// eg: { Monday: ['08:00 - 08:10', '08:20 - 08:30'], Tuesday: ['08:00 - 08:10'] }
-const formatAvailability = (
-  availability: Availability,
-): Partial<Record<WeekDays, { notEarlier: number; notLater: number }>> => {
-  const formattedAvailability: Partial<
-    Record<WeekDays, { notEarlier: number; notLater: number }>
-  > = {};
-
-  Object.keys(availability).forEach((day) => {
-    const dayAvailability = availability[day as WeekDays];
-    if (dayAvailability.length > 0) {
-      dayAvailability.sort((a, b) => {
-        const [hourA, minuteA] = a.split(' - ')[0].split(':').map(Number);
-        const [hourB, minuteB] = b.split(' - ')[0].split(':').map(Number);
-        return hourA - hourB || minuteA - minuteB;
-      });
-
-      const firstTime = dayAvailability[0].split(' - ')[0];
-      const lastTime =
-        dayAvailability[dayAvailability.length - 1].split(' - ')[1];
-
-      const [firstHour, firstMinute] = firstTime.split(':').map(Number);
-      const [lastHour, lastMinute] = lastTime.split(':').map(Number);
-
-      const notEarlier = firstHour * 60 + firstMinute;
-      const notLater = lastHour * 60 + lastMinute;
-
-      formattedAvailability[day as WeekDays] = {
-        notEarlier,
-        notLater,
-      };
-    }
-  });
-
-  return formattedAvailability;
+  timeIntervals: string[];
+  availability: Record<WeekDays, string[]>;
+  initialAvailability: Record<WeekDays, string[]>;
+  setVisibleDayIndex: React.Dispatch<React.SetStateAction<number>>;
+  toggleTimeSlot: (day: WeekDays, interval: string) => void;
+  visibleDayIndex: number;
 };
 
 export const CreateStaffAvailability = ({
-  startHour,
-  endHour,
-  scheduleId,
+  timeIntervals,
+  availability,
+  initialAvailability,
+  setVisibleDayIndex,
+  toggleTimeSlot,
+  visibleDayIndex,
 }: CreateStaffAvailabilityProps) => {
-  const { addNotification } = useNotifications();
-  const [availability, setAvailability] =
-    useState<Availability>(initialAvailability);
-  const [visibleDayIndex, setVisibleDayIndex] = useState<number>(0);
-
-  const startHourDecimal = convertTimeStringToDecimal(startHour);
-  const endHourDecimal = convertTimeStringToDecimal(endHour);
-
-  const timeIntervals = generateCustomTimeIntervals(
-    startHourDecimal,
-    endHourDecimal,
-  );
-
-  const createStaffAvailabilityMutation = useCreateStaffAvailability({
-    mutationConfig: {
-      onSuccess: () => {
-        addNotification({
-          type: 'success',
-          title: 'Availability registered with success',
-        });
-      },
-    },
-  });
-
-  const toggleTimeSlot = (day: WeekDays, timeSlot: TimeSlot) => {
-    setAvailability((prevAvailability) => {
-      const dayAvailability = prevAvailability[day];
-      const newDayAvailability = dayAvailability.includes(timeSlot)
-        ? dayAvailability.filter((slot) => slot !== timeSlot)
-        : [...dayAvailability, timeSlot];
-      return { ...prevAvailability, [day]: newDayAvailability };
-    });
-  };
-
   return (
     <div className="container p-4">
       <div className="mb-2 flex justify-center md:hidden">
@@ -183,20 +99,6 @@ export const CreateStaffAvailability = ({
               ))}
             </tbody>
           </table>
-
-          <div className="flex w-full justify-end pt-4">
-            <Button
-              onClick={() => {
-                createStaffAvailabilityMutation.mutate({
-                  scheduleId: scheduleId,
-                  data: formatAvailability(availability),
-                });
-              }}
-              size="lg"
-            >
-              Submit
-            </Button>
-          </div>
         </div>
       </div>
     </div>

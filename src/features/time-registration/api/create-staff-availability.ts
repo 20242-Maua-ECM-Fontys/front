@@ -1,8 +1,8 @@
 import { useMutation } from '@tanstack/react-query';
 
 import { api } from '@/lib/api-client';
+import type { MutationConfig } from '@/lib/react-query';
 
-import type { MutationConfig } from '../../../lib/react-query';
 import type { WeekDays } from '../types/availability';
 
 export const createStaffAvailability = ({
